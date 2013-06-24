@@ -7,8 +7,8 @@ For issue tracking see the GitHub issues page: https://github.com/DeployGate/gra
 ### This plugin is published in preparation to the Maven Central Repository
 
 ### Tasks
-apkUpload          - Upload the apk file to deploygate
-distributionUpdate - Apk upload and distribution update
+apkUpload          - Upload the apk file to deploygate  
+distributionUpdate - Apk upload and distribution update  
 
 ### Edit build.gradle
 
