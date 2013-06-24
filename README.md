@@ -1,7 +1,7 @@
 This is the DeployGate plugin for the Gradle.  
 This plugin, you can use the deploygate API from Gradle easily.
 
-For issue tracking see the GitHub issues page: https://github.com/deploygate/gradle-deploygate-plugin/issues
+For issue tracking see the GitHub issues page: https://github.com/DeployGate/gradle-deploygate-plugin/issues
 
 ## Licence
 Copyright 2012 DeployGate, henteko
