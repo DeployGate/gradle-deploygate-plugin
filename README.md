@@ -1,11 +1,11 @@
 This is the DeployGate plugin for the Gradle.  
 This plugin, you can use the deploygate API from Gradle easily.
 
+### Please check [document](https://deploygate.com/docs/gradle) for usage.
+
 For issue tracking see the GitHub issues page: https://github.com/DeployGate/gradle-deploygate-plugin/issues
 
 ## Usage
-### This plugin is published in preparation to the Maven Central Repository
-
 ### Tasks
 apkUpload          - Upload the apk file to deploygate  
 distributionUpdate - Apk upload and distribution update  
@@ -25,16 +25,20 @@ buildscript {
 apply plugin: 'deploygate'
 
 deploygate {
-  userName "<deploygate user name>"
-  apkPath "<apk file path>"
-  token "<deploygate api key>"
-  message "message(optional)"
-  distributionKey "<deploygate distribution key(distributionUpdate task)>"
-  releaseNote "release note(distributionUpdate task optional)"
+  userName "[owner name]"
+  apkPath "[apk file path]"
+  token "[token]"
+  message "sample"
+
+  //Below is optional
+  distributionKey "[distribution_key]"
+  releaseNote "release note sample"
 }
 ```
+Replace [owner name] [apk file path] [token] [distribution_key] with your param.  
+Please check [Push API](https://deploygate.com/docs/api) for param information. 
 
-### run
+### Run
 
 ```
 $ gradle apkUpload
@@ -44,7 +48,6 @@ or
 ```
 $ gradle distributionUpdate 
 ```
-
 
 ## Licence
 Copyright 2012 DeployGate, henteko
