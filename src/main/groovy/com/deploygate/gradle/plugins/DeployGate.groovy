@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins
 
+import org.gradle.api.GradleException;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.apache.http.protocol.HTTP
@@ -21,32 +22,67 @@ import java.nio.charset.Charset
 class DeployGate implements Plugin<Project> {
     void apply(Project target) {
         target.extensions.create('deploygate', DeployGateExtension)
-        def apkUpload = target.task('apkUpload') << {
+        def apkUpload = target.task('uploadDeployGate') << {
             HashMap<String, String> params = setBaseParams(target)
             JSONObject json = httpPost(params)
+            errorHandling(json) 
+
             println json.toString() 
         }
         apkUpload.group = 'DeployGate' 
         apkUpload.description = 'Upload the apk file to deploygate'
 
-        def distributionUpdate = target.task('distributionUpdate') << {
+        def distributionUpdate = target.task('updateDeployGateDistribution') << {
+            String distributionKey = target.deploygate.distributionKey
+            String releaseNote = target.deploygate.releaseNote
+            if(distributionKey == null || distributionKey == '') {
+                throw new GradleException('distributionKey is missing. Please enter the distributionKey.')
+            }
+            if(releaseNote == null) {
+                releaseNote = ''
+            }
+            
             HashMap<String, String> params = setBaseParams(target)
-            params.put("distribution_key", target.deploygate.distributionKey)
+            params.put("distribution_key", distributionKey)
             params.put("release_note", target.deploygate.releaseNote)
 
             JSONObject json = httpPost(params)
+            errorHandling(json) 
+
             println json.toString()
         }
         distributionUpdate.group = 'DeployGate' 
         distributionUpdate.description = 'Apk upload and distribution update'
     }
 
-    private HashMap<String, String> setBaseParams(Project target) {
-        String endPoint = "https://deploygate.com/api/users/${target.deploygate.userName}/apps"
+    private void errorHandling(JSONObject json) {
+        if(json['error'] == true) {
+            throw new GradleException('error massage: ' + json['message'])
+        }
+    }
 
+    private HashMap<String, String> setBaseParams(Project target) {
+        String userName = target.deploygate.userName
+        String apkPath = target.deploygate.apkPath
+        String token = target.deploygate.token
+        String message = target.deploygate.message
+        if(userName == null || userName == '') {
+            throw new GradleException('userName is missing. Please enter the userName.')
+        }
+        if(apkPath == null || apkPath == '') {
+            throw new GradleException('apkPath is missing. Please enter the apkPath.')
+        }
+        if(token == null || token == '') {
+            throw new GradleException('token is missing. Please enter the token.')
+        }
+        if(message == null) {
+            message = ''
+        }
+
+        String endPoint = "https://deploygate.com/api/users/${userName}/apps"
         HashMap<String, String> params = new HashMap<String, String>()
-        params.put("file", target.deploygate.apkPath)
-        params.put("token", target.deploygate.token)
+        params.put("file", apkPath)
+        params.put("token", token)
         params.put("message", target.deploygate.message)
         params.put("endPoint", endPoint)
         
