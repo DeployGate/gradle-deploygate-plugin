@@ -41,7 +41,7 @@ class DeployGate implements Plugin<Project> {
             }
         }
         apkUpload.group = 'DeployGate' 
-        apkUpload.description = 'Upload the apk file to deploygate'
+        apkUpload.description = 'Upload the apk file to deploygate and distribution update'
     }
 
     private void errorHandling(Apk apk, JSONObject json) {
