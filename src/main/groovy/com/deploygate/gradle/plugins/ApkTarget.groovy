@@ -9,15 +9,15 @@ import org.gradle.plugins.binaries.model.NativeDependencyCapableSourceSet;
 import org.gradle.plugins.binaries.model.NativeDependencySet
 
 class ApkTarget implements Named {
-  String name
-  ProjectInternal target 
-  File sourceFile
-  String message
-  String distributionKey
-  String releaseNote
-  public ApkTarget(String name) {
-    super()
-    this.name = name
-    this.target = target
-  }
+    String name
+    ProjectInternal target 
+    File sourceFile
+    String message
+    String distributionKey
+    String releaseNote
+    public ApkTarget(String name) {
+      super()
+      this.name = name
+      this.target = target
+    }
 }
