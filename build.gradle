@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
-version = '0.2'
+version = '0.3'
 
 repositories {
   mavenCentral()
@@ -36,6 +36,22 @@ artifacts {
   archives sourcesJar
 }
 
+// local upload
+/*
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      repository(url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath)
+    }
+  }
+}
+*/
+
+// central upload 
 if (gradle.startParameter.taskNames.contains('uploadArchives')) {
-    apply from: 'build.publish.gradle'
+  apply from: 'build.publish.gradle'
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.7'
 }
