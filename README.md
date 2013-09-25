@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
+
 This is the DeployGate plugin for the Gradle.  
 This plugin, you can use the deploygate API from Gradle easily.
 

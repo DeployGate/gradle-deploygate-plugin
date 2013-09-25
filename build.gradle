@@ -37,6 +37,7 @@ artifacts {
 }
 
 // local upload
+/*
 uploadArchives {
   repositories {
     mavenDeployer {
@@ -44,13 +45,12 @@ uploadArchives {
     }
   }
 }
+*/
 
 // central upload 
-/*
 if (gradle.startParameter.taskNames.contains('uploadArchives')) {
   apply from: 'build.publish.gradle'
 }
-*/
 
 task wrapper(type: Wrapper) {
   gradleVersion = '1.7'
