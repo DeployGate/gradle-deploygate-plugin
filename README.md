@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
+
 This is the DeployGate plugin for the Gradle.  
 This plugin, you can use the deploygate API from Gradle easily.
 
@@ -7,8 +9,7 @@ For issue tracking see the GitHub issues page: https://github.com/DeployGate/gra
 
 ## Usage
 ### Tasks
-uploadDeployGate          - Upload the apk file to deploygate  
-updateDeployGateDistribution - Apk upload and distribution update  
+uploadDeployGate          - Upload the apk file to deploygate and distribution update
 
 ### Edit build.gradle
 
@@ -19,20 +20,30 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:0.2'
+    classpath 'com.deploygate:gradle:0.3'
   }
 }
 apply plugin: 'deploygate'
 
 deploygate {
-  userName "[owner name]"
-  apkPath "[apk file path]"
-  token "[token]"
-  message "sample"
+  userName = "[owner name]"
+  token = "[token]"
 
-  //Below is optional
-  distributionKey "[distribution_key]"
-  releaseNote "release note sample"
+  apks {
+    test_upload1 {
+      sourceFile = file("[apk1 file path]")
+      message = "test upload1 sample"
+    }
+
+    test_upload2 {
+      sourceFile = file("[apk2 file path]")
+      message = "test upload2 sample"
+
+      //Below is optional
+      distributionKey = "[distribution_key]"
+      releaseNote = "release note sample"
+    }
+  }
 }
 ```
 Replace [owner name] [apk file path] [token] [distribution_key] with your param.  
@@ -42,11 +53,6 @@ Please check [Push API](https://deploygate.com/docs/api) for param information.
 
 ```
 $ gradle uploadDeployGate 
-```
-or
-
-```
-$ gradle updateDeployGateDistribution 
 ```
 
 ## License
