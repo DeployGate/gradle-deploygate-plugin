@@ -29,10 +29,12 @@ class Apk {
         return params
     }
 
-    public static List<Apk> getApks(Project target) {
+    public static List<Apk> getApks(Project target, String searchApkName = "") {
         List<Apk> apks = []
         for (_apk in target.deploygateApks) {
             String name = _apk.name
+            if(searchApkName != "" && searchApkName != name) continue
+
             File file = null
             String message = ""
             String distributionKey = null
