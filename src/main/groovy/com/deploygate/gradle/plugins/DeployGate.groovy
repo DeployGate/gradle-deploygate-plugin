@@ -8,9 +8,9 @@ class DeployGate implements Plugin<Project> {
     void apply(Project project) {
         def apks = project.container(ApkTarget) {
             String apkName = it.toString()
-            def userTask = project.task("${apkName}UploadDeployGate", type: DeployGateUserUploadTask)
+            def userTask = project.task("uploadDeployGate${apkName}", type: DeployGateUserUploadTask)
             userTask.group = 'DeployGate' 
-            userTask.description = "Upload the ${apkName} APK file"
+            userTask.description = "Upload an APK file of ${apkName}" 
             userTask.apkName = apkName
 
             project.extensions.create(it, ApkTarget, apkName)

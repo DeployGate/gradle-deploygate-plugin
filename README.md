@@ -10,8 +10,7 @@ For issue tracking see the GitHub issues page: https://github.com/DeployGate/gra
 ## Usage
 ### Tasks
 * uploadDeployGate              - Uploads the APK file. Also updates the distribution specified by distributionKey if configured
-* test1UploadDeployGate  - Upload the test1 APK file (User custom task)
-* test2UploadDeployGate  - Upload the test2 APK file (User custom task)
+* uploadDeployGate<FlavorName>  - Upload an APK file of <FlavorName>
 
 ### Edit build.gradle
 
@@ -32,12 +31,12 @@ deploygate {
   token = "[token]"
 
   apks {
-    test1 {
+    Release {
       sourceFile = file("[apk1 file path]")
       message = "test upload1 sample"
     }
 
-    test2 {
+    Debug {
       sourceFile = file("[apk2 file path]")
       message = "test upload2 sample"
 
