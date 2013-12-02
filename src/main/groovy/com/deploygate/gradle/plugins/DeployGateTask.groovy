@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins
 
-import org.gradle.api.GradleException;
+import org.gradle.api.GradleException
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.apache.http.protocol.HTTP
