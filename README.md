@@ -9,7 +9,9 @@ For issue tracking see the GitHub issues page: https://github.com/DeployGate/gra
 
 ## Usage
 ### Tasks
-uploadDeployGate          - Upload the apk file to deploygate and distribution update
+uploadDeployGate              - Uploads the APK file. Also updates the distribution specified by distributionKey if configured
+test_upload1UploadDeployGate  - Upload the test_upload1 APK file (User custom task)
+test_upload2UploadDeployGate  - Upload the test_upload2 APK file (User custom task)
 
 ### Edit build.gradle
 
@@ -20,7 +22,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:0.3'
+    classpath 'com.deploygate:gradle:0.4'
   }
 }
 apply plugin: 'deploygate'
@@ -53,6 +55,13 @@ Please check [Push API](https://deploygate.com/docs/api) for param information.
 
 ```
 $ gradle uploadDeployGate 
+```
+
+or
+
+```
+$ gradle test_upload1UploadDeployGate
+$ gradle test_upload2UploadDeployGate
 ```
 
 ## License
