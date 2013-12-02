@@ -10,7 +10,7 @@ For issue tracking see the GitHub issues page: https://github.com/DeployGate/gra
 ## Usage
 ### Tasks
 * uploadDeployGate              - Uploads the APK file. Also updates the distribution specified by distributionKey if configured
-* uploadDeployGate<FlavorName>  - Upload an APK file of <FlavorName>
+* uploadDeployGate[FlavorName]  - Upload an APK file of [FlavorName]
 
 ### Edit build.gradle
 
