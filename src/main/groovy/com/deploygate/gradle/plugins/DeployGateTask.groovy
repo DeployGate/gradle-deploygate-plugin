@@ -1,8 +1,7 @@
 package com.deploygate.gradle.plugins
 
-import org.gradle.api.GradleException;
+import org.gradle.api.GradleException
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
 import org.gradle.api.Project
 import org.apache.http.protocol.HTTP
 import org.apache.http.HttpEntity
@@ -23,9 +22,7 @@ import java.nio.charset.Charset
 class DeployGateTask extends DefaultTask {
     private final String API_END_POINT = "https://deploygate.com/api"
 
-    @TaskAction
-    def uploadDeployGate() {
-        List<Apk> apks = Apk.getApks(project)
+    private void upload(Project project, List<Apk> apks) {
         String endPoint = getEndPoint(project)
         String token = getToken(project)
 
@@ -36,7 +33,7 @@ class DeployGateTask extends DefaultTask {
             println "${apk.name} result: ${json.toString()}"
         }
     }
-    
+
     private void errorHandling(Apk apk, JSONObject json) {
         if(json['error'] == true) {
             throw new GradleException("${apk.name} error massage: ${json['message']}")

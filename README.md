@@ -9,7 +9,8 @@ For issue tracking see the GitHub issues page: https://github.com/DeployGate/gra
 
 ## Usage
 ### Tasks
-uploadDeployGate          - Upload the apk file to deploygate and distribution update
+* uploadDeployGate              - Uploads the APK file. Also updates the distribution specified by distributionKey if configured
+* uploadDeployGate[FlavorName]  - Upload an APK file of [FlavorName]
 
 ### Edit build.gradle
 
@@ -20,7 +21,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:0.3'
+    classpath 'com.deploygate:gradle:0.4'
   }
 }
 apply plugin: 'deploygate'
@@ -30,12 +31,12 @@ deploygate {
   token = "[token]"
 
   apks {
-    test_upload1 {
+    Release {
       sourceFile = file("[apk1 file path]")
       message = "test upload1 sample"
     }
 
-    test_upload2 {
+    Debug {
       sourceFile = file("[apk2 file path]")
       message = "test upload2 sample"
 
@@ -55,8 +56,14 @@ Please check [Push API](https://deploygate.com/docs/api) for param information.
 $ gradle uploadDeployGate 
 ```
 
+or
+
+```
+$ gradle uploadDeployGate[FlavorName]
+```
+
 ## License
-Copyright 2012 DeployGate, henteko
+Copyright 2012-2013 DeployGate, henteko
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
