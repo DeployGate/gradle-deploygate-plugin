@@ -59,8 +59,7 @@ $ gradle uploadDeployGate
 or
 
 ```
-$ gradle test_upload1UploadDeployGate
-$ gradle test_upload2UploadDeployGate
+$ gradle uploadDeployGate[FlavorName]
 ```
 
 ## License
