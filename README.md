@@ -21,7 +21,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:0.4'
+    classpath 'com.deploygate:gradle:0.5'
   }
 }
 apply plugin: 'deploygate'
