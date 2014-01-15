@@ -3,8 +3,6 @@
 This is the DeployGate plugin for the Gradle.  
 This plugin, you can use the deploygate API from Gradle easily.
 
-### Please check [document](https://deploygate.com/docs/gradle) for usage.
-
 For issue tracking see the GitHub issues page: https://github.com/DeployGate/gradle-deploygate-plugin/issues
 
 ## Usage
