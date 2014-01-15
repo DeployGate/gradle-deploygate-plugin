@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
-version = '0.4'
+version = '0.5'
 
 repositories {
   mavenCentral()
@@ -12,10 +12,8 @@ repositories {
 dependencies {
   compile gradleApi()
   groovy localGroovy()
-  compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.0' 
   compile 'org.json:json:20090211'
   compile 'org.apache.httpcomponents:httpmime:4.2.5'
-  runtime 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.0' 
   runtime 'org.json:json:20090211'
   runtime 'org.apache.httpcomponents:httpmime:4.2.5'
 }
@@ -53,5 +51,5 @@ if (gradle.startParameter.taskNames.contains('uploadArchives')) {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '1.7'
+  gradleVersion = '1.9'
 }
