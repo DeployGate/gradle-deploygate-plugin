@@ -19,7 +19,9 @@ class Apk {
 
     public HashMap<String, String> getParams() {
         HashMap<String, String> params = new HashMap<String, String>()
-        params.put("message", message)
+        if(message != null) {
+            params.put("message", message)
+        }
         if(distributionKey != null) {
             params.put("distribution_key", distributionKey)
         }

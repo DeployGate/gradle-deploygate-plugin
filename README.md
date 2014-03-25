@@ -31,14 +31,13 @@ deploygate {
   apks {
     Release {
       sourceFile = file("[apk1 file path]")
-      message = "test upload1 sample"
     }
 
     Debug {
       sourceFile = file("[apk2 file path]")
-      message = "test upload2 sample"
 
       //Below is optional
+      message = "test upload2 sample"
       distributionKey = "[distribution_key]"
       releaseNote = "release note sample"
     }
@@ -61,7 +60,7 @@ $ gradle uploadDeployGate[FlavorName]
 ```
 
 ## License
-Copyright 2012-2013 DeployGate, henteko
+Copyright 2012-2014 DeployGate, henteko
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
