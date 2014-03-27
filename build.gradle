@@ -12,8 +12,10 @@ repositories {
 dependencies {
   compile gradleApi()
   groovy localGroovy()
+  compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
   compile 'org.json:json:20090211'
   compile 'org.apache.httpcomponents:httpmime:4.2.5'
+  runtime 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
   runtime 'org.json:json:20090211'
   runtime 'org.apache.httpcomponents:httpmime:4.2.5'
 }
