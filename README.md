@@ -19,7 +19,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:0.5'
+    classpath 'com.deploygate:gradle:0.6'
   }
 }
 apply plugin: 'deploygate'
@@ -29,11 +29,11 @@ deploygate {
   token = "[token]"
 
   apks {
-    Release {
+    release {
       sourceFile = file("[apk1 file path]")
     }
 
-    Debug {
+    debug {
       sourceFile = file("[apk2 file path]")
 
       //Below is optional

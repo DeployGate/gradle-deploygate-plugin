@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
-version = '0.5'
+version = '0.6'
 
 repositories {
   mavenCentral()
