@@ -3,11 +3,12 @@ package com.deploygate.gradle.plugins
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.apache.commons.lang.WordUtils
 
 class DeployGate implements Plugin<Project> {
     void apply(Project project) {
         def apks = project.container(ApkTarget) {
-            String apkName = it.toString()
+            String apkName = WordUtils.capitalize(it.toString())
             def userTask = project.task("uploadDeployGate${apkName}", type: DeployGateUserUploadTask)
             userTask.group = 'DeployGate' 
             userTask.description = "Upload an APK file of ${apkName}" 
