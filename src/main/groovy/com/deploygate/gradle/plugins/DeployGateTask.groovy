@@ -29,14 +29,14 @@ class DeployGateTask extends DefaultTask {
         HashMap<String, JSONObject> result = httpPost(endPoint, token, apks)
         for(Apk apk in apks) {
             JSONObject json = result.get(apk.name)
-            errorHandling(apk, json) 
+            errorHandling(apk, json)
             println "${apk.name} result: ${json.toString()}"
         }
     }
 
     private void errorHandling(Apk apk, JSONObject json) {
         if(json['error'] == true) {
-            throw new GradleException("${apk.name} error massage: ${json['message']}")
+            throw new GradleException("${apk.name} error message: ${json['message']}")
         }
     }
 
@@ -58,7 +58,7 @@ class DeployGateTask extends DefaultTask {
     }
 
     private HashMap<String, JSONObject> httpPost(String endPoint, String token, List<Apk> apks) {
-        HashMap<String, JSONObject> result = new HashMap<String, JSONObject>() 
+        HashMap<String, JSONObject> result = new HashMap<String, JSONObject>()
         for(Apk apk in apks) {
             HttpClient httpclient = new DefaultHttpClient()
             HttpPost httppost = new HttpPost(endPoint)
@@ -69,7 +69,7 @@ class DeployGateTask extends DefaultTask {
             request_entity.addPart("file", new FileBody(file.getAbsoluteFile()))
             request_entity.addPart("token", new StringBody(token, charset))
 
-            HashMap<String, String> params = apk.getParams() 
+            HashMap<String, String> params = apk.getParams()
             for (String key : params.keySet()) {
                 request_entity.addPart(key, new StringBody(params.get(key), charset))
             }
@@ -89,6 +89,6 @@ class DeployGateTask extends DefaultTask {
                 }
             }
         }
-        return result 
+        return result
     }
 }
