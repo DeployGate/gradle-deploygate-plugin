@@ -3,6 +3,7 @@ package com.deploygate.gradle.plugins
 import org.gradle.api.GradleException
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.apache.http.HttpHost
 import org.apache.http.protocol.HTTP
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
@@ -15,12 +16,16 @@ import org.apache.http.message.BasicNameValuePair
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.entity.mime.content.FileBody
+import org.apache.http.conn.params.ConnRoutePNames
 import java.util.HashMap
 import org.json.JSONObject
 import java.nio.charset.Charset
 
 class DeployGateTask extends DefaultTask {
     private final String API_END_POINT = "https://deploygate.com/api"
+    private final String PROP_PROXY_HOST = "https.proxyHost"
+    private final String PROP_PROXY_PORT = "https.proxyPort"
+
 
     private void upload(Project project, List<Apk> apks) {
         String endPoint = getEndPoint(project)
@@ -57,10 +62,25 @@ class DeployGateTask extends DefaultTask {
         return endPoint
     }
 
+    private void setProxy(HttpClient httpclient) {
+        Properties systemProps = System.properties
+        String hostProp = systemProps.getProperty(PROP_PROXY_HOST)
+        String portProp = systemProps.getProperty(PROP_PROXY_PORT)
+
+        if (hostProp != null && portProp != null) {
+            int port = Integer.valueOf(portProp)
+            HttpHost proxy = new HttpHost(hostProp, port, "http")
+            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+        }
+    }
+
     private HashMap<String, JSONObject> httpPost(String endPoint, String token, List<Apk> apks) {
         HashMap<String, JSONObject> result = new HashMap<String, JSONObject>()
         for(Apk apk in apks) {
             HttpClient httpclient = new DefaultHttpClient()
+
+            setProxy(httpclient)
+
             HttpPost httppost = new HttpPost(endPoint)
             MultipartEntity request_entity = new MultipartEntity()
             Charset charset = Charset.forName(HTTP.UTF_8)
