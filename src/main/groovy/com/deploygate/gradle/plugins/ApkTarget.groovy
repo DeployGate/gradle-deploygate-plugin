@@ -10,6 +10,7 @@ class ApkTarget implements Named {
     String message
     String distributionKey
     String releaseNote
+    String visibility
     public ApkTarget(String name) {
       super()
       this.name = name
