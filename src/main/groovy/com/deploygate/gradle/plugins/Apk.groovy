@@ -8,13 +8,15 @@ class Apk {
     String message
     String distributionKey
     String releaseNote
+    String visibility
 
-    public Apk(String name, File file, String message = "", String distributionKey = null, String releaseNote = null) {
+    public Apk(String name, File file, String message = "", String distributionKey = null, String releaseNote = null, String visibility = "private") {
         this.name = name
         this.file = file
         this.message = message
         this.distributionKey = distributionKey
         this.releaseNote = releaseNote
+        this.visibility = visibility
     }
 
     public HashMap<String, String> getParams() {
@@ -27,6 +29,9 @@ class Apk {
         }
         if(releaseNote != null) {
             params.put("release_note", releaseNote)
+        }
+        if(visibility != null) {
+            params.put("visibility", visibility)
         }
         return params
     }
@@ -41,6 +46,7 @@ class Apk {
             String message = ""
             String distributionKey = null
             String releaseNote = null
+            String visibility = "private"
 
             if(_apk.hasProperty("sourceFile")) {
                 file = _apk.sourceFile
@@ -54,8 +60,11 @@ class Apk {
             if(_apk.hasProperty("releaseNote")) {
                 releaseNote = _apk.releaseNote 
             }
+            if(_apk.hasProperty("visibility")) {
+                visibility = _apk.visibility
+            }
 
-            Apk apk = new Apk(name, file, message, distributionKey, releaseNote)
+            Apk apk = new Apk(name, file, message, distributionKey, releaseNote, visibility)
             apks.add(apk)
         }
         return apks

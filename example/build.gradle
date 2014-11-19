@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.deploygate:gradle:0.6'
+        classpath 'com.deploygate:gradle:0.6.1'
     }
 }
 apply plugin: 'deploygate'
@@ -19,6 +19,7 @@ deploygate {
 
             //Below is optional
             message = "example upload deploygate sample apk"
+            visibility = "public" // public or private
         }
     }
 }
