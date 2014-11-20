@@ -1,0 +1,8 @@
+signing.keyId=keyID
+signing.secretKeyRingFile=filePath
+sonatypeUsername=yourName
+sonatypeFullname=yourFullName
+
+jdkVersion=1.7
+projectUrl=https://github.com/DeployGate/gradle-deploygate-plugin
+github=git@github.com:DeployGate/gradle-deploygate-plugin.git
