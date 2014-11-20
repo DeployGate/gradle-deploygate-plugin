@@ -5,6 +5,11 @@ This plugin, you can use the deploygate API from Gradle easily.
 
 For issue tracking see the GitHub issues page: https://github.com/DeployGate/gradle-deploygate-plugin/issues
 
+## Update
+### ver 0.6.1
+* Fix error message
+* Supported Push API visibility option
+
 ## Usage
 ### Tasks
 * uploadDeployGate              - Uploads the APK file. Also updates the distribution specified by distributionKey if configured
@@ -19,7 +24,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:0.6'
+    classpath 'com.deploygate:gradle:0.6.1'
   }
 }
 apply plugin: 'deploygate'
@@ -38,6 +43,7 @@ deploygate {
 
       //Below is optional
       message = "test upload2 sample"
+      visibility = "public" // default private
       distributionKey = "[distribution_key]"
       releaseNote = "release note sample"
     }
