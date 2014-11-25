@@ -6,9 +6,9 @@ import org.junit.Test
 
 import static org.junit.Assert.assertTrue
 
-class SampleTest {
+class ApplyPluginTest {
     @Test
-    public void sampleTask() {
+    public void checkTask() {
         Project target = ProjectBuilder.builder().build()
         target.apply plugin: 'deploygate'
 
