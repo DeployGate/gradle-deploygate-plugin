@@ -48,19 +48,19 @@ class Apk {
             String releaseNote = null
             String visibility = "private"
 
-            if(_apk.hasProperty("sourceFile")) {
+            if(_apk.hasProperty("sourceFile") && _apk.sourceFile != null) {
                 file = _apk.sourceFile
             }
-            if(_apk.hasProperty("message")) {
+            if(_apk.hasProperty("message") && _apk.message != null) {
                 message = _apk.message
             }
-            if(_apk.hasProperty("distributionKey")) {
+            if(_apk.hasProperty("distributionKey") && _apk.distributionKey != null) {
                 distributionKey = _apk.distributionKey
             }
-            if(_apk.hasProperty("releaseNote")) {
+            if(_apk.hasProperty("releaseNote") && _apk.releaseNote != null) {
                 releaseNote = _apk.releaseNote 
             }
-            if(_apk.hasProperty("visibility")) {
+            if(_apk.hasProperty("visibility") && _apk.visibility != null) {
                 visibility = _apk.visibility
             }
 
