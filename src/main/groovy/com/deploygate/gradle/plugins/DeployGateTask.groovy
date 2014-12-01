@@ -11,6 +11,7 @@ import org.apache.http.client.HttpClient
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.impl.conn.ProxySelectorRoutePlanner
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.StringBody
@@ -18,6 +19,7 @@ import org.apache.http.entity.mime.content.FileBody
 import java.util.HashMap
 import org.json.JSONObject
 import java.nio.charset.Charset
+import java.net.ProxySelector
 
 class DeployGateTask extends DefaultTask {
     private final String API_END_POINT = "https://deploygate.com/api"
@@ -57,10 +59,19 @@ class DeployGateTask extends DefaultTask {
         return endPoint
     }
 
+    private void setProxy(HttpClient httpclient) {
+        ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(
+            httpclient.getConnectionManager().getSchemeRegistry(), ProxySelector.getDefault());
+        httpclient.setRoutePlanner(routePlanner);
+    }
+
     private HashMap<String, JSONObject> httpPost(String endPoint, String token, List<Apk> apks) {
         HashMap<String, JSONObject> result = new HashMap<String, JSONObject>()
         for(Apk apk in apks) {
             HttpClient httpclient = new DefaultHttpClient()
+
+            setProxy(httpclient)
+
             HttpPost httppost = new HttpPost(endPoint)
             MultipartEntity request_entity = new MultipartEntity()
             Charset charset = Charset.forName(HTTP.UTF_8)
