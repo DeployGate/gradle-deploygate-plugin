@@ -2,3 +2,4 @@ build
 .gradle
 .DS_Store
 gradle.properties
+src/test/project/userHome

@@ -1,0 +1,18 @@
+deploygate {
+    userName = 'owner name'
+    token = 'token'
+
+    apks {
+        test {
+            sourceFile = null
+            message = 'test message'
+            distributionKey = 'key'
+            releaseNote = 'release note'
+        }
+
+        test2 {
+            sourceFile = null
+            visibility = 'public'
+        }
+    }
+}
