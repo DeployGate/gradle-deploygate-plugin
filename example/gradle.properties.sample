@@ -1,2 +1,6 @@
 ownerName=yourName
 myToken=yourToken
+
+// set proxy
+systemProp.https.proxyHost=proxyHost
+systemProp.https.proxyPort=proxyPort
