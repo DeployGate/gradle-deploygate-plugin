@@ -1,10 +1,10 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath 'com.deploygate:gradle:0.6.1'
+        classpath 'com.deploygate:gradle:0.6.2'
     }
 }
 apply plugin: 'deploygate'

@@ -6,6 +6,9 @@ This plugin, you can use the deploygate API from Gradle easily.
 For issue tracking see the GitHub issues page: https://github.com/DeployGate/gradle-deploygate-plugin/issues
 
 ## Update
+### ver 0.6.2
+* Supported proxy
+
 ### ver 0.6.1
 * Fix error message
 * Supported Push API visibility option
@@ -20,11 +23,11 @@ For issue tracking see the GitHub issues page: https://github.com/DeployGate/gra
 ```
 buildscript {
   repositories {
-    mavenCentral()
+    jcenter()
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:0.6.1'
+    classpath 'com.deploygate:gradle:0.6.2'
   }
 }
 apply plugin: 'deploygate'
