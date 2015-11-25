@@ -1,28 +1,23 @@
 package com.deploygate.gradle.plugins
 
-import org.gradle.api.GradleException
-import org.gradle.api.DefaultTask
-import org.gradle.api.Project
-import org.apache.http.protocol.HTTP
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
-import org.apache.http.NameValuePair
 import org.apache.http.client.HttpClient
-import org.apache.http.impl.conn.ProxySelectorRoutePlanner
-import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpPost
-import org.apache.http.impl.client.DefaultHttpClient
-import org.apache.http.message.BasicNameValuePair
 import org.apache.http.entity.mime.MultipartEntity
-import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.entity.mime.content.FileBody
-import java.util.HashMap
+import org.apache.http.entity.mime.content.StringBody
+import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.impl.conn.ProxySelectorRoutePlanner
+import org.apache.http.protocol.HTTP
+import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
+import org.gradle.api.Project
 import org.json.JSONObject
+
 import java.nio.charset.Charset
-import java.net.ProxySelector
 
 class DeployGateTask extends DefaultTask {
-    private final String API_END_POINT = "https://deploygate.com/api"
 
     private void upload(Project project, List<Apk> apks) {
         String endPoint = getEndPoint(project)
@@ -36,7 +31,16 @@ class DeployGateTask extends DefaultTask {
         }
     }
 
-    private void errorHandling(Apk apk, JSONObject json) {
+    private void upload(Project project, ApkTarget apk) {
+        String endPoint = getEndPoint(project)
+        String token = getToken(project)
+
+        def json = httpPost(endPoint, token, apk)
+        errorHandling(apk, json)
+        println "${apk.name} result: ${json.toString()}"
+    }
+
+    private void errorHandling(apk, JSONObject json) {
         if(json['error'] == true) {
             throw new GradleException("${apk.name} error message: ${json['message']}")
         }
@@ -55,7 +59,7 @@ class DeployGateTask extends DefaultTask {
         if(userName == null || userName == '') {
             throw new GradleException('userName is missing. Please enter the userName.')
         }
-        String endPoint = API_END_POINT + "/users/${userName}/apps"
+        String endPoint = Config.API_END_POINT + "/users/${userName}/apps"
         return endPoint
     }
 
@@ -71,6 +75,7 @@ class DeployGateTask extends DefaultTask {
 
     private HashMap<String, JSONObject> httpPost(String endPoint, String token, List<Apk> apks) {
         HashMap<String, JSONObject> result = new HashMap<String, JSONObject>()
+
         for(Apk apk in apks) {
             HttpClient httpclient = getHttpClient()
             HttpPost httppost = new HttpPost(endPoint)
@@ -102,5 +107,36 @@ class DeployGateTask extends DefaultTask {
             }
         }
         return result
+    }
+
+    private JSONObject httpPost(String endPoint, String token, ApkTarget apk) {
+        HttpClient httpclient = getHttpClient()
+        HttpPost httppost = new HttpPost(endPoint)
+        MultipartEntity request_entity = new MultipartEntity()
+        Charset charset = Charset.forName(HTTP.UTF_8)
+
+        File file = apk.sourceFile
+        request_entity.addPart("file", new FileBody(file.getAbsoluteFile()))
+        request_entity.addPart("token", new StringBody(token, charset))
+
+        HashMap<String, String> params = apk.toParams()
+        for (String key : params.keySet()) {
+            request_entity.addPart(key, new StringBody(params.get(key), charset))
+        }
+
+        httppost.setEntity(request_entity)
+        HttpResponse response = httpclient.execute(httppost)
+        HttpEntity entity = response.getEntity()
+
+        if (entity != null) {
+            InputStream is = entity.getContent()
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is))
+                JSONObject json = new JSONObject(reader.readLine())
+                return json
+            } finally {
+                is.close()
+            }
+        }
     }
 }

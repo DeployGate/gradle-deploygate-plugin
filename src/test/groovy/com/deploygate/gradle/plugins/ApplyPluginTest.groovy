@@ -12,6 +12,6 @@ class ApplyPluginTest {
         Project target = ProjectBuilder.builder().build()
         target.apply plugin: 'deploygate'
 
-        assertTrue(target.tasks.uploadDeployGate instanceof DeployGateTask)
+        assertTrue(target.extensions.deploygate instanceof DeployGateExtension)
     }
 }

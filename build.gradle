@@ -3,37 +3,37 @@ apply plugin: 'maven'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
-version = '0.6.2'
+version = '1.0.0'
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-  compile gradleApi()
-  groovy localGroovy()
-  compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
-  compile 'org.json:json:20090211'
-  compile 'org.apache.httpcomponents:httpmime:4.2.5'
-  runtime 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
-  runtime 'org.json:json:20090211'
-  runtime 'org.apache.httpcomponents:httpmime:4.2.5'
+    compile gradleApi()
+    compile localGroovy()
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    compile 'org.json:json:20090211'
+    compile 'org.apache.httpcomponents:httpmime:4.2.5'
+    runtime 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    runtime 'org.json:json:20090211'
+    runtime 'org.apache.httpcomponents:httpmime:4.2.5'
 }
 
 task javadocJar(type: Jar, dependsOn: groovydoc) {
-  classifier = 'javadoc'
-  from "${buildDir}/javadoc"
+    classifier = 'javadoc'
+    from "${buildDir}/javadoc"
 }
 
 task sourcesJar(type: Jar) {
-  from sourceSets.main.allSource
-  classifier = 'sources'
+    from sourceSets.main.allSource
+    classifier = 'sources'
 }
 
 artifacts {
-  archives jar
-  archives javadocJar
-  archives sourcesJar
+    archives jar
+    archives javadocJar
+    archives sourcesJar
 }
 
 // local upload
@@ -47,9 +47,9 @@ uploadArchives {
 }
 */
 
-// central upload 
+// central upload
 if (gradle.startParameter.taskNames.contains('uploadArchives')) {
-  apply from: 'build.publish.gradle'
+    apply from: 'build.publish.gradle'
 }
 
 task wrapper(type: Wrapper) {

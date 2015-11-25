@@ -3,20 +3,20 @@ package com.deploygate.gradle.plugins
 import org.gradle.api.Project
 
 class Apk {
-    String name
+    final String name
     File file
     String message
     String distributionKey
     String releaseNote
     String visibility
 
-    public Apk(String name, File file, String message = "", String distributionKey = null, String releaseNote = null, String visibility = "private") {
+    Apk(String name) {
         this.name = name
-        this.file = file
-        this.message = message
-        this.distributionKey = distributionKey
-        this.releaseNote = releaseNote
-        this.visibility = visibility
+        this.file = null
+        this.message = null
+        this.distributionKey = null
+        this.releaseNote = null
+        this.visibility = 'private'
     }
 
     public HashMap<String, String> getParams() {

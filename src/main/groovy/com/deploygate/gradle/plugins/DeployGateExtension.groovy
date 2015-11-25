@@ -3,15 +3,15 @@ package com.deploygate.gradle.plugins
 import org.gradle.api.NamedDomainObjectContainer
 
 public class DeployGateExtension {
-    final private NamedDomainObjectContainer<ApkTarget> deploygateApks
     String token
     String userName
+    NamedDomainObjectContainer<ApkTarget> apks
 
-    public DeployGateExtension(NamedDomainObjectContainer<ApkTarget> apks) {
-        deploygateApks = apks
+    public DeployGateExtension(NamedDomainObjectContainer<ApkTarget> apkTargets) {
+        this.apks = apkTargets
     }
 
     public apks(Closure closure) {
-        deploygateApks.configure(closure)
+        apks.configure(closure)
     }
 }
