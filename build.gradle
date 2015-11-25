@@ -53,5 +53,5 @@ if (gradle.startParameter.taskNames.contains('uploadArchives')) {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '1.9'
+    gradleVersion = '2.8'
 }
