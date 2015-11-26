@@ -29,6 +29,8 @@ class DeployGate implements Plugin<Project> {
     }
 
     def createDeployGateTasks (project) {
+        project.task 'deployGateLogout', type: DeployGateRemoveCredentialTask, group: 'DeployGate'
+
         def loginTask = project.task('deployGateLogin', type: DeployGateSetupCredentialTask, group: 'DeployGate')
 
         // @see ApplicationVariantFactory#createVariantData

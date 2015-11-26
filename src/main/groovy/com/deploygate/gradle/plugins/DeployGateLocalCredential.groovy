@@ -33,6 +33,10 @@ class DeployGateLocalCredential {
         saveLocalCredentialFile(json.toString())
     }
 
+    def delete() {
+        localCredentialFile().delete()
+    }
+
     def loadLocalCredentialFile() {
         def file = localCredentialFile()
         if (file.exists())
