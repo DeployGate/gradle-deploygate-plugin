@@ -19,7 +19,7 @@ import java.nio.charset.Charset
 
 class DeployGateTask extends DefaultTask {
 
-    private void upload(Project project, List<Apk> apks) {
+    void upload(Project project, List<Apk> apks) {
         String endPoint = getEndPoint(project)
         String token = getToken(project)
 
@@ -31,13 +31,15 @@ class DeployGateTask extends DefaultTask {
         }
     }
 
-    private void upload(Project project, ApkTarget apk) {
+    def upload(Project project, ApkTarget apk) {
         String endPoint = getEndPoint(project)
         String token = getToken(project)
 
-        def json = httpPost(endPoint, token, apk)
+        JSONObject json = httpPost(endPoint, token, apk)
         errorHandling(apk, json)
         println "${apk.name} result: ${json.toString()}"
+
+        json
     }
 
     private void errorHandling(apk, JSONObject json) {

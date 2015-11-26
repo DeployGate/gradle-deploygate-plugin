@@ -15,6 +15,9 @@ class DeployGate implements Plugin<Project> {
                 createDeployGateTasks it
             }
         }
+        project.gradle.buildFinished { buildResult ->
+            project.deploygate.notifyServer 'finished', [ result: Boolean.toString(buildResult.failure == null) ]
+        }
     }
 
     def setupExtension (Project project) {

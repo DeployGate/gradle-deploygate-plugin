@@ -6,7 +6,6 @@ import org.gradle.api.internal.project.ProjectInternal
 
 class ApkTarget implements Named {
     String name
-    Project target
 
     File sourceFile
     String message

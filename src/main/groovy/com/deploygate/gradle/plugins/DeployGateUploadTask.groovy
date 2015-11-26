@@ -20,6 +20,13 @@ class DeployGateUploadTask extends DeployGateTask {
         if (target.sourceFile == null)
             target.sourceFile = defaultSourceFile
 
-        super.upload(project, target)
+        project.deploygate.notifyServer 'start_upload', [ 'length': Long.toString(target.sourceFile?.length()) ]
+
+        def res = super.upload(project, target)
+
+        if (res.error)
+            project.deploygate.notifyServer 'upload_finished', [ 'error': true, message: res.message ]
+        else
+            project.deploygate.notifyServer 'upload_finished', [ 'path': res.results.path ]
     }
 }

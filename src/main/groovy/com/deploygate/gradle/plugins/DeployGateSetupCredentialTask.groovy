@@ -9,13 +9,14 @@ import org.gradle.api.tasks.TaskAction
 import java.awt.Desktop
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 
 /**
  * Created by tnj on 11/25/15.
  */
 class DeployGateSetupCredentialTask extends DefaultTask {
-    static def LOCAL_PORT = 64126
+    def port = 0
 
     CountDownLatch latch
     boolean saved
@@ -65,7 +66,7 @@ class DeployGateSetupCredentialTask extends DefaultTask {
         try {
             server = startLocalServer()
             if (Desktop.isDesktopSupported()) {
-                def url = "${Config.DEPLOYGATE_HOST}/cli/login?port=${LOCAL_PORT}"
+                def url = "${Config.DEPLOYGATE_HOST}/cli/login?port=${port}"
                 try {
                     Desktop.getDesktop().browse(URI.create(url))
                 } catch (e) {
@@ -88,22 +89,23 @@ class DeployGateSetupCredentialTask extends DefaultTask {
     }
 
     def startLocalServer() {
-        def httpServer = HttpServer.create(new InetSocketAddress("localhost", LOCAL_PORT), LOCAL_PORT)
+        def address = new InetSocketAddress("localhost", 0)
+        def httpServer = HttpServer.create(address, 0)
+        port = httpServer.address.port
+
         httpServer.createContext "/token", new HttpHandler() {
             @Override
             void handle(HttpExchange httpExchange) throws IOException {
-                def query = parseQueryString(httpExchange.requestURI.query)
-                if (!query.containsKey('cancel')) {
-                    httpExchange.getResponseHeaders().add("Location", "${Config.DEPLOYGATE_HOST}/cli/setup_progress?token=${query.token}")
-                    httpExchange.sendResponseHeaders(302, 0)
-                    httpExchange.close()
+                def query = UrlUtils.parseQueryString(httpExchange.requestURI.query)
+                project.deploygate.notifyKey = query.key
+                httpExchange.sendResponseHeaders(204, -1)
+                httpExchange.close()
 
-                    retrieveCredentialFromToken(query.token)
-                } else {
-                    httpExchange.getResponseHeaders().add("Location", "${Config.DEPLOYGATE_HOST}/cli/setup_cancelled")
-                    httpExchange.sendResponseHeaders(302, 0)
-                    httpExchange.close()
+                if (!query.containsKey('cancel')) {
+                    retrieveCredentialFromKey(query.key)
+                    project.deploygate.notifyServer 'credential_saved'
                 }
+
                 latch.countDown()
             }
         }
@@ -111,14 +113,21 @@ class DeployGateSetupCredentialTask extends DefaultTask {
         httpServer
     }
 
+
     def waitForResponse() {
+        def timeout = 180 * 1000
+        def start = System.currentTimeMillis()
+
         latch = new CountDownLatch(1)
         while (!latch.await(5000, TimeUnit.MILLISECONDS)) {
+            print "."
+            if (System.currentTimeMillis() - start > timeout)
+                throw new TimeoutException('Timeout while waiting for browser response')
         }
     }
 
-    boolean retrieveCredentialFromToken(String token) {
-        def json = getCredentialJsonFromToken(token)
+    boolean retrieveCredentialFromKey(String key) {
+        def json = getCredentialJsonFromKey(key)
         if (json) {
             if (localCredential.saveLocalCredentialFile(json)) {
                 localCredential.load()
@@ -127,20 +136,12 @@ class DeployGateSetupCredentialTask extends DefaultTask {
         }
     }
 
-    def getCredentialJsonFromToken(token) {
+    def getCredentialJsonFromKey(key) {
         try {
-            new URL("${Config.DEPLOYGATE_HOST}/cli/credential?token=${token}").getText()
+            new URL("${Config.DEPLOYGATE_HOST}/cli/credential?key=${key}").getText()
         } catch (e) {
             logger.error('failed to retrieve credential: ' + e.message)
             return null
         }
-    }
-
-    static def parseQueryString(String s) {
-        (s ?: "").split("&").inject([:]) { LinkedHashMap<String, String> m, String str ->
-            def (k, v) = str.split("=", 2).collect { URLDecoder.decode(it, 'UTF-8') }
-            m.put k, v
-            m
-        } as LinkedHashMap<String, String>
     }
 }
