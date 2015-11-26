@@ -29,9 +29,8 @@ class DeployGate implements Plugin<Project> {
     }
 
     def createDeployGateTasks (project) {
-        project.task 'deployGateLogout', type: DeployGateRemoveCredentialTask, group: 'DeployGate'
-
-        def loginTask = project.task('deployGateLogin', type: DeployGateSetupCredentialTask, group: 'DeployGate')
+        project.task 'logoutDeployGate', type: DeployGateRemoveCredentialTask, group: 'DeployGate'
+        def loginTask = project.task('loginDeployGate', type: DeployGateSetupCredentialTask, group: 'DeployGate')
 
         // @see ApplicationVariantFactory#createVariantData
         // variant is for applicationFlavors
@@ -66,7 +65,7 @@ class DeployGate implements Plugin<Project> {
         }
 
         def capitalized = WordUtils.capitalize(name)
-        def taskName = "deployGateUpload${capitalized}"
+        def taskName = "uploadDeployGate${capitalized}"
         project.task(taskName,
                 type: DeployGateUploadTask,
                 dependsOn: ([ assemble, loginTask ] - null),
