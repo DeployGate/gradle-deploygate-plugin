@@ -2,9 +2,6 @@ package com.deploygate.gradle.plugins
 
 import org.json.JSONObject
 
-/**
- * Created by tnj on 11/25/15.
- */
 class DeployGateLocalCredential {
     JSONObject json
     String name

@@ -5,9 +5,6 @@ import org.junit.Test
 
 import static org.junit.Assert.assertTrue
 
-/**
- * Created by kenta.imai on 2014/11/25.
- */
 class ApkTest {
     @Test
     public void apkTest() {

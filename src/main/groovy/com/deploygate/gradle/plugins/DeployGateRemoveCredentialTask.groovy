@@ -11,9 +11,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-/**
- * Created by tnj on 11/25/15.
- */
 class DeployGateRemoveCredentialTask extends DefaultTask {
     @TaskAction
     def remove() {
