@@ -1,13 +1,13 @@
-package com.deploygate.gradle.plugins.auth
+package com.deploygate.gradle.plugins.credentials
 
 import org.json.JSONObject
 
-class DeployGateLocalCredential {
+class CliCredentialStore {
     JSONObject json
     String name
     String token
 
-    DeployGateLocalCredential() {
+    CliCredentialStore() {
         load()
     }
 

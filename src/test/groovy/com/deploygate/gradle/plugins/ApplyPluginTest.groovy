@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins
 
-import com.deploygate.gradle.plugins.extensions.DeployGateExtension
+import com.deploygate.gradle.plugins.entities.DeployGateExtension
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test

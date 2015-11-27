@@ -1,10 +1,10 @@
 package com.deploygate.gradle.plugins
 
-import com.deploygate.gradle.plugins.entities.ApkTarget
-import com.deploygate.gradle.plugins.extensions.DeployGateExtension
-import com.deploygate.gradle.plugins.tasks.DeployGateRemoveCredentialTask
-import com.deploygate.gradle.plugins.tasks.DeployGateSetupCredentialTask
-import com.deploygate.gradle.plugins.tasks.DeployGateUploadTask
+import com.deploygate.gradle.plugins.entities.DeployTarget
+import com.deploygate.gradle.plugins.entities.DeployGateExtension
+import com.deploygate.gradle.plugins.tasks.LogoutTask
+import com.deploygate.gradle.plugins.tasks.LoginTask
+import com.deploygate.gradle.plugins.tasks.UploadTask
 import org.apache.commons.lang.WordUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -26,7 +26,7 @@ class DeployGate implements Plugin<Project> {
     }
 
     def setupExtension (Project project) {
-        def apkTargets = project.container(ApkTarget)
+        def apkTargets = project.container(DeployTarget)
         apkTargets.all {
             tasksToCreate.add name
         }
@@ -34,8 +34,8 @@ class DeployGate implements Plugin<Project> {
     }
 
     def createDeployGateTasks (project) {
-        project.task 'logoutDeployGate', type: DeployGateRemoveCredentialTask, group: 'DeployGate'
-        def loginTask = project.task('loginDeployGate', type: DeployGateSetupCredentialTask, group: 'DeployGate')
+        project.task 'logoutDeployGate', type: LogoutTask, group: 'DeployGate'
+        def loginTask = project.task('loginDeployGate', type: LoginTask, group: 'DeployGate')
 
         // @see ApplicationVariantFactory#createVariantData
         // variant is for applicationFlavors
@@ -72,7 +72,7 @@ class DeployGate implements Plugin<Project> {
         def capitalized = WordUtils.capitalize(name)
         def taskName = "uploadDeployGate${capitalized}"
         project.task(taskName,
-                type: DeployGateUploadTask,
+                type: UploadTask,
                 dependsOn: ([ assemble, loginTask ] - null),
                 overwrite: true) {
 

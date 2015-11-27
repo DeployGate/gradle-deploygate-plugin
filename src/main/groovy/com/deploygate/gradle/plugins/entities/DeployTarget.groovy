@@ -2,7 +2,7 @@ package com.deploygate.gradle.plugins.entities
 
 import org.gradle.api.Named
 
-class ApkTarget implements Named {
+class DeployTarget implements Named {
     String name
 
     File sourceFile
@@ -11,7 +11,7 @@ class ApkTarget implements Named {
     String releaseNote
     String visibility
 
-    public ApkTarget(String name) {
+    public DeployTarget(String name) {
       super()
       this.name = name
     }

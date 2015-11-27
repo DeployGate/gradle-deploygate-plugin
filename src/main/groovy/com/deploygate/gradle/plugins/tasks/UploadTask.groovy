@@ -1,10 +1,10 @@
 package com.deploygate.gradle.plugins.tasks
 
-import com.deploygate.gradle.plugins.entities.ApkTarget
+import com.deploygate.gradle.plugins.entities.DeployTarget
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
-class DeployGateUploadTask extends DeployGateTask {
+class UploadTask extends BaseUploadTask {
     String outputName
     boolean hasSigningConfig
     File defaultSourceFile
@@ -15,9 +15,9 @@ class DeployGateUploadTask extends DeployGateTask {
             throw new GradleException('Cannot upload a build without code signature to DeployGate')
         }
 
-        ApkTarget target = project.deploygate.apks.findByName(outputName)
+        DeployTarget target = project.deploygate.apks.findByName(outputName)
         if (!target)
-            target = new ApkTarget(outputName)
+            target = new DeployTarget(outputName)
         if (target.sourceFile == null)
             target.sourceFile = defaultSourceFile
 

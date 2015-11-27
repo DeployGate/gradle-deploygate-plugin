@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.entities.ApkTarget
+import com.deploygate.gradle.plugins.entities.DeployTarget
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -19,9 +19,9 @@ import org.json.JSONObject
 
 import java.nio.charset.Charset
 
-abstract class DeployGateTask extends DefaultTask {
+abstract class BaseUploadTask extends DefaultTask {
 
-    def upload(Project project, ApkTarget apk) {
+    def upload(Project project, DeployTarget apk) {
         String endPoint = getEndPoint(project)
         String token = getToken(project)
 
@@ -64,7 +64,7 @@ abstract class DeployGateTask extends DefaultTask {
         return httpclient;
     }
 
-    private JSONObject httpPost(String endPoint, String token, ApkTarget apk) {
+    private JSONObject httpPost(String endPoint, String token, DeployTarget apk) {
         HttpClient httpclient = getHttpClient()
         HttpPost httppost = new HttpPost(endPoint)
         MultipartEntity request_entity = new MultipartEntity()

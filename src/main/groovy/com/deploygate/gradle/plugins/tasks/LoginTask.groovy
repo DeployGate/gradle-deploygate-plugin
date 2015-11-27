@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.auth.DeployGateLocalCredential
+import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
@@ -14,16 +14,16 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class DeployGateSetupCredentialTask extends DefaultTask {
+class LoginTask extends DefaultTask {
     def port = 0
 
     CountDownLatch latch
     boolean saved
-    DeployGateLocalCredential localCredential
+    CliCredentialStore localCredential
 
     @TaskAction
     def setup() {
-        localCredential = new DeployGateLocalCredential()
+        localCredential = new CliCredentialStore()
         if (!hasCredential())
             if (!setupCredential())
                 throw new RuntimeException('Failed to retrieve DeployGate credentials. Please try again or specify it in your build.gradle script.')

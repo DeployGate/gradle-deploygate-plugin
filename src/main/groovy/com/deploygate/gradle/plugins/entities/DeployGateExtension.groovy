@@ -1,18 +1,17 @@
-package com.deploygate.gradle.plugins.extensions
+package com.deploygate.gradle.plugins.entities
 
 import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.entities.ApkTarget
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import org.gradle.api.NamedDomainObjectContainer
 
 public class DeployGateExtension {
     String token
     String userName
-    NamedDomainObjectContainer<ApkTarget> apks
+    NamedDomainObjectContainer<DeployTarget> apks
 
     String notifyKey = null
 
-    public DeployGateExtension(NamedDomainObjectContainer<ApkTarget> apkTargets) {
+    public DeployGateExtension(NamedDomainObjectContainer<DeployTarget> apkTargets) {
         this.apks = apkTargets
     }
 
