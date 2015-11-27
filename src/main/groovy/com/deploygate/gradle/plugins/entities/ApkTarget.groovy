@@ -1,8 +1,6 @@
-package com.deploygate.gradle.plugins
+package com.deploygate.gradle.plugins.entities
 
 import org.gradle.api.Named
-import org.gradle.api.Project
-import org.gradle.api.internal.project.ProjectInternal
 
 class ApkTarget implements Named {
     String name

@@ -1,5 +1,6 @@
-package com.deploygate.gradle.plugins
+package com.deploygate.gradle.plugins.tasks
 
+import com.deploygate.gradle.plugins.entities.ApkTarget
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
@@ -22,7 +23,7 @@ class DeployGateUploadTask extends DeployGateTask {
 
         project.deploygate.notifyServer 'start_upload', [ 'length': Long.toString(target.sourceFile?.length()) ]
 
-        def res = super.upload(project, target)
+        def res = Object.upload(project, target)
 
         if (res.error)
             project.deploygate.notifyServer 'upload_finished', [ 'error': true, message: res.message ]

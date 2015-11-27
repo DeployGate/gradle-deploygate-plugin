@@ -1,5 +1,7 @@
-package com.deploygate.gradle.plugins
+package com.deploygate.gradle.plugins.tasks
 
+import com.deploygate.gradle.plugins.Config
+import com.deploygate.gradle.plugins.entities.ApkTarget
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -17,19 +19,7 @@ import org.json.JSONObject
 
 import java.nio.charset.Charset
 
-class DeployGateTask extends DefaultTask {
-
-    void upload(Project project, List<Apk> apks) {
-        String endPoint = getEndPoint(project)
-        String token = getToken(project)
-
-        HashMap<String, JSONObject> result = httpPost(endPoint, token, apks)
-        for(Apk apk in apks) {
-            JSONObject json = result.get(apk.name)
-            errorHandling(apk, json)
-            println "${apk.name} result: ${json.toString()}"
-        }
-    }
+abstract class DeployGateTask extends DefaultTask {
 
     def upload(Project project, ApkTarget apk) {
         String endPoint = getEndPoint(project)
@@ -37,7 +27,6 @@ class DeployGateTask extends DefaultTask {
 
         JSONObject json = httpPost(endPoint, token, apk)
         errorHandling(apk, json)
-        println "${apk.name} result: ${json.toString()}"
 
         json
     }
@@ -73,42 +62,6 @@ class DeployGateTask extends DefaultTask {
         httpclient.setRoutePlanner(routePlanner);
 
         return httpclient;
-    }
-
-    private HashMap<String, JSONObject> httpPost(String endPoint, String token, List<Apk> apks) {
-        HashMap<String, JSONObject> result = new HashMap<String, JSONObject>()
-
-        for(Apk apk in apks) {
-            HttpClient httpclient = getHttpClient()
-            HttpPost httppost = new HttpPost(endPoint)
-            MultipartEntity request_entity = new MultipartEntity()
-            Charset charset = Charset.forName(HTTP.UTF_8)
-
-            File file = apk.file
-            request_entity.addPart("file", new FileBody(file.getAbsoluteFile()))
-            request_entity.addPart("token", new StringBody(token, charset))
-
-            HashMap<String, String> params = apk.getParams()
-            for (String key : params.keySet()) {
-                request_entity.addPart(key, new StringBody(params.get(key), charset))
-            }
-
-            httppost.setEntity(request_entity)
-            HttpResponse response = httpclient.execute(httppost)
-            HttpEntity entity = response.getEntity()
-
-            if (entity != null) {
-                InputStream is = entity.getContent()
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is))
-                JSONObject json = new JSONObject(reader.readLine())
-                result.put(apk.name, json)
-                try {
-                } finally {
-                    is.close()
-                }
-            }
-        }
-        return result
     }
 
     private JSONObject httpPost(String endPoint, String token, ApkTarget apk) {

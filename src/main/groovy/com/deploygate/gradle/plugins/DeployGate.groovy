@@ -1,5 +1,10 @@
 package com.deploygate.gradle.plugins
 
+import com.deploygate.gradle.plugins.entities.ApkTarget
+import com.deploygate.gradle.plugins.extensions.DeployGateExtension
+import com.deploygate.gradle.plugins.tasks.DeployGateRemoveCredentialTask
+import com.deploygate.gradle.plugins.tasks.DeployGateSetupCredentialTask
+import com.deploygate.gradle.plugins.tasks.DeployGateUploadTask
 import org.apache.commons.lang.WordUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project

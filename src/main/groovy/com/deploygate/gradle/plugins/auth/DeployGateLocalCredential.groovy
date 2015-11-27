@@ -1,4 +1,4 @@
-package com.deploygate.gradle.plugins
+package com.deploygate.gradle.plugins.auth
 
 import org.json.JSONObject
 

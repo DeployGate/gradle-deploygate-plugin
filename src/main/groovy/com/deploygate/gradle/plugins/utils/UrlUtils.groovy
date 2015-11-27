@@ -1,4 +1,4 @@
-package com.deploygate.gradle.plugins
+package com.deploygate.gradle.plugins.utils
 
 class UrlUtils {
     static def toQueryString(Map<String, String> data) {

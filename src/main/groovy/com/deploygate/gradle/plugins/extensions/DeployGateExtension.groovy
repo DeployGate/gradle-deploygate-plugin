@@ -1,5 +1,8 @@
-package com.deploygate.gradle.plugins
+package com.deploygate.gradle.plugins.extensions
 
+import com.deploygate.gradle.plugins.Config
+import com.deploygate.gradle.plugins.entities.ApkTarget
+import com.deploygate.gradle.plugins.utils.UrlUtils
 import org.gradle.api.NamedDomainObjectContainer
 
 public class DeployGateExtension {
