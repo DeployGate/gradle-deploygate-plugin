@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.entities.DeployTarget
+import groovy.json.JsonSlurper
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -11,11 +12,9 @@ import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.impl.conn.ProxySelectorRoutePlanner
-import org.apache.http.protocol.HTTP
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.json.JSONObject
 
 import java.nio.charset.Charset
 
@@ -25,13 +24,13 @@ abstract class BaseUploadTask extends DefaultTask {
         String endPoint = getEndPoint(project)
         String token = getToken(project)
 
-        JSONObject json = httpPost(endPoint, token, apk)
+        def json = httpPost(endPoint, token, apk)
         errorHandling(apk, json)
 
         json
     }
 
-    private void errorHandling(apk, JSONObject json) {
+    private void errorHandling(apk, json) {
         if(json['error'] == true) {
             throw new GradleException("${apk.name} error message: ${json['message']}")
         }
@@ -64,11 +63,11 @@ abstract class BaseUploadTask extends DefaultTask {
         return httpclient;
     }
 
-    private JSONObject httpPost(String endPoint, String token, DeployTarget apk) {
+    private def httpPost(String endPoint, String token, DeployTarget apk) {
         HttpClient httpclient = getHttpClient()
         HttpPost httppost = new HttpPost(endPoint)
         MultipartEntity request_entity = new MultipartEntity()
-        Charset charset = Charset.forName(HTTP.UTF_8)
+        Charset charset = Charset.forName('UTF-8')
 
         File file = apk.sourceFile
         request_entity.addPart("file", new FileBody(file.getAbsoluteFile()))
@@ -84,14 +83,7 @@ abstract class BaseUploadTask extends DefaultTask {
         HttpEntity entity = response.getEntity()
 
         if (entity != null) {
-            InputStream is = entity.getContent()
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is))
-                JSONObject json = new JSONObject(reader.readLine())
-                return json
-            } finally {
-                is.close()
-            }
+            return new JsonSlurper().parse(entity.getContent(), 'UTF-8')
         }
     }
 }

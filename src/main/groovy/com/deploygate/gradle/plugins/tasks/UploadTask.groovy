@@ -23,7 +23,7 @@ class UploadTask extends BaseUploadTask {
 
         project.deploygate.notifyServer 'start_upload', [ 'length': Long.toString(target.sourceFile?.length()) ]
 
-        def res = Object.upload(project, target)
+        def res = super.upload(project, target)
 
         if (res.error)
             project.deploygate.notifyServer 'upload_finished', [ 'error': true, message: res.message ]
