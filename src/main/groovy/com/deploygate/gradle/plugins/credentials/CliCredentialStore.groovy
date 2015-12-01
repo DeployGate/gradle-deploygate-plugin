@@ -1,9 +1,10 @@
 package com.deploygate.gradle.plugins.credentials
 
-import org.json.JSONObject
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 
 class CliCredentialStore {
-    JSONObject json
+    def store
     String name
     String token
 
@@ -14,20 +15,20 @@ class CliCredentialStore {
     def load() {
         def contents = loadLocalCredentialFile()
         if (contents) {
-            json = new JSONObject(contents)
-            name = json.getString('name')
-            token = json.getString('token')
+            store = new JsonSlurper().parseText(contents)
+            name = store.name
+            token = store.token
             return true
         }
         return false
     }
 
     def save() {
-        if (!json)
-            json = new JSONObject()
-        json.put('name', name)
-        json.put('token', token)
-        saveLocalCredentialFile(json.toString())
+        if (!store)
+            store = [:]
+        store.name = name
+        store.token = token
+        saveLocalCredentialFile(JsonOutput.toJson(store))
     }
 
     def delete() {
@@ -42,8 +43,7 @@ class CliCredentialStore {
     }
 
     def saveLocalCredentialFile(String str) {
-        def dir = baseDir()
-        if (!dir.exists() && !dir.mkdirs())
+        if (!ensureDirectoryWritable())
             return false
         def file = localCredentialFile()
         if (!file.exists() || file.canWrite()) {
@@ -51,6 +51,11 @@ class CliCredentialStore {
             return true
         }
         return false
+    }
+
+    private boolean ensureDirectoryWritable() {
+        File dir = baseDir()
+        dir.exists() || dir.mkdirs()
     }
 
     def localCredentialFile() {
