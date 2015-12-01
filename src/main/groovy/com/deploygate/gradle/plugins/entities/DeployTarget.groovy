@@ -6,14 +6,14 @@ class DeployTarget implements Named {
     String name
 
     File sourceFile
-    String message
+    String message = ""
     String distributionKey
     String releaseNote
-    String visibility
+    String visibility = "private"
 
-    public DeployTarget(String name) {
-      super()
-      this.name = name
+    DeployTarget(){}
+    DeployTarget(String name) {
+        this.name = name
     }
 
     public HashMap<String, String> toParams() {
