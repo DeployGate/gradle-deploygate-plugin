@@ -3,8 +3,6 @@ package com.deploygate.gradle.plugins
 import com.deploygate.gradle.plugins.entities.DeployTarget
 import org.junit.Test
 
-import static org.junit.Assert.assertTrue
-
 class DeployTargetTest {
     @Test
     public void apkTest() {
@@ -36,20 +34,20 @@ class DeployTargetTest {
     }
 
     public void checkDeployTarget(DeployTarget apk, String name, File file, String message, String distributionKey, String releaseNote, String visibility) {
-        assertTrue(apk instanceof DeployTarget)
-        assertTrue(apk.name == name)
-        assertTrue(apk.sourceFile == file)
-        assertTrue(apk.message == message)
-        assertTrue(apk.distributionKey == distributionKey)
-        assertTrue(apk.releaseNote == releaseNote)
-        assertTrue(apk.visibility == visibility)
+        assert apk instanceof DeployTarget
+        assert apk.name == name
+        assert apk.sourceFile == file
+        assert apk.message == message
+        assert apk.distributionKey == distributionKey
+        assert apk.releaseNote == releaseNote
+        assert apk.visibility == visibility
     }
 
     public void checkParams(DeployTarget apk, String message, String distributionKey, String releaseNote, String visibility) {
         HashMap<String, String> params = apk.toParams()
-        assertTrue(params["message"] == message)
-        assertTrue(params["distribution_key"] == distributionKey)
-        assertTrue(params["release_note"] == releaseNote)
-        assertTrue(params["visibility"] == visibility)
+        assert params["message"] == message
+        assert params["distribution_key"] == distributionKey
+        assert params["release_note"] == releaseNote
+        assert params["visibility"] == visibility
     }
 }
