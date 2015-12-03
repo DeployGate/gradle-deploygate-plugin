@@ -1,22 +1,26 @@
+#  Gradle DeployGate Plugin
+
 [![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
 
 This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
 
-# Getting started
+## Getting started
 
-1. Open your <code>build.gradle</code> on your project root and add a dependency.
+1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
   classpath 'com.deploygate:gradle:1.0.0'
 }
 ```
-2. Open your module build script file (<em>e.g.</em> <code>app/build.gradle</code>) and add the following line just after <code>apply plugin: 'com.android.application'</code>.
+
+2) Open your module build script file (<em>e.g.</em> <code>app/build.gradle</code>) and add the following line just after <code>apply plugin: 'com.android.application'</code>.
 ```groovy
 apply plugin: 'deploygate'
 ```
-3. If you are using Android Studio, click <strong>Sync Now</strong> link appearing on the right top corner of your editor window.
 
-4. You are all set! Open <strong>Gradle</strong> tab on the right side of your Android Studio, and select <strong>Tasks - deploygate - uploadDeployGateDebug</strong> under your app module, or you can run as a Gradle command like:
+3) If you are using Android Studio, click <strong>Sync Now</strong> link appearing on the right top corner of your editor window.
+
+4) You are all set! Open <strong>Gradle</strong> tab on the right side of your Android Studio, and select <strong>Tasks - deploygate - uploadDeployGateDebug</strong> under your app module, or you can run as a Gradle command like:
 ```
 ./gradlew :app:uploadDeployGateDebug
 ```
