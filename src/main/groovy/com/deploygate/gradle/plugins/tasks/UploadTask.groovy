@@ -1,16 +1,13 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.entities.DeployTarget
-import groovy.json.JsonSlurper
-import org.apache.http.HttpEntity
-import org.apache.http.HttpResponse
-import org.apache.http.client.HttpClient
-import org.apache.http.client.methods.HttpPost
+import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
+import groovyx.net.http.ContentType
+import groovyx.net.http.HttpResponseDecorator
+import groovyx.net.http.Method
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
-import org.apache.http.impl.client.DefaultHttpClient
-import org.apache.http.impl.conn.ProxySelectorRoutePlanner
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -46,69 +43,53 @@ class UploadTask extends DefaultTask {
     }
 
     def uploadProject(Project project, DeployTarget apk) {
-        String endPoint = getEndPoint(project)
+        String userName = getUserName(project)
         String token = getToken(project)
 
-        def json = httpPost(endPoint, token, apk)
-        errorHandling(apk, json)
+        def result = postApk(userName, token, apk)
+        errorHandling(apk, result)
 
-        json
+        result.data
     }
 
-    private void errorHandling(apk, json) {
-        if(json['error'] == true) {
-            throw new GradleException("${apk.name} error message: ${json['message']}")
+    private void errorHandling(apk, result) {
+        if (result.status != 200 || result.data.error) {
+            throw new GradleException("${apk.name} error message: ${result.data.message}")
         }
     }
 
     private String getToken(Project project) {
         String token = project.deploygate.token
-        if(token == null || token == '') {
+        if (!token?.trim()) {
             throw new GradleException('token is missing. Please enter the token.')
         }
-        return token
+        token
     }
 
-    private String getEndPoint(Project project) {
+    private String getUserName(Project project) {
         String userName = project.deploygate.userName
-        if(userName == null || userName == '') {
+        if (!userName?.trim()) {
             throw new GradleException('userName is missing. Please enter the userName.')
         }
-        String endPoint = project.deploygate.endpoint + "/api/users/${userName}/apps"
-        return endPoint
+        userName
     }
 
-    private HttpClient getHttpClient() {
-        HttpClient httpclient = new DefaultHttpClient()
-
-        ProxySelectorRoutePlanner routePlanner =
-                new ProxySelectorRoutePlanner(httpclient.getConnectionManager().getSchemeRegistry(), ProxySelector.getDefault());
-        httpclient.setRoutePlanner(routePlanner);
-
-        return httpclient;
-    }
-
-    private def httpPost(String endPoint, String token, DeployTarget apk) {
-        HttpClient httpclient = getHttpClient()
-        HttpPost httppost = new HttpPost(endPoint)
-        MultipartEntity request_entity = new MultipartEntity()
+    private HttpResponseDecorator postApk(String userName, String token, DeployTarget apk) {
+        MultipartEntity entity = new MultipartEntity()
         Charset charset = Charset.forName('UTF-8')
 
         File file = apk.sourceFile
-        request_entity.addPart("file", new FileBody(file.getAbsoluteFile()))
-        request_entity.addPart("token", new StringBody(token, charset))
+        entity.addPart("file", new FileBody(file.getAbsoluteFile()))
+        entity.addPart("token", new StringBody(token, charset))
 
         HashMap<String, String> params = apk.toParams()
         for (String key : params.keySet()) {
-            request_entity.addPart(key, new StringBody(params.get(key), charset))
+            entity.addPart(key, new StringBody(params.get(key), charset))
         }
 
-        httppost.setEntity(request_entity)
-        HttpResponse response = httpclient.execute(httppost)
-        HttpEntity entity = response.getEntity()
-
-        if (entity != null) {
-            return new JsonSlurper().parse(entity.getContent(), 'UTF-8')
-        }
+        HTTPBuilderFactory.restClient(project.deploygate.endpoint).request(Method.POST, ContentType.JSON) { req ->
+                    uri.path = "/api/users/${userName}/apps"
+                    req.entity = entity
+        } as HttpResponseDecorator
     }
 }

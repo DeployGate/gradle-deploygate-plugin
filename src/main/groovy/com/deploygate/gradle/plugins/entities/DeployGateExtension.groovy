@@ -1,7 +1,8 @@
 package com.deploygate.gradle.plugins.entities
 
 import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.utils.UrlUtils
+import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
+import groovyx.net.http.ContentType
 import org.gradle.api.NamedDomainObjectContainer
 
 public class DeployGateExtension {
@@ -29,7 +30,8 @@ public class DeployGateExtension {
             query = query + data
 
         try {
-            new URL("${endpoint}/cli/notify?${UrlUtils.toQueryString(query)}").getText()
+            HTTPBuilderFactory.httpBuilder(endpoint).post path: "/cli/notify",
+                    body: query, requestContentType: ContentType.URLENC
         } catch (e) {}
     }
 }
