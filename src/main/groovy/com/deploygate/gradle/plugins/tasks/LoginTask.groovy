@@ -65,15 +65,7 @@ class LoginTask extends DefaultTask {
         def server
         try {
             server = startLocalServer()
-            if (Desktop.isDesktopSupported()) {
-                def url = "${project.deploygate.endpoint}/cli/login?port=${port}"
-                try {
-                    Desktop.getDesktop().browse(URI.create(url))
-                } catch (e) {
-                    println 'Please log in to DeployGate by opening the following URL on your browser:'
-                    println url
-                }
-            }
+            openBrowser()
             waitForResponse()
             if (saved) {
                 println "Welcome ${localCredential.name}!"
@@ -86,6 +78,20 @@ class LoginTask extends DefaultTask {
                 server.stop(1)
             }
         }
+    }
+
+    void openBrowser() {
+        def url = "${project.deploygate.endpoint}/cli/login?port=${port}&client=gradle"
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().browse(URI.create(url))
+                return
+            } catch (e) {
+                logger.warn "Could not open a browser: ${e.message}"
+            }
+        }
+        println 'Please log in to DeployGate by opening the following URL on your browser:'
+        println url
     }
 
     def startLocalServer() {
