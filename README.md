@@ -71,9 +71,9 @@ deploygate {
   // You can also specify additional options for each flavor.
   apks {
     
-    // this correnspond to `debug` flavor and used for `uploadDeployGateDebug` task 
+    // this correspond to `debug` flavor and used for `uploadDeployGateDebug` task 
     debug {
-      // protip: get git hash for current commit for easier troubleshooting
+      // ProTip: get git hash for current commit for easier troubleshooting
       def hash = "git rev-parse --short HEAD".execute().text.trim()
       // set as build message
       message = "debug build ${hash}"
