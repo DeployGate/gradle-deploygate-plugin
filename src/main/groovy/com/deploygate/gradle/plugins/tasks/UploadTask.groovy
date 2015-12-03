@@ -22,17 +22,19 @@ class UploadTask extends DefaultTask {
 
     @TaskAction
     def upload() {
-        if (!hasSigningConfig) {
+        if (!hasSigningConfig)
             throw new GradleException('Cannot upload a build without code signature to DeployGate')
-        }
 
         DeployTarget target = project.deploygate.apks.findByName(outputName)
         if (!target)
             target = new DeployTarget(outputName)
-        if (target.sourceFile == null)
+        if (!target.sourceFile)
             target.sourceFile = defaultSourceFile
 
-        project.deploygate.notifyServer 'start_upload', [ 'length': Long.toString(target.sourceFile?.length()) ]
+        if (!target.sourceFile?.exists())
+            throw new GradleException("APK file not found")
+
+        project.deploygate.notifyServer 'start_upload', [ 'length': Long.toString(target.sourceFile.length()) ]
 
         def res = uploadProject(project, target)
 
