@@ -5,11 +5,12 @@ import com.deploygate.gradle.plugins.utils.UrlUtils
 import org.gradle.api.NamedDomainObjectContainer
 
 public class DeployGateExtension {
-    String token
-    String userName
-    NamedDomainObjectContainer<DeployTarget> apks
+    def String token
+    def String userName
+    def String endpoint = Config.DEPLOYGATE_ROOT
 
-    String notifyKey = null
+    def NamedDomainObjectContainer<DeployTarget> apks
+    def String notifyKey = null
 
     public DeployGateExtension(NamedDomainObjectContainer<DeployTarget> apkTargets) {
         this.apks = apkTargets
@@ -28,7 +29,7 @@ public class DeployGateExtension {
             query = query + data
 
         try {
-            new URL("${Config.DEPLOYGATE_HOST}/cli/notify?${UrlUtils.toQueryString(query)}").getText()
+            new URL("${endpoint}/cli/notify?${UrlUtils.toQueryString(query)}").getText()
         } catch (e) {}
     }
 }

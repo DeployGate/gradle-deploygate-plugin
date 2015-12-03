@@ -1,11 +1,10 @@
 package com.deploygate.gradle.plugins
 
-import com.deploygate.gradle.plugins.entities.DeployTarget
 import com.deploygate.gradle.plugins.entities.DeployGateExtension
-import com.deploygate.gradle.plugins.tasks.LogoutTask
+import com.deploygate.gradle.plugins.entities.DeployTarget
 import com.deploygate.gradle.plugins.tasks.LoginTask
+import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.UploadTask
-import org.apache.commons.lang.WordUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -15,9 +14,9 @@ class DeployGate implements Plugin<Project> {
     void apply(Project project) {
         tasksToCreate = new HashSet<>()
         setupExtension project
-        project.afterEvaluate {
-            if (it.plugins.hasPlugin('com.android.application')) {
-                createDeployGateTasks it
+        project.afterEvaluate { prj ->
+            if (['com.android.application', 'android'].any { prj.plugins.hasPlugin(it) }) {
+                createDeployGateTasks prj
             }
         }
         project.gradle.buildFinished { buildResult ->
@@ -69,7 +68,7 @@ class DeployGate implements Plugin<Project> {
             outputFile = output.outputFile
         }
 
-        def capitalized = WordUtils.capitalize(name)
+        def capitalized = name.capitalize()
         def taskName = "uploadDeployGate${capitalized}"
         project.task(taskName,
                 type: UploadTask,

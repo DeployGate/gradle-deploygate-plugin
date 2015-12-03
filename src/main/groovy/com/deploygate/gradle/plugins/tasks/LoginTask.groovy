@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins.tasks
 
-import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import com.sun.net.httpserver.HttpExchange
@@ -65,7 +64,7 @@ class LoginTask extends DefaultTask {
         try {
             server = startLocalServer()
             if (Desktop.isDesktopSupported()) {
-                def url = "${Config.DEPLOYGATE_HOST}/cli/login?port=${port}"
+                def url = "${project.deploygate.endpoint}/cli/login?port=${port}"
                 try {
                     Desktop.getDesktop().browse(URI.create(url))
                 } catch (e) {
@@ -137,7 +136,7 @@ class LoginTask extends DefaultTask {
 
     def getCredentialJsonFromKey(key) {
         try {
-            new URL("${Config.DEPLOYGATE_HOST}/cli/credential?key=${key}").getText()
+            new URL("${project.deploygate.endpoint}/cli/credential?key=${key}").getText()
         } catch (e) {
             logger.error('failed to retrieve credential: ' + e.message)
             return null
