@@ -8,11 +8,9 @@ jdk:
 - openjdk7
 before_install:
 - openssl aes-256-cbc -K $encrypted_3d2a2d8844ff_key -iv $encrypted_3d2a2d8844ff_iv
-  -in secret.key.enc -out ./secret.key -d
-- openssl aes-256-cbc -K $encrypted_3d2a2d8844ff_key -iv $encrypted_3d2a2d8844ff_iv
-  -in pub.key.enc -out ./pub.key -d
-- gpg --import pub.key
+  -in secret.key.enc -out secret.key -d
 - gpg --import --allow-secret-key-import secret.key
+- rm secret.key
 script:
 - "./gradlew build test"
 deploy:
