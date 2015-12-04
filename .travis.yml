@@ -18,6 +18,6 @@ deploy:
   provider: script
   script: ./release.sh
   on:
-    branch: auto_release
+    branch: release
 after_deploy:
 - 'curl -X POST --data-urlencode "payload={\"channel\": \"#devs\", \"username\": \"DG-RELEASE-GRADLE-PLUGIN\", \"text\": \"Released a gradle-deploygate-plugin in Maven Central! Please check <https://oss.sonatype.org/content/groups/public/com/deploygate/|public> or <https://oss.sonatype.org/index.html#stagingRepositories|stagingRepositories>\", \"icon_emoji\": \":tada:\"}" $SLACK_URL'
