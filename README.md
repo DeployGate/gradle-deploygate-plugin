@@ -1,75 +1,114 @@
+#  Gradle DeployGate Plugin
+
 [![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
 
-This is the DeployGate plugin for the Gradle.  
-This plugin, you can use the deploygate API from Gradle easily.
+This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
 
-For issue tracking see the GitHub issues page: https://github.com/DeployGate/gradle-deploygate-plugin/issues
+## Getting started
 
-## Update
-### ver 0.6.2
-* Supported proxy
-
-### ver 0.6.1
-* Fix error message
-* Supported Push API visibility option
-
-## Usage
-### Tasks
-* uploadDeployGate              - Uploads the APK file. Also updates the distribution specified by distributionKey if configured
-* uploadDeployGate[FlavorName]  - Upload an APK file of [FlavorName]
-
-### Edit build.gradle
-
+1) Open your <code>build.gradle</code> on your project root and add a dependency.
+```groovy
+dependency {
+  classpath 'com.deploygate:gradle:1.0.0'
+}
 ```
+
+2) Open your module build script file (<em>e.g.</em> <code>app/build.gradle</code>) and add the following line just after <code>apply plugin: 'com.android.application'</code>.
+```groovy
+apply plugin: 'deploygate'
+```
+
+3) If you are using Android Studio, click <strong>Sync Now</strong> link appearing on the right top corner of your editor window.
+
+4) You are all set! Open <strong>Gradle</strong> tab on the right side of your Android Studio, and select <strong>Tasks - deploygate - uploadDeployGateDebug</strong> under your app module, or you can run as a Gradle command like:
+```
+./gradlew :app:uploadDeployGateDebug
+```
+
+By running `uploadDeployGate<FlavorName>` task, it will build your application,
+set up your DeployGate credentials (for the first time) and upload your application.
+You can deploy an update of your application by running the same task.
+
+
+# Usage
+
+## Tasks
+
+Run `./gradlew tasks` on your project root to see all available tasks. 
+
+* uploadDeployGate[FlavorName]  - Build and upload app of [FlavorName]
+* loginDeployGate - Log in to DeployGate and save credentials locally
+* logoutDeployGate - Delete current credentials
+
+## Example of `build.gradle`
+
+### Project Build File
+
+```groovy
 buildscript {
   repositories {
     jcenter()
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:0.6.2'
+    classpath 'com.deploygate:gradle:1.0.0'   // add this line
   }
 }
-apply plugin: 'deploygate'
+```
 
+### Module Build File
+
+```groovy
+apply plugin: 'deploygate'                    // add this *after* 'android' plugin 
+
+// Optional configurations
 deploygate {
-  userName = "[owner name]"
-  token = "[token]"
 
+  // If you are using automated build, you can specify your account credentials like this
+  userName = "[username of app owner]"
+  token = "[your API token]"
+
+  // You can also specify additional options for each flavor.
   apks {
-    release {
-      sourceFile = file("[apk1 file path]")
-    }
-
+    
+    // this correspond to `debug` flavor and used for `uploadDeployGateDebug` task 
     debug {
-      sourceFile = file("[apk2 file path]")
+      // ProTip: get git hash for current commit for easier troubleshooting
+      def hash = ["sh",  "-c",  "cd ${project.rootDir} ; git rev-parse --short HEAD"].execute().in.text.trim()
+      // set as build message
+      message = "debug build ${hash}"
 
-      //Below is optional
-      message = "test upload2 sample"
-      visibility = "public" // default private
-      distributionKey = "[distribution_key]"
+      // if you are using a distribution page, you can update it simultaneously
+      distributionKey = "1234567890abcdef1234567890abcdef"
       releaseNote = "release note sample"
     }
+    
+    // this creates `uploadDeployGateCustom` task to upload arbitrary APK file 
+    custom {
+      // set target file
+      sourceFile = "${project.rootDir}/app/build/some-custom-build.apk"
+    }
   }
 }
 ```
-Replace [owner name] [apk file path] [token] [distribution_key] with your param.  
-Please check [Push API](https://deploygate.com/docs/api) for param information. 
 
-### Run
+# History
 
-```
-$ gradle uploadDeployGate 
-```
+## ver 1.0.0
 
-or
+* Support browser log in and share credentials with `dg` command. 
+* DeployGate plugin now handles all Android project automatically, so you don't have to write `deploygate` settings to your `build.gradle`.
 
-```
-$ gradle uploadDeployGate[FlavorName]
-```
+## ver 0.6.2
+* Supported proxy
 
-## License
-Copyright 2012-2014 DeployGate, henteko
+## ver 0.6.1
+* Fix error message
+* Supported Push API visibility option
+
+# License
+
+Copyright 2015 DeployGate Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

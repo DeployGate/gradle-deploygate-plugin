@@ -1,5 +1,20 @@
-build
 .gradle
+build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# IntelliJ IDEA
+*.iml
+.idea/
+
+# others
 .DS_Store
 gradle.properties
 src/test/project/userHome

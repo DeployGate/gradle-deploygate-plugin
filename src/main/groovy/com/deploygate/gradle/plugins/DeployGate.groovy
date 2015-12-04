@@ -1,28 +1,100 @@
 package com.deploygate.gradle.plugins
 
-import org.gradle.api.GradleException
+import com.deploygate.gradle.plugins.entities.DeployGateExtension
+import com.deploygate.gradle.plugins.entities.DeployTarget
+import com.deploygate.gradle.plugins.tasks.LoginTask
+import com.deploygate.gradle.plugins.tasks.LogoutTask
+import com.deploygate.gradle.plugins.tasks.UploadTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.apache.commons.lang.WordUtils
 
 class DeployGate implements Plugin<Project> {
-    void apply(Project project) {
-        def apks = project.container(ApkTarget) {
-            String apkName = WordUtils.capitalize(it.toString())
-            def userTask = project.task("uploadDeployGate${apkName}", type: DeployGateUserUploadTask)
-            userTask.group = 'DeployGate' 
-            userTask.description = "Upload an APK file of ${apkName}" 
-            userTask.apkName = apkName
+    HashSet<String> tasksToCreate
 
-            project.extensions.create(it, ApkTarget, apkName)
+    void apply(Project project) {
+        tasksToCreate = new HashSet<>()
+        setupExtension project
+        project.afterEvaluate { prj ->
+            if (['com.android.application', 'android'].any { prj.plugins.hasPlugin(it) }) {
+                createDeployGateTasks prj
+            }
+        }
+        project.gradle.buildFinished { buildResult ->
+            project.deploygate.notifyServer 'finished', [ result: Boolean.toString(buildResult.failure == null) ]
+        }
+    }
+
+    def setupExtension (Project project) {
+        def apkTargets = project.container(DeployTarget)
+        apkTargets.all {
+            tasksToCreate.add name
+        }
+        project.extensions.add 'deploygate', new DeployGateExtension(apkTargets)
+    }
+
+    def createDeployGateTasks (project) {
+        project.task 'logoutDeployGate', type: LogoutTask, group: 'DeployGate'
+        def loginTask = project.task('loginDeployGate', type: LoginTask, group: 'DeployGate')
+
+        // @see ApplicationVariantFactory#createVariantData
+        // variant is for applicationFlavors
+        project.android.applicationVariants.all { variant ->
+            // variant is for splits
+            variant.outputs.eachWithIndex { output, idx ->
+                createTask(project, output, loginTask)
+                tasksToCreate.remove output.name
+            }
         }
 
-        def deploygate = new DeployGateExtension(apks)
-        project.convention.plugins.deploygate = deploygate 
-        project.extensions.deploygate = deploygate
+        tasksToCreate.each { name ->
+            createTask(project, name, loginTask)
+        }
+    }
 
-        def apkUpload = project.task('uploadDeployGate', type: DeployGateAllUploadTask)
-        apkUpload.group = 'DeployGate' 
-        apkUpload.description = 'Uploads the APK file. Also updates the distribution specified by distributionKey if configured'
+    private void createTask(project, output, loginTask) {
+        def name
+        def signingReady = true
+        def isUniversal = true
+        def assemble = null
+        def outputFile = null
+
+        if (output instanceof String) {
+            name = output
+        } else {
+            name = output.name
+            signingReady = output.variantOutputData.variantData.signed
+            isUniversal = output.outputs.get(0).filters.size() == 0
+            assemble = output.assemble
+            outputFile = output.outputFile
+        }
+
+        def capitalized = name.capitalize()
+        def taskName = "uploadDeployGate${capitalized}"
+        project.task(taskName,
+                type: UploadTask,
+                dependsOn: ([ assemble, loginTask ] - null),
+                overwrite: true) {
+
+            def desc = "Deploy assembled ${capitalized} to DeployGate"
+
+            // require signing config to build a signed APKs
+            if (!signingReady) {
+                desc += " (requires valid signingConfig setting)"
+            }
+
+            // universal builds show in DeployGate group
+            if (isUniversal) {
+                group 'DeployGate'
+            }
+
+            description desc
+            outputName name
+            hasSigningConfig signingReady
+
+            defaultSourceFile outputFile
+        }
     }
 }
+
+
+
