@@ -7,15 +7,17 @@ env:
   - secure: QxW33yGF9/tSieBkR6B3Vhr7IlvzOA0HlsFjr3QJZ/8/NDtXbFZxDFgF02s217r9IhUlSLXO99CdgBPrEPiJlZ1Zue15TdTKXM4z+aJfcCkIL8wxw2lm4tGmi4YAKinSVA0x8KDNO2X/o7wWLbfi8hTY7vj8w0BnklIn6sQILc8=
 jdk:
 - openjdk7
-before_install:
+script:
+- "./gradlew build test"
+before_deploy:
 - openssl aes-256-cbc -K $encrypted_3d2a2d8844ff_key -iv $encrypted_3d2a2d8844ff_iv
   -in secret.key.enc -out secret.key -d
 - gpg --import --allow-secret-key-import secret.key
 - rm secret.key
-script:
-- "./gradlew build test"
 deploy:
   provider: script
   script: ./release.sh
   on:
     branch: auto_release
+after_deploy:
+- 'curl -X POST --data-urlencode "payload={\"channel\": \"#dev\", \"username\": \"DG-RELEASE-GRADLE-PLUGIN\", \"text\": \"Released a gradle-deploygate-plugin in Maven Central! Please check <https://oss.sonatype.org/content/groups/public/com/deploygate/|public> or <https://oss.sonatype.org/index.html#stagingRepositories|stagingRepositories>\", \"icon_emoji\": \":tada:\"}" $SLACK_URL'
