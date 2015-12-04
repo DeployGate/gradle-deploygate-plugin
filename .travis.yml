@@ -1,6 +1,4 @@
 language: java
-branches:
-  only: auto_release
 env:
   global:
   - secure: RrOxRkXn7IHW3kz1qg4X9XC99qB7Kt6tEFOlKSIpkZjFjst+TchaYzupt6ZplQ8Syj1tEhh6OibP3c0SIdtF4ztTViirgzRtbXXNbNICoYuDPxFFIWIN5eq6HgNnRf7aPy/oDi0sVtLmPaKG06MgviiSgEpnF6MhBgVKA6/CAfI=
@@ -17,9 +15,8 @@ before_install:
 - gpg --import --allow-secret-key-import secret.key
 script:
 - "./gradlew build test"
-- "./gradlew clean build uploadArchives -Psigning.secretKeyRingFile=$HOME/.gnupg/secring.gpg
-  -PsonatypeUsername=henteko -PsonatypeFullname=deploygate -Psigning.keyId=$SIGNING_KEY_ID
-  -Psigning.password=$SIGNING_PASSWORD -PsonatypePassword=$SONATYPE_PASSWORD"
-notifications:
-  slack:
-    secure: AKYACFZgCynbYDQnYy84nluHckTKA/p7Q5IlN4MzPwz7Hz9aDoa9upOR+6puJgPVerlLIiQYGztyzbu5O5NowqRdssVqWT+tIuAvg8xY6jb0wgLPfyCmMpJz728aunbwBSBqgxs7hKtnHVFhaIYnEvnYL31DiDGO3tarKVg23OU=
+deploy:
+  provider: script
+  script: release.sh
+  on:
+    branch: auto_release
