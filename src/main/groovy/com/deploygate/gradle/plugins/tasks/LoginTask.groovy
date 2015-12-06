@@ -49,11 +49,19 @@ class LoginTask extends DefaultTask {
 
     def setupCredential() {
         saved = false
-        if (Desktop.isDesktopSupported()) {
+        if ( !isAwtHeadless() && !isCiEnvironment() && Desktop.isDesktopSupported() ) {
             setupBrowser()
         } else {
             setupTerminal()
         }
+    }
+
+    boolean isCiEnvironment() {
+        System.getenv('CI') || System.getenv('JENKINS_URL')
+    }
+
+    boolean isAwtHeadless() {
+        System.getProperty('java.awt.headless')
     }
 
     def setupTerminal() {
