@@ -74,7 +74,7 @@ deploygate {
     // this correspond to `debug` flavor and used for `uploadDeployGateDebug` task 
     debug {
       // ProTip: get git hash for current commit for easier troubleshooting
-      def hash = ["sh",  "-c",  "cd ${project.rootDir} ; git rev-parse --short HEAD"].execute().in.text.trim()
+      def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
       // set as build message
       message = "debug build ${hash}"
 

@@ -1,4 +1,5 @@
 language: java
+sudo: false
 env:
   global:
   - secure: RrOxRkXn7IHW3kz1qg4X9XC99qB7Kt6tEFOlKSIpkZjFjst+TchaYzupt6ZplQ8Syj1tEhh6OibP3c0SIdtF4ztTViirgzRtbXXNbNICoYuDPxFFIWIN5eq6HgNnRf7aPy/oDi0sVtLmPaKG06MgviiSgEpnF6MhBgVKA6/CAfI=
