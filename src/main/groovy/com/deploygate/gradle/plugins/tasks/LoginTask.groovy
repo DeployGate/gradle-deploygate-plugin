@@ -29,14 +29,22 @@ class LoginTask extends DefaultTask {
             if (!setupCredential())
                 throw new RuntimeException('Failed to retrieve DeployGate credentials. Please try again or specify it in your build.gradle script.')
 
-        if (!project.deploygate.userName)
-            project.deploygate.userName = localCredential.name
-        if (!project.deploygate.token)
-            project.deploygate.token = localCredential.token
+        project.deploygate.userName =
+                [project.deploygate.userName, System.getenv('DEPLOYGATE_USER_NAME'), localCredential.name].find {
+                    it != null
+                }
+        project.deploygate.token =
+                [project.deploygate.token, System.getenv('DEPLOYGATE_API_TOKEN'), localCredential.token].find {
+                    it != null
+                }
     }
 
     boolean hasCredential() {
-        hasCreadentialInScript() || hasSavedCredential()
+        hasCreadentialInScript() || hasSavedCredential() || hasCredentialInEnv()
+    }
+
+    boolean hasCredentialInEnv() {
+        System.getenv('DEPLOYGATE_USER_NAME') && System.getenv('DEPLOYGATE_API_TOKEN')
     }
 
     private boolean hasSavedCredential() {
@@ -49,7 +57,7 @@ class LoginTask extends DefaultTask {
 
     def setupCredential() {
         saved = false
-        if ( !isAwtHeadless() && !isCiEnvironment() && Desktop.isDesktopSupported() ) {
+        if (!isAwtHeadless() && !isCiEnvironment() && Desktop.isDesktopSupported()) {
             setupBrowser()
         } else {
             setupTerminal()
@@ -153,7 +161,7 @@ class LoginTask extends DefaultTask {
     String getCredentialJsonFromKey(key) {
         try {
             HTTPBuilderFactory.restClient(project.deploygate.endpoint).
-                    get(path: '/cli/credential', query: [ key: key ], contentType: ContentType.TEXT).data.text
+                    get(path: '/cli/credential', query: [key: key], contentType: ContentType.TEXT).data.text
         } catch (e) {
             logger.error('failed to retrieve credential: ' + e.message)
             return null
