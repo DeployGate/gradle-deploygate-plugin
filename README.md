@@ -107,6 +107,13 @@ to provide default values for DeployGate Plugin instead of writing in `build.gra
 By using environment variables, you can avoid storing your credentials
 in your source code repository and compose deployment messages dynamically.
 
+For example, you can set application owner user to the organization you are belonging to
+by running task like:
+
+```
+DEPLOYGATE_USER_NAME=YourOrganizationName ./gradlew :app:uploadDeployGateDebug
+```
+
 Note that these values are used as default values so `build.gradle` may override them.
 
 

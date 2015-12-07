@@ -47,10 +47,10 @@ class UploadTask extends DefaultTask {
     private def fillFromEnv(DeployTarget target) {
         target.with {
             sourceFile = sourceFile ?: project.file(System.getenv('DEPLOYGATE_SOURCE_FILE'))
-            message = message ?: project.file(System.getenv('DEPLOYGATE_MESSAGE'))
-            distributionKey = distributionKey ?: project.file(System.getenv('DEPLOYGATE_DISTRIBUTION_KEY'))
-            releaseNote = releaseNote ?: project.file(System.getenv('DEPLOYGATE_RELEASE_NOTE'))
-            visibility = visibility ?: project.file(System.getenv('DEPLOYGATE_VISIBILITY'))
+            message = message ?: System.getenv('DEPLOYGATE_MESSAGE')
+            distributionKey = distributionKey ?: System.getenv('DEPLOYGATE_DISTRIBUTION_KEY')
+            releaseNote = releaseNote ?: System.getenv('DEPLOYGATE_RELEASE_NOTE')
+            visibility = visibility ?: System.getenv('DEPLOYGATE_VISIBILITY')
         }
     }
 
