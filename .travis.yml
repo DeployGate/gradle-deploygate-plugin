@@ -1,4 +1,5 @@
 language: java
+sudo: false
 env:
   global:
   - secure: RrOxRkXn7IHW3kz1qg4X9XC99qB7Kt6tEFOlKSIpkZjFjst+TchaYzupt6ZplQ8Syj1tEhh6OibP3c0SIdtF4ztTViirgzRtbXXNbNICoYuDPxFFIWIN5eq6HgNnRf7aPy/oDi0sVtLmPaKG06MgviiSgEpnF6MhBgVKA6/CAfI=
@@ -18,6 +19,7 @@ deploy:
   provider: script
   script: ./release.sh
   on:
-    branch: release
+    tags: true
+    repo: DeployGate/gradle-deploygate-plugin
 after_deploy:
-- 'curl -X POST --data-urlencode "payload={\"channel\": \"#devs\", \"username\": \"DG-RELEASE-GRADLE-PLUGIN\", \"text\": \"Released a gradle-deploygate-plugin in Maven Central! Please check <https://oss.sonatype.org/content/groups/public/com/deploygate/|public> or <https://oss.sonatype.org/index.html#stagingRepositories|stagingRepositories>\", \"icon_emoji\": \":tada:\"}" $SLACK_URL'
+- 'curl -X POST --data-urlencode "payload={\"text\": \"Released a gradle-deploygate-plugin in Maven Central! Please check <https://oss.sonatype.org/content/groups/public/com/deploygate/|public> or <https://oss.sonatype.org/index.html#stagingRepositories|stagingRepositories>\"}" $SLACK_URL'
