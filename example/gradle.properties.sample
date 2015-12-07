@@ -1,6 +1,3 @@
-ownerName=yourName
-myToken=yourToken
-
-// set proxy
+// You can configure HTTP Proxy setting via systemProp
 systemProp.https.proxyHost=proxyHost
 systemProp.https.proxyPort=proxyPort
