@@ -9,7 +9,7 @@ This is the DeployGate plugin for the Gradle. You can build and deploy your apps
 1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
-  classpath 'com.deploygate:gradle:1.0.0'
+  classpath 'com.deploygate:gradle:1.0.1'
 }
 ```
 
@@ -51,7 +51,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:1.0.0'   // add this line
+    classpath 'com.deploygate:gradle:1.0.1'   // add this line
   }
 }
 ```
@@ -92,7 +92,37 @@ deploygate {
 }
 ```
 
+### Environment Variables for CI
+
+If you are using Continuous Integration, you can set these environment variables 
+to provide default values for DeployGate Plugin instead of writing in `build.gradle`.
+
+ * `DEPLOYGATE_USER_NAME`
+ * `DEPLOYGATE_API_TOKEN`
+ * `DEPLOYGATE_MESSAGE`
+ * `DEPLOYGATE_DISTRIBUTION_KEY`
+ * `DEPLOYGATE_RELEASE_NOTE`
+ * `DEPLOYGATE_SOURCE_FILE`
+
+By using environment variables, you can avoid storing your credentials
+in your source code repository and compose deployment messages dynamically.
+
+For example, you can set application owner user to the organization you are belonging to
+by running task like:
+
+```
+DEPLOYGATE_USER_NAME=YourOrganizationName ./gradlew :app:uploadDeployGateDebug
+```
+
+Note that these values are used as default values so `build.gradle` may override them.
+
+
 # History
+
+## ver 1.0.1
+
+* Prevent invoking browser on headless environment
+* Allow passing values from environment variable
 
 ## ver 1.0.0
 

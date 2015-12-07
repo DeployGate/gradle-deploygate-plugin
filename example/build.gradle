@@ -2,24 +2,39 @@ buildscript {
     repositories {
         jcenter()
     }
-
     dependencies {
-        classpath 'com.deploygate:gradle:0.6.2'
+        classpath 'com.deploygate:gradle:1.0.1'
     }
 }
-apply plugin: 'deploygate'
 
+apply plugin: 'deploygate'                    // add this *after* 'android' plugin
+
+// Optional configurations
 deploygate {
-    userName = ownerName
-    token = myToken
 
+    // If you are using automated build, you can specify your account credentials like this
+    userName = "[username of app owner]"
+    token = "[your API token]"
+
+    // You can also specify additional options for each flavor.
     apks {
-        example {
-            sourceFile = file("./DeployGateSample.apk")
 
-            //Below is optional
-            message = "example upload deploygate sample apk"
-            visibility = "public" // public or private
+        // this correspond to `debug` flavor and used for `uploadDeployGateDebug` task
+        debug {
+            // ProTip: get git hash for current commit for easier troubleshooting
+            def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
+            // set as build message
+            message = "debug build ${hash}"
+
+            // if you are using a distribution page, you can update it simultaneously
+            distributionKey = "1234567890abcdef1234567890abcdef"
+            releaseNote = "release note sample"
+        }
+
+        // this creates `uploadDeployGateCustom` task to upload arbitrary APK file
+        custom {
+            // set target file
+            sourceFile = "${project.rootDir}/app/build/some-custom-build.apk"
         }
     }
 }

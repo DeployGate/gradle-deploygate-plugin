@@ -30,6 +30,7 @@ class UploadTask extends DefaultTask {
             target = new DeployTarget(outputName)
         if (!target.sourceFile)
             target.sourceFile = defaultSourceFile
+        fillFromEnv(target)
 
         if (!target.sourceFile?.exists())
             throw new GradleException("APK file not found")
@@ -37,11 +38,20 @@ class UploadTask extends DefaultTask {
         project.deploygate.notifyServer 'start_upload', [ 'length': Long.toString(target.sourceFile.length()) ]
 
         def res = uploadProject(project, target)
-
         if (res.error)
             project.deploygate.notifyServer 'upload_finished', [ 'error': true, message: res.message ]
         else
             project.deploygate.notifyServer 'upload_finished', [ 'path': res.results.path ]
+    }
+
+    private def fillFromEnv(DeployTarget target) {
+        target.with {
+            sourceFile = sourceFile ?: project.file(System.getenv('DEPLOYGATE_SOURCE_FILE'))
+            message = message ?: System.getenv('DEPLOYGATE_MESSAGE')
+            distributionKey = distributionKey ?: System.getenv('DEPLOYGATE_DISTRIBUTION_KEY')
+            releaseNote = releaseNote ?: System.getenv('DEPLOYGATE_RELEASE_NOTE')
+            visibility = visibility ?: System.getenv('DEPLOYGATE_VISIBILITY')
+        }
     }
 
     def uploadProject(Project project, DeployTarget apk) {
