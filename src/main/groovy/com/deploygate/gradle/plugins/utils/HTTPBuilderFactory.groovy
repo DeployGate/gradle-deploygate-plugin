@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.utils
 
+import com.deploygate.gradle.plugins.Config
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.RESTClient
 import org.apache.http.impl.conn.ProxySelectorRoutePlanner
@@ -12,12 +13,18 @@ class HTTPBuilderFactory {
         )
         httpBuilder
     }
+    static HTTPBuilder setDefaultRequestHeaders(HTTPBuilder httpBuilder) {
+        httpBuilder.headers = [
+                'User-Agent': Config.USER_AGENT
+        ]
+        httpBuilder
+    }
 
     static HTTPBuilder httpBuilder(endpoint) {
-        setDefaultProxy new HTTPBuilder(endpoint)
+        setDefaultProxy(setDefaultRequestHeaders(new HTTPBuilder(endpoint)))
     }
 
     static RESTClient restClient(endpoint) {
-        setDefaultProxy new RESTClient(endpoint)
+        setDefaultProxy(setDefaultRequestHeaders(new RESTClient(endpoint)))
     }
 }
