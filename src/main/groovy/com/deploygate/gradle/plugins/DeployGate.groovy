@@ -36,6 +36,8 @@ class DeployGate implements Plugin<Project> {
         project.task 'logoutDeployGate', type: LogoutTask, group: 'DeployGate'
         def loginTask = project.task('loginDeployGate', type: LoginTask, group: 'DeployGate')
 
+        createMultipleUploadTask(project, tasksToCreate)
+
         // @see ApplicationVariantFactory#createVariantData
         // variant is for applicationFlavors
         project.android.applicationVariants.all { variant ->
@@ -94,7 +96,12 @@ class DeployGate implements Plugin<Project> {
             defaultSourceFile outputFile
         }
     }
+
+    def createMultipleUploadTask(Project project, HashSet<String> dependsOn) {
+        if (dependsOn.empty) return
+        project.task 'uploadDeployGate',
+                dependsOn: dependsOn.toArray().collect { "uploadDeployGate${it.capitalize()}" },
+                description: 'Upload all builds defined in build.gradle to DeployGate',
+                group: 'DeployGate'
+    }
 }
-
-
-
