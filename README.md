@@ -9,7 +9,7 @@ This is the DeployGate plugin for the Gradle. You can build and deploy your apps
 1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
-  classpath 'com.deploygate:gradle:1.0.1'
+  classpath 'com.deploygate:gradle:1.0.2'
 }
 ```
 
@@ -36,9 +36,11 @@ You can deploy an update of your application by running the same task.
 
 Run `./gradlew tasks` on your project root to see all available tasks. 
 
-* uploadDeployGate[FlavorName]  - Build and upload app of [FlavorName]
-* loginDeployGate - Log in to DeployGate and save credentials locally
-* logoutDeployGate - Delete current credentials
+* `uploadDeployGate[FlavorName]` - Build and upload app of [FlavorName]
+* `loginDeployGate` - Log in to DeployGate and save credentials locally
+* `logoutDeployGate` - Delete current credentials
+
+If you define flavors in `apks` section, there will also be `uploadDeployGate` task which can upload all the flavors at once.   
 
 ## Example of `build.gradle`
 
@@ -51,7 +53,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:1.0.1'   // add this line
+    classpath 'com.deploygate:gradle:1.0.2'   // add this line
   }
 }
 ```
@@ -119,22 +121,19 @@ Note that these values are used as default values so `build.gradle` may override
 
 # History
 
+## ver 1.0.2
+
+ * Restore `uploadDeployGate` feature
+
 ## ver 1.0.1
 
-* Prevent invoking browser on headless environment
-* Allow passing values from environment variable
+ * Prevent invoking browser on headless environment
+ * Allow passing values from environment variable
 
 ## ver 1.0.0
 
-* Support browser log in and share credentials with `dg` command. 
-* DeployGate plugin now handles all Android project automatically, so you don't have to write `deploygate` settings to your `build.gradle`.
-
-## ver 0.6.2
-* Supported proxy
-
-## ver 0.6.1
-* Fix error message
-* Supported Push API visibility option
+ * Support browser log in and share credentials with `dg` command. 
+ * DeployGate plugin now handles all Android project automatically, so you don't have to write `deploygate` settings to your `build.gradle`.
 
 # License
 
