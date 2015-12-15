@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
+import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import com.sun.net.httpserver.HttpExchange
@@ -10,7 +11,6 @@ import groovyx.net.http.ContentType
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
-import java.awt.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -57,19 +57,11 @@ class LoginTask extends DefaultTask {
 
     def setupCredential() {
         saved = false
-        if (!isAwtHeadless() && !isCiEnvironment() && Desktop.isDesktopSupported()) {
+        if (BrowserUtils.hasBrowser()) {
             setupBrowser()
         } else {
             setupTerminal()
         }
-    }
-
-    boolean isCiEnvironment() {
-        System.getenv('CI') || System.getenv('JENKINS_URL')
-    }
-
-    boolean isAwtHeadless() {
-        System.getProperty('java.awt.headless')
     }
 
     def setupTerminal() {
@@ -96,18 +88,14 @@ class LoginTask extends DefaultTask {
         }
     }
 
-    void openBrowser() {
+    boolean openBrowser() {
         def url = "${project.deploygate.endpoint}/cli/login?port=${port}&client=gradle"
-        if (Desktop.isDesktopSupported()) {
-            try {
-                Desktop.getDesktop().browse(URI.create(url))
-                return
-            } catch (e) {
-                logger.warn "Could not open a browser: ${e.message}"
-            }
-        }
+        if (BrowserUtils.openBrowser(url))
+            return true
+        logger.warn 'Could not open a browser on current environment.'
         println 'Please log in to DeployGate by opening the following URL on your browser:'
         println url
+        false
     }
 
     def startLocalServer() {
