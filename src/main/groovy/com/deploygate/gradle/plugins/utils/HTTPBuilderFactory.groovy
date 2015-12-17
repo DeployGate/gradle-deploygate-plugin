@@ -26,6 +26,6 @@ class HTTPBuilderFactory {
     }
 
     static RESTClient restClient(endpoint) {
-        setDefaultProxy(setDefaultRequestHeaders(new RESTClient(endpoint)))
+        setDefaultProxy(setDefaultRequestHeaders(new RESTClient(endpoint))) as RESTClient
     }
 }
