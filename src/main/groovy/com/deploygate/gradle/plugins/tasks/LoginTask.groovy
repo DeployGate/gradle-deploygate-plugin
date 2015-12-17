@@ -5,7 +5,6 @@ import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import com.sun.net.httpserver.HttpExchange
-import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
 import groovyx.net.http.ContentType
 import org.gradle.api.DefaultTask
@@ -103,21 +102,18 @@ class LoginTask extends DefaultTask {
         def httpServer = HttpServer.create(address, 0)
         port = httpServer.address.port
 
-        httpServer.createContext "/token", new HttpHandler() {
-            @Override
-            void handle(HttpExchange httpExchange) throws IOException {
-                def query = UrlUtils.parseQueryString(httpExchange.requestURI.query)
-                project.deploygate.notifyKey = query.key
-                httpExchange.sendResponseHeaders(204, -1)
-                httpExchange.close()
+        httpServer.createContext "/token", { HttpExchange httpExchange ->
+            def query = UrlUtils.parseQueryString(httpExchange.requestURI.query)
+            project.deploygate.notifyKey = query.key
+            httpExchange.sendResponseHeaders(204, -1)
+            httpExchange.close()
 
-                if (!query.containsKey('cancel')) {
-                    retrieveCredentialFromKey(query.key)
-                    project.deploygate.notifyServer 'credential_saved'
-                }
-
-                latch.countDown()
+            if (!query.containsKey('cancel')) {
+                retrieveCredentialFromKey(query.key)
+                project.deploygate.notifyServer 'credential_saved'
             }
+
+            latch.countDown()
         }
         httpServer.start()
         httpServer

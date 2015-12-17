@@ -25,13 +25,14 @@ public class DeployGateExtension {
         if (!notifyKey)
             return
 
-        def query = [ 'key': notifyKey, 'command_action': action ]
+        def query = ['key': notifyKey, 'command_action': action]
         if (data)
             query = query + data
 
         try {
             HTTPBuilderFactory.httpBuilder(endpoint).post path: "/cli/notify",
                     body: query, requestContentType: ContentType.URLENC
-        } catch (e) {}
+        } catch (ignored) {
+        }
     }
 }

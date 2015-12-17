@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins.utils
 
-import java.awt.Desktop
+import java.awt.*
 
 class BrowserUtils {
     static boolean openBrowser(String url) {
@@ -8,12 +8,13 @@ class BrowserUtils {
             try {
                 Desktop.getDesktop().browse(URI.create(url))
                 return true
-            } catch (ignored) {}
+            } catch (ignored) {
+            }
         }
         false
     }
 
-    static def hasBrowser() {
+    static boolean hasBrowser() {
         !isAwtHeadless() && !isCiEnvironment() && Desktop.isDesktopSupported()
     }
 

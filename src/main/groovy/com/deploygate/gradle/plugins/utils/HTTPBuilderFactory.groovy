@@ -13,6 +13,7 @@ class HTTPBuilderFactory {
         )
         httpBuilder
     }
+
     static HTTPBuilder setDefaultRequestHeaders(HTTPBuilder httpBuilder) {
         httpBuilder.headers = [
                 'User-Agent': Config.USER_AGENT

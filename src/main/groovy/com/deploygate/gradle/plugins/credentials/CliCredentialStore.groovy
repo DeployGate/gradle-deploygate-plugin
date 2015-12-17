@@ -12,18 +12,17 @@ class CliCredentialStore {
         load()
     }
 
-    def load() {
+    boolean load() {
         def contents = loadLocalCredentialFile()
         if (contents) {
             store = new JsonSlurper().parseText(contents)
             name = store.name
             token = store.token
-            return true
+            true
         }
-        return false
     }
 
-    def save() {
+    boolean save() {
         if (!store)
             store = [:]
         store.name = name
@@ -31,26 +30,25 @@ class CliCredentialStore {
         saveLocalCredentialFile(JsonOutput.toJson(store))
     }
 
-    def delete() {
+    boolean delete() {
         localCredentialFile().delete()
     }
 
-    def loadLocalCredentialFile() {
+    String loadLocalCredentialFile() {
         def file = localCredentialFile()
         if (file.exists())
-            return file.getText('UTF-8')
-        return null
+            file.getText('UTF-8')
     }
 
-    def saveLocalCredentialFile(String str) {
+    boolean saveLocalCredentialFile(String str) {
         if (!ensureDirectoryWritable())
             return false
+
         def file = localCredentialFile()
         if (!file.exists() || file.canWrite()) {
             file.write(str, 'UTF-8')
-            return true
+            true
         }
-        return false
     }
 
     private boolean ensureDirectoryWritable() {
