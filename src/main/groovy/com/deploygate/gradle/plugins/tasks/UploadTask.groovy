@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.entities.DeployTarget
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
+import com.deploygate.gradle.plugins.utils.UrlUtils
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.Method
@@ -25,23 +26,23 @@ class UploadTask extends DefaultTask {
         if (!hasSigningConfig)
             throw new GradleException('Cannot upload a build without code signature to DeployGate')
 
+        DeployTarget target = findTarget()
+        if (!target.sourceFile?.exists())
+            throw new GradleException("APK file not found")
+
+        onBeforeUpload(target)
+        def res = uploadProject(project, target)
+        onAfterUpload(res)
+    }
+
+    private DeployTarget findTarget() {
         DeployTarget target = project.deploygate.apks.findByName(outputName)
         if (!target)
             target = new DeployTarget(outputName)
         if (!target.sourceFile)
             target.sourceFile = defaultSourceFile
         fillFromEnv(target)
-
-        if (!target.sourceFile?.exists())
-            throw new GradleException("APK file not found")
-
-        project.deploygate.notifyServer 'start_upload', [ 'length': Long.toString(target.sourceFile.length()) ]
-
-        def res = uploadProject(project, target)
-        if (res.error)
-            project.deploygate.notifyServer 'upload_finished', [ 'error': true, message: res.message ]
-        else
-            project.deploygate.notifyServer 'upload_finished', [ 'path': res.results.path ]
+        target
     }
 
     private def fillFromEnv(DeployTarget target) {
@@ -52,6 +53,26 @@ class UploadTask extends DefaultTask {
             releaseNote = releaseNote ?: System.getenv('DEPLOYGATE_RELEASE_NOTE')
             visibility = visibility ?: System.getenv('DEPLOYGATE_VISIBILITY')
         }
+    }
+
+    private void onBeforeUpload(DeployTarget target) {
+        project.deploygate.notifyServer 'start_upload', ['length': Long.toString(target.sourceFile.length())]
+    }
+
+    private void onAfterUpload(res) {
+        if (res.error)
+            project.deploygate.notifyServer 'upload_finished', ['error': true, message: res.message]
+        else {
+            def sent = project.deploygate.notifyServer 'upload_finished', ['path': res.results.path]
+            if (!sent &&
+                    (hasOpenBrowserFlag() || res.results.revision == 1)) {
+                UrlUtils.openBrowser "${project.deploygate.endpoint}${res.results.path}"
+            }
+        }
+    }
+
+    boolean hasOpenBrowserFlag() {
+        System.getenv('DEPLOYGATE_OPEN_BROWSER')
     }
 
     def uploadProject(Project project, DeployTarget apk) {
@@ -100,8 +121,8 @@ class UploadTask extends DefaultTask {
         }
 
         HTTPBuilderFactory.restClient(project.deploygate.endpoint).request(Method.POST, ContentType.JSON) { req ->
-                    uri.path = "/api/users/${userName}/apps"
-                    req.entity = entity
+            uri.path = "/api/users/${userName}/apps"
+            req.entity = entity
         } as HttpResponseDecorator
     }
 }
