@@ -13,6 +13,7 @@ class HTTPBuilderFactory {
         )
         httpBuilder
     }
+
     static HTTPBuilder setDefaultRequestHeaders(HTTPBuilder httpBuilder) {
         httpBuilder.headers = [
                 'User-Agent': Config.USER_AGENT
@@ -25,6 +26,6 @@ class HTTPBuilderFactory {
     }
 
     static RESTClient restClient(endpoint) {
-        setDefaultProxy(setDefaultRequestHeaders(new RESTClient(endpoint)))
+        setDefaultProxy(setDefaultRequestHeaders(new RESTClient(endpoint))) as RESTClient
     }
 }

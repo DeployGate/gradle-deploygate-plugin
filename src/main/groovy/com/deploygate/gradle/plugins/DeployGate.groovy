@@ -20,11 +20,11 @@ class DeployGate implements Plugin<Project> {
             }
         }
         project.gradle.buildFinished { buildResult ->
-            project.deploygate.notifyServer 'finished', [ result: Boolean.toString(buildResult.failure == null) ]
+            project.deploygate.notifyServer 'finished', [result: Boolean.toString(buildResult.failure == null)]
         }
     }
 
-    def setupExtension (Project project) {
+    def setupExtension(Project project) {
         def apkTargets = project.container(DeployTarget)
         apkTargets.all {
             tasksToCreate.add name
@@ -32,7 +32,7 @@ class DeployGate implements Plugin<Project> {
         project.extensions.add 'deploygate', new DeployGateExtension(apkTargets)
     }
 
-    def createDeployGateTasks (project) {
+    def createDeployGateTasks(project) {
         project.task 'logoutDeployGate', type: LogoutTask, group: 'DeployGate'
         def loginTask = project.task('loginDeployGate', type: LoginTask, group: 'DeployGate')
 
@@ -74,7 +74,7 @@ class DeployGate implements Plugin<Project> {
         def taskName = "uploadDeployGate${capitalized}"
         project.task(taskName,
                 type: UploadTask,
-                dependsOn: ([ assemble, loginTask ] - null),
+                dependsOn: ([assemble, loginTask] - null),
                 overwrite: true) {
 
             def desc = "Deploy assembled ${capitalized} to DeployGate"

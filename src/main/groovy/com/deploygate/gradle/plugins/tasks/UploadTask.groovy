@@ -71,7 +71,7 @@ class UploadTask extends DefaultTask {
         }
     }
 
-    boolean hasOpenBrowserFlag() {
+    static boolean hasOpenBrowserFlag() {
         System.getenv('DEPLOYGATE_OPEN_BROWSER')
     }
 
@@ -85,13 +85,13 @@ class UploadTask extends DefaultTask {
         result.data
     }
 
-    private void errorHandling(apk, result) {
+    private static void errorHandling(apk, result) {
         if (result.status != 200 || result.data.error) {
             throw new GradleException("${apk.name} error message: ${result.data.message}")
         }
     }
 
-    private String getToken(Project project) {
+    private static String getToken(Project project) {
         String token = project.deploygate.token
         if (!token?.trim()) {
             throw new GradleException('token is missing. Please enter the token.')
@@ -99,7 +99,7 @@ class UploadTask extends DefaultTask {
         token
     }
 
-    private String getUserName(Project project) {
+    private static String getUserName(Project project) {
         String userName = project.deploygate.userName
         if (!userName?.trim()) {
             throw new GradleException('userName is missing. Please enter the userName.')
