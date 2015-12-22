@@ -6,6 +6,20 @@ This is the DeployGate plugin for the Gradle. You can build and deploy your apps
 
 ## Getting started
 
+### `dg deploy` way (for OS X)
+
+If you have installed [`dg` command](https://github.com/deploygate/deploygate-cli) on your Mac, just move to your project root directory and type `dg deploy`.
+
+```
+cd Your/Project/Root
+dg deploy
+```
+
+`dg` will setup the Gradle DeployGate Plugin on your project (if not yet installed) and start uploading.
+
+
+### Gradle way 
+
 1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
