@@ -23,7 +23,7 @@ dg deploy
 1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
-  classpath 'com.deploygate:gradle:1.0.3'
+  classpath 'com.deploygate:gradle:1.0.4'
 }
 ```
 
@@ -67,7 +67,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:1.0.3'   // add this line
+    classpath 'com.deploygate:gradle:1.0.4'   // add this line
   }
 }
 ```
@@ -136,9 +136,13 @@ Note that these values are used as default values so `build.gradle` may override
 
 # Changes
 
+## ver 1.0.4
+
+ * Fix: Browser doesn't open on the first upload
+
 ## ver 1.0.3
 
- * Open the app page for the first upload or environment variable set.
+ * Open the app page for the first upload or environment variable set
 
 ## ver 1.0.2
 
