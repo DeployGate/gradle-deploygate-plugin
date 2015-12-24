@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.entities.DeployTarget
+import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import groovyx.net.http.ContentType
@@ -66,7 +67,7 @@ class UploadTask extends DefaultTask {
             def sent = project.deploygate.notifyServer 'upload_finished', ['path': res.results.path]
             if (!sent &&
                     (hasOpenBrowserFlag() || res.results.revision == 1)) {
-                UrlUtils.openBrowser "${project.deploygate.endpoint}${res.results.path}"
+                BrowserUtils.openBrowser "${project.deploygate.endpoint}${res.results.path}"
             }
         }
     }
