@@ -102,7 +102,7 @@ deploygate {
     // this creates `uploadDeployGateCustom` task to upload arbitrary APK file 
     custom {
       // set target file
-      sourceFile = "${project.rootDir}/app/build/some-custom-build.apk"
+      sourceFile = file("${project.rootDir}/app/build/some-custom-build.apk")
     }
   }
 }
