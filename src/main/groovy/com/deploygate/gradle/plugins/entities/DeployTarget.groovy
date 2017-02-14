@@ -10,6 +10,7 @@ class DeployTarget implements Named {
     String distributionKey
     String releaseNote
     String visibility = "private"
+    boolean noAssemble
 
     DeployTarget() {}
 
@@ -31,6 +32,7 @@ class DeployTarget implements Named {
         if (visibility != null) {
             params.put("visibility", visibility)
         }
+        params.put("no_asssemble", noAssemble)
         return params
     }
 }
