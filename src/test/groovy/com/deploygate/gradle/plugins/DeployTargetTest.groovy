@@ -16,7 +16,7 @@ class DeployTargetTest {
 
         DeployTarget apk = new DeployTarget(name: name, sourceFile: file, message: message, distributionKey: distributionKey, releaseNote: releaseNote, visibility: visibility, noAssemble: noAssemble)
         checkDeployTarget(apk, name, file, message, distributionKey, releaseNote, visibility, noAssemble)
-        checkParams(apk, message, distributionKey, releaseNote, visibility, noAssemble)
+        checkParams(apk, message, distributionKey, releaseNote, visibility)
     }
 
     @Test
@@ -32,7 +32,7 @@ class DeployTargetTest {
         DeployTarget apk = new DeployTarget(name)
         apk.sourceFile = file
         checkDeployTarget(apk, name, file, message, distributionKey, releaseNote, visibility, noAssemble)
-        checkParams(apk, message, distributionKey, releaseNote, visibility, noAssemble)
+        checkParams(apk, message, distributionKey, releaseNote, visibility)
     }
 
     public void checkDeployTarget(DeployTarget apk, String name, File file, String message, String distributionKey, String releaseNote, String visibility, boolean noAssemble) {
@@ -46,12 +46,11 @@ class DeployTargetTest {
         assert apk.noAssemble == noAssemble
     }
 
-    public void checkParams(DeployTarget apk, String message, String distributionKey, String releaseNote, String visibility, boolean noAssemble) {
+    public void checkParams(DeployTarget apk, String message, String distributionKey, String releaseNote, String visibility) {
         HashMap<String, String> params = apk.toParams()
         assert params["message"] == message
         assert params["distribution_key"] == distributionKey
         assert params["release_note"] == releaseNote
         assert params["visibility"] == visibility
-        assert params["no_asssemble"] == noAssemble
     }
 }
