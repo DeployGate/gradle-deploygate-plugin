@@ -12,10 +12,11 @@ class DeployTargetTest {
         String distributionKey = "test distribution key"
         String releaseNote     = "test release note"
         String visibility      = "public"
+        boolean noAssemble     = true
 
-        DeployTarget apk = new DeployTarget(name: name, sourceFile: file, message: message, distributionKey: distributionKey, releaseNote: releaseNote, visibility: visibility)
-        checkDeployTarget(apk, name, file, message, distributionKey, releaseNote, visibility)
-        checkParams(apk, message, distributionKey, releaseNote, visibility)
+        DeployTarget apk = new DeployTarget(name: name, sourceFile: file, message: message, distributionKey: distributionKey, releaseNote: releaseNote, visibility: visibility, noAssemble: noAssemble)
+        checkDeployTarget(apk, name, file, message, distributionKey, releaseNote, visibility, noAssemble)
+        checkParams(apk, message, distributionKey, releaseNote, visibility, noAssemble)
     }
 
     @Test
@@ -26,14 +27,15 @@ class DeployTargetTest {
         String distributionKey = null
         String releaseNote     = null
         String visibility      = "private"
+        boolean noAssemble     = false
 
         DeployTarget apk = new DeployTarget(name)
         apk.sourceFile = file
-        checkDeployTarget(apk, name, file, message, distributionKey, releaseNote, visibility)
-        checkParams(apk, message, distributionKey, releaseNote, visibility)
+        checkDeployTarget(apk, name, file, message, distributionKey, releaseNote, visibility, noAssemble)
+        checkParams(apk, message, distributionKey, releaseNote, visibility, noAssemble)
     }
 
-    public void checkDeployTarget(DeployTarget apk, String name, File file, String message, String distributionKey, String releaseNote, String visibility) {
+    public void checkDeployTarget(DeployTarget apk, String name, File file, String message, String distributionKey, String releaseNote, String visibility, boolean noAssemble) {
         assert apk instanceof DeployTarget
         assert apk.name == name
         assert apk.sourceFile == file
@@ -41,13 +43,15 @@ class DeployTargetTest {
         assert apk.distributionKey == distributionKey
         assert apk.releaseNote == releaseNote
         assert apk.visibility == visibility
+        assert apk.noAssemble == noAssemble
     }
 
-    public void checkParams(DeployTarget apk, String message, String distributionKey, String releaseNote, String visibility) {
+    public void checkParams(DeployTarget apk, String message, String distributionKey, String releaseNote, String visibility, boolean noAssemble) {
         HashMap<String, String> params = apk.toParams()
         assert params["message"] == message
         assert params["distribution_key"] == distributionKey
         assert params["release_note"] == releaseNote
         assert params["visibility"] == visibility
+        assert params["no_asssemble"] == noAssemble
     }
 }
