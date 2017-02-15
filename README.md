@@ -94,6 +94,10 @@ deploygate {
       // set as build message
       message = "debug build ${hash}"
 
+      // If this property is `true` , Skip dependency of `assemble` task from `uploadDeployGate` task
+      // The default value is `false`
+      noAssemble = true
+
       // if you are using a distribution page, you can update it simultaneously
       distributionKey = "1234567890abcdef1234567890abcdef"
       releaseNote = "release note sample"
