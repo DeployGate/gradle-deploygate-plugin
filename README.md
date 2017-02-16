@@ -23,7 +23,7 @@ dg deploy
 1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
-  classpath 'com.deploygate:gradle:1.0.4'
+  classpath 'com.deploygate:gradle:1.1.0'
 }
 ```
 
@@ -67,7 +67,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:1.0.4'   // add this line
+    classpath 'com.deploygate:gradle:1.1.0'   // add this line
   }
 }
 ```
@@ -139,6 +139,10 @@ Note that these values are used as default values so `build.gradle` may override
 
 
 # Changes
+
+## ver 1.1.0
+
+ * Add noAssemble option for just uploading artifacts (by @operando)
 
 ## ver 1.0.4
 
