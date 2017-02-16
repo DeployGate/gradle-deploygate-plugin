@@ -10,6 +10,7 @@ class DeployTarget implements Named {
     String distributionKey
     String releaseNote
     String visibility = "private"
+    boolean noAssemble
 
     DeployTarget() {}
 

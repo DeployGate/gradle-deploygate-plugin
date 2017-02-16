@@ -71,10 +71,17 @@ class DeployGate implements Plugin<Project> {
         }
 
         def capitalized = name.capitalize()
+        def dependsOn = []
+        DeployTarget target = project.deploygate.apks.findByName(name)
+        if (!target || !target.noAssemble) {
+            dependsOn.add(assemble)
+        }
+        dependsOn.add(loginTask)
+
         def taskName = "uploadDeployGate${capitalized}"
         project.task(taskName,
                 type: UploadTask,
-                dependsOn: ([assemble, loginTask] - null),
+                dependsOn: (dependsOn - null),
                 overwrite: true) {
 
             def desc = "Deploy assembled ${capitalized} to DeployGate"
