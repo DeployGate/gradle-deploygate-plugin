@@ -18,3 +18,5 @@ gradle-app.setting
 .DS_Store
 gradle.properties
 src/test/project/userHome
+
+local.properties
