@@ -1,6 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.jfrog.bintray'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
@@ -38,14 +38,25 @@ artifacts {
 }
 
 // Release
-publish {
-    userOrg = 'deploygate'
-    groupId = group
-    repoName = 'maven'
-    artifactId = archivesBaseName
-    publishVersion = '1.1.0'
-    desc = 'Gradle Plugin for DeployGate'
-    website = 'https://github.com/DeployGate/gradle-deploygate-plugin'
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'maven'
+        name = 'com.deploygate:gradle'
+        userOrg = 'deploygate'
+        licenses = ['Apache-2.0']
+        websiteUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin'
+        issueTrackerUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin/issues'
+        vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin.git'
+        githubRepo = 'DeployGate/gradle-deploygate-plugin'
+        version {
+            name = '1.1.0'
+            released = new Date()
+        }
+    }
+
+    configurations = ['archives']
 }
 
 buildscript {
@@ -53,6 +64,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.novoda:bintray-release:0.4.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
