@@ -1,5 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'com.jfrog.bintray'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
@@ -16,6 +17,8 @@ dependencies {
     compile 'org.apache.httpcomponents:httpmime:4.2.5'
     runtime 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
     runtime 'org.apache.httpcomponents:httpmime:4.2.5'
+
+    testCompile 'junit:junit:4.12'
 }
 
 task javadocJar(type: Jar, dependsOn: groovydoc) {
@@ -34,11 +37,33 @@ artifacts {
     archives sourcesJar
 }
 
-// central upload
-if (gradle.startParameter.taskNames.contains('uploadArchives')) {
-    apply from: 'build.publish.gradle'
+// Release
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'maven'
+        name = 'com.deploygate:gradle'
+        userOrg = 'deploygate'
+        licenses = ['Apache-2.0']
+        websiteUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin'
+        issueTrackerUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin/issues'
+        vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin.git'
+        githubRepo = 'DeployGate/gradle-deploygate-plugin'
+        version {
+            name = '1.1.0'
+            released = new Date()
+        }
+    }
+
+    configurations = ['archives']
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
 }

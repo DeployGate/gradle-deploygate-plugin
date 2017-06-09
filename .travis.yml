@@ -1,20 +1,9 @@
 language: java
 sudo: false
-env:
-  global:
-  - secure: RrOxRkXn7IHW3kz1qg4X9XC99qB7Kt6tEFOlKSIpkZjFjst+TchaYzupt6ZplQ8Syj1tEhh6OibP3c0SIdtF4ztTViirgzRtbXXNbNICoYuDPxFFIWIN5eq6HgNnRf7aPy/oDi0sVtLmPaKG06MgviiSgEpnF6MhBgVKA6/CAfI=
-  - secure: Lt10jFXW5FQxmmX6PQlBu6yTaTadurq6eFqkDFoBiPjauzRWTiy75e079+db7OMkdJsJrYXwbxLHP8XFj0uUfNuKEVS+uzIAs1iXRc9lsFsTGytXiSSQMXhDljNacZVNYoe70UtxIwgU2LreqXxJxQr4DRAuuv1qc2PqPYf9CB4=
-  - secure: b0HU1LBDDUyMORC9w9Y5wEWbSrD0eMpKxQVIC8xvMJRT4tvEZSBePwzwoQqj2G5fDB7XMwhiQhlgf88k4jVMkGwYwn/iT97cuCmj40f9DSobR1wZiP9OmxNfbJ2tNvpK4GsBi+0hJQarDBJhe+fWuJJnmVIsEMr8x+CdhFr6+Nk=
-  - secure: QxW33yGF9/tSieBkR6B3Vhr7IlvzOA0HlsFjr3QJZ/8/NDtXbFZxDFgF02s217r9IhUlSLXO99CdgBPrEPiJlZ1Zue15TdTKXM4z+aJfcCkIL8wxw2lm4tGmi4YAKinSVA0x8KDNO2X/o7wWLbfi8hTY7vj8w0BnklIn6sQILc8=
 jdk:
 - openjdk7
 script:
 - "./gradlew build test"
-before_deploy:
-- openssl aes-256-cbc -K $encrypted_3d2a2d8844ff_key -iv $encrypted_3d2a2d8844ff_iv
-  -in secret.key.enc -out secret.key -d
-- gpg --import --allow-secret-key-import secret.key
-- rm secret.key
 deploy:
   provider: script
   script: ./release.sh
