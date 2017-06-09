@@ -64,10 +64,14 @@ class DeployGate implements Plugin<Project> {
             name = output
         } else {
             name = output.name
-            signingReady = output.variantOutputData.variantData.signed
             isUniversal = output.outputs.get(0).filters.size() == 0
             assemble = output.assemble
-            outputFile = output.outputFile
+
+            // TODO Workaround for 3.0.0 Preview, until the new API released
+            signingReady = output.hasProperty('variantOutputData') ? output.variantOutputData.variantData.signed : true
+            try {
+                outputFile = output.outputFile
+            } catch (Exception ignored) {}
         }
 
         def capitalized = name.capitalize()

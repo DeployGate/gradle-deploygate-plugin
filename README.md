@@ -140,6 +140,11 @@ Note that these values are used as default values so `build.gradle` may override
 
 # Changes
 
+## ver 1.1.1
+
+ * Workaround for the issue on Android Gradle Plugin 3.0 Preview
+    * You need to specify the `sourceFile` option manually in your build.gradle to upload builds. This temporal limitation will be resolved in future release of Android Gradle Plugin. 
+
 ## ver 1.1.0
 
  * Add noAssemble option for just uploading artifacts (by @operando)
