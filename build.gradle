@@ -51,7 +51,7 @@ bintray {
         vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin.git'
         githubRepo = 'DeployGate/gradle-deploygate-plugin'
         version {
-            name = '1.1.0'
+            name = '1.1.1'
             released = new Date()
         }
     }
