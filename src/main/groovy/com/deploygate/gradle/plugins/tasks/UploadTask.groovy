@@ -29,7 +29,7 @@ class UploadTask extends DefaultTask {
 
         DeployTarget target = findTarget()
         if (!target.sourceFile?.exists())
-            throw new GradleException("APK file not found")
+            throw new GradleException("APK file was not found. If you are using Android O Developer Preview, you need to set `sourceFile` in your build.gradle. See https://docs.deploygate.com/docs/gradle-plugin")
 
         onBeforeUpload(target)
         def res = uploadProject(project, target)
@@ -47,8 +47,9 @@ class UploadTask extends DefaultTask {
     }
 
     private def fillFromEnv(DeployTarget target) {
+        def envFile = System.getenv('DEPLOYGATE_SOURCE_FILE')
         target.with {
-            sourceFile = sourceFile ?: project.file(System.getenv('DEPLOYGATE_SOURCE_FILE'))
+            sourceFile = sourceFile ?: (envFile ? project.file(envFile) : null)
             message = message ?: System.getenv('DEPLOYGATE_MESSAGE')
             distributionKey = distributionKey ?: System.getenv('DEPLOYGATE_DISTRIBUTION_KEY')
             releaseNote = releaseNote ?: System.getenv('DEPLOYGATE_RELEASE_NOTE')
