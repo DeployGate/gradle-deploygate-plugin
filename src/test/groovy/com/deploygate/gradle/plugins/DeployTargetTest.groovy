@@ -23,10 +23,10 @@ class DeployTargetTest {
     public void argsNullTest() {
         String name            = "name"
         File file              = null
-        String message         = ""
+        String message         = null
         String distributionKey = null
         String releaseNote     = null
-        String visibility      = "private"
+        String visibility      = null
         boolean noAssemble     = false
 
         DeployTarget apk = new DeployTarget(name)
