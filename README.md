@@ -23,7 +23,7 @@ dg deploy
 1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
-  classpath 'com.deploygate:gradle:1.1.0'
+  classpath 'com.deploygate:gradle:1.1.2'
 }
 ```
 
