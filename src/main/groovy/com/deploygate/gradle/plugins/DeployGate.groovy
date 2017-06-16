@@ -42,7 +42,7 @@ class DeployGate implements Plugin<Project> {
         // variant is for applicationFlavors
         project.android.applicationVariants.all { variant ->
             // variant is for splits
-            variant.outputs.eachWithIndex { output, idx ->
+            variant.outputs.each { output ->
                 createTask(project, output, loginTask)
                 tasksToCreate.remove output.name
             }

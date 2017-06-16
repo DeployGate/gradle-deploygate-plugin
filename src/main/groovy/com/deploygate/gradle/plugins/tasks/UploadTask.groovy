@@ -29,7 +29,7 @@ class UploadTask extends DefaultTask {
 
         DeployTarget target = findTarget()
         if (!target.sourceFile?.exists())
-            throw new GradleException("APK file was not found. If you are using Android O Developer Preview, you need to set `sourceFile` in your build.gradle. See https://docs.deploygate.com/docs/gradle-plugin")
+            throw new GradleException("APK file was not found. If you are using Android Build Tools >= 3.0.0, you need to set `sourceFile` in your build.gradle. See https://docs.deploygate.com/docs/gradle-plugin")
 
         onBeforeUpload(target)
         def res = uploadProject(project, target)

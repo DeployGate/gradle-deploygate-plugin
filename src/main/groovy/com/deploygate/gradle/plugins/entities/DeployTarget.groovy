@@ -6,10 +6,10 @@ class DeployTarget implements Named {
     String name
 
     File sourceFile
-    String message = ""
+    String message
     String distributionKey
     String releaseNote
-    String visibility = "private"
+    String visibility
     boolean noAssemble
 
     DeployTarget() {}
