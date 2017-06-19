@@ -114,7 +114,7 @@ class DeployGate implements Plugin<Project> {
 
         if (variant) try {
             // Android plugin 3.0.0-alpha way
-            return variant.variantData.scope.apkLocation()
+            return variant.variantData.scope.apkLocation
         } catch (Exception ignored) {}
     }
 
