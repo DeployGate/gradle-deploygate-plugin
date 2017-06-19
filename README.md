@@ -140,6 +140,10 @@ Note that these values are used as default values so `build.gradle` may override
 
 # Changes
 
+## ver 1.1.3
+
+ * Restore auto configuring APK file path functionality (supports Android Gradle Plugin 3.0.0-alpha4) 
+
 ## ver 1.1.1
 
  * Workaround for the issue on Android Gradle Plugin 3.0 Preview

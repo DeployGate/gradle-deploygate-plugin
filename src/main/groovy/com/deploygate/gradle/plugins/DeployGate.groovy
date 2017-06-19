@@ -43,7 +43,7 @@ class DeployGate implements Plugin<Project> {
         project.android.applicationVariants.all { variant ->
             // variant is for splits
             variant.outputs.each { output ->
-                createTask(project, output, loginTask)
+                createTask(project, output, loginTask, variant)
                 tasksToCreate.remove output.name
             }
         }
@@ -53,7 +53,7 @@ class DeployGate implements Plugin<Project> {
         }
     }
 
-    private void createTask(project, output, loginTask) {
+    private void createTask(project, output, loginTask, variant = null) {
         def name
         def signingReady = true
         def isUniversal = true
@@ -69,9 +69,7 @@ class DeployGate implements Plugin<Project> {
 
             // TODO Workaround for 3.0.0 Preview, until the new API released
             signingReady = output.hasProperty('variantOutputData') ? output.variantOutputData.variantData.signed : true
-            try {
-                outputFile = output.outputFile
-            } catch (Exception ignored) {}
+            outputFile = findOutputFile(output, variant)
         }
 
         def capitalized = name.capitalize()
@@ -106,6 +104,18 @@ class DeployGate implements Plugin<Project> {
 
             defaultSourceFile outputFile
         }
+    }
+
+    def findOutputFile(output, variant) {
+        try {
+            // Android plugin < 3.0.0 way
+            return output.outputFile
+        } catch (Exception ignored) {}
+
+        if (variant) try {
+            // Android plugin 3.0.0-alpha way
+            return variant.variantData.scope.apkLocation()
+        } catch (Exception ignored) {}
     }
 
     def createMultipleUploadTask(Project project, HashSet<String> dependsOn) {
