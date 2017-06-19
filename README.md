@@ -23,7 +23,7 @@ dg deploy
 1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
-  classpath 'com.deploygate:gradle:1.1.0'
+  classpath 'com.deploygate:gradle:1.1.3'
 }
 ```
 
@@ -143,6 +143,10 @@ Note that these values are used as default values so `build.gradle` may override
 ## ver 1.1.3
 
  * Restore auto configuring APK file path functionality (supports Android Gradle Plugin 3.0.0-alpha4) 
+
+## ver 1.1.2
+
+ * Fix failing first time upload with Free plans
 
 ## ver 1.1.1
 
