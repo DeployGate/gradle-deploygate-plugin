@@ -63,7 +63,7 @@ class DeployGate implements Plugin<Project> {
         if (output instanceof String) {
             name = output
         } else {
-            name = output.name
+            name = variant?.name ?: output.name
             isUniversal = output.outputs.get(0).filters.size() == 0
             assemble = output.assemble
 
