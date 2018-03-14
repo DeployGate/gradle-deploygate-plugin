@@ -40,7 +40,7 @@ class BrowserUtils {
     }
 
     static boolean hasBrowser() {
-        !isCiEnvironment() && (isMac() || isWindows() || (isLinux() && isLinuxDesktop()))
+        !isCiEnvironment() && (isMac() || isWindows() || (isLinux() && isDisplayAvailable()))
     }
 
     static boolean isLinux() {
@@ -55,7 +55,7 @@ class BrowserUtils {
         return OS_NAME.startsWith("windows")
     }
 
-    static boolean isLinuxDesktop() {
+    static boolean isDisplayAvailable() {
         String display = System.getenv("DISPLAY")
         return display != null && !display.trim().isEmpty()
     }
