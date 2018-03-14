@@ -29,7 +29,7 @@ class BrowserUtils {
     }
 
     static void openBrowserForWindows(String url) {
-        "start $url".execute().waitFor()
+        "cmd /c start $url".execute().waitFor()
     }
 
     static void openBrowserForLinux(String url) {
