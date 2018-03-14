@@ -1,12 +1,22 @@
 package com.deploygate.gradle.plugins.utils
 
-import java.awt.*
-
 class BrowserUtils {
+
+    private static final String OS_NAME = System.getProperty("os.name").toLowerCase()
+
     static boolean openBrowser(String url) {
         if (hasBrowser()) {
             try {
-                Desktop.getDesktop().browse(URI.create(url))
+                if(isMac()) {
+                    openBrowserForMac(url)
+                } else if(isWindows()) {
+                    openBrowserForWindows(url)
+                } else if(isLinux()) {
+                    openBrowserForLinux(url)
+                } else {
+                    return false
+                }
+
                 return true
             } catch (ignored) {
             }
@@ -14,15 +24,43 @@ class BrowserUtils {
         false
     }
 
+    static void openBrowserForMac(String url) {
+        "open $url".execute().waitFor()
+    }
+
+    static void openBrowserForWindows(String url) {
+        "start $url".execute().waitFor()
+    }
+
+    static void openBrowserForLinux(String url) {
+        String result = "xdg-open $url".execute().waitFor()
+        if(!result.equals('0')) {
+            "gnome-open $url".execute().waitFor()
+        }
+    }
+
     static boolean hasBrowser() {
-        !isAwtHeadless() && !isCiEnvironment() && Desktop.isDesktopSupported()
+        !isCiEnvironment() && (isMac() || isWindows() || (isLinux() && isLinuxDesktop()))
+    }
+
+    static boolean isLinux() {
+        return OS_NAME.startsWith("linux")
+    }
+
+    static boolean isMac() {
+        return OS_NAME.startsWith("mac")
+    }
+
+    static boolean isWindows() {
+        return OS_NAME.startsWith("windows")
+    }
+
+    static boolean isLinuxDesktop() {
+        String display = System.getenv("DISPLAY")
+        return display != null && !display.trim().isEmpty()
     }
 
     static boolean isCiEnvironment() {
         System.getenv('CI') || System.getenv('JENKINS_URL')
-    }
-
-    static boolean isAwtHeadless() {
-        System.getProperty('java.awt.headless')
     }
 }
