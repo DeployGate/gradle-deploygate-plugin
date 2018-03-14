@@ -33,8 +33,12 @@ class BrowserUtils {
     }
 
     static void openBrowserForLinux(String url) {
-        String result = "xdg-open $url".execute().waitFor()
-        if(!result.equals('0')) {
+        try {
+            String result = "xdg-open $url".execute().waitFor()
+            if(!result.equals('0')) {
+                throw new RuntimeException()
+            }
+        } catch (ignored) {
             "gnome-open $url".execute().waitFor()
         }
     }
