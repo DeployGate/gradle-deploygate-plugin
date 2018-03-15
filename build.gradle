@@ -4,7 +4,7 @@ apply plugin: 'com.jfrog.bintray'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
-version = '1.1.4'
+version = '1.1.5'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -55,7 +55,7 @@ bintray {
         vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin.git'
         githubRepo = 'DeployGate/gradle-deploygate-plugin'
         version {
-            name = '1.1.4'
+            name = '1.1.5'
             released = new Date()
         }
     }
