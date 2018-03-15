@@ -8,38 +8,38 @@ class BrowserUtils {
         if (hasBrowser()) {
             try {
                 if(isMac()) {
-                    openBrowserForMac(url)
+                    return openBrowserForMac(url)
                 } else if(isWindows()) {
-                    openBrowserForWindows(url)
+                    return openBrowserForWindows(url)
                 } else if(isLinux()) {
-                    openBrowserForLinux(url)
+                    return openBrowserForLinux(url)
                 } else {
                     return false
                 }
-
-                return true
             } catch (ignored) {
             }
         }
         false
     }
 
-    static void openBrowserForMac(String url) {
-        "open $url".execute().waitFor()
+    static boolean openBrowserForMac(String url) {
+        return ['open', url].execute().waitFor() == 0
     }
 
-    static void openBrowserForWindows(String url) {
-        "cmd /c start $url".execute().waitFor()
+    static boolean openBrowserForWindows(String url) {
+        return ['cmd', '/c', 'start', url].execute().waitFor() == 0
     }
 
-    static void openBrowserForLinux(String url) {
+    static boolean openBrowserForLinux(String url) {
         try {
-            String result = "xdg-open $url".execute().waitFor()
-            if(!result.equals('0')) {
+            int result = ['xdg-open', url].execute().waitFor()
+            if(result == 0) {
+                return true
+            } else {
                 throw new RuntimeException()
             }
         } catch (ignored) {
-            "gnome-open $url".execute().waitFor()
+            return ['gnome-open', url].execute().waitFor() == 0
         }
     }
 
