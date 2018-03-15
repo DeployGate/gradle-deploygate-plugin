@@ -1,15 +1,12 @@
 package com.deploygate.gradle.plugins.utils
 
-import org.codehaus.groovy.runtime.GStringImpl
 import org.junit.Test
-
-import java.awt.*
 
 class BrowserUtilsTest {
     @Test
     public void testOpenBrowser() {
-        Desktop.metaClass.static.getDesktop = { ->
-            [ browse: { URI uri -> true }]
+        java.util.List.metaClass.execute = { ->
+            [ waitFor: { -> 0 }]
         }
         BrowserUtils.metaClass.static.hasBrowser = { -> true }
 
