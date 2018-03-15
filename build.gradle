@@ -47,7 +47,7 @@ bintray {
     key = System.getenv('BINTRAY_KEY')
     pkg {
         repo = 'maven'
-        name = 'com.deploygate:gradle'
+        name = 'gradle'
         userOrg = 'deploygate'
         licenses = ['Apache-2.0']
         websiteUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin'
