@@ -1,6 +1,7 @@
 #  Gradle DeployGate Plugin
 
 [![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
+[ ![Download](https://api.bintray.com/packages/deploygate/maven/gradle/images/download.svg) ](https://bintray.com/deploygate/maven/gradle/_latestVersion)
 
 This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
 
@@ -20,10 +21,12 @@ dg deploy
 
 ### Gradle way 
 
+[ ![Download](https://api.bintray.com/packages/deploygate/maven/gradle/images/download.svg) ](https://bintray.com/deploygate/maven/gradle/_latestVersion)
+
 1) Open your <code>build.gradle</code> on your project root and add a dependency.
 ```groovy
 dependency {
-  classpath 'com.deploygate:gradle:1.1.4'
+  classpath "com.deploygate:gradle:${the latest version}"
 }
 ```
 
@@ -67,7 +70,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.deploygate:gradle:1.1.0'   // add this line
+    classpath "com.deploygate:gradle:${the latest version}"   // add this line
   }
 }
 ```
@@ -139,6 +142,10 @@ Note that these values are used as default values so `build.gradle` may override
 
 
 # Changes
+
+## ver 1.1.5
+
+ * Fixed that loginDeployGate task couldn't open a browser. [#47](https://github.com/DeployGate/gradle-deploygate-plugin/issues/47)
 
 ## ver 1.1.4
 
