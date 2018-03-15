@@ -11,4 +11,4 @@ deploy:
     tags: true
     repo: DeployGate/gradle-deploygate-plugin
 after_deploy:
-- 'curl -X POST --data-urlencode "payload={\"text\": \"Released a gradle-deploygate-plugin in Maven Central! Please check <https://oss.sonatype.org/content/groups/public/com/deploygate/|public> or <https://oss.sonatype.org/index.html#stagingRepositories|stagingRepositories>\"}" $SLACK_URL'
+- 'curl -X POST --data-urlencode "payload={\"text\": \"Released a gradle-deploygate-plugin in Bintray! Please check <https://bintray.com/deploygate/maven|Bintray>\"}" $SLACK_URL'
