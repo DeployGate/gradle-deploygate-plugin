@@ -1,128 +1,114 @@
 package com.deploygate.gradle.plugins
 
+import com.deploygate.gradle.plugins.artifacts.ApkInfo
+import com.deploygate.gradle.plugins.artifacts.ApkInfoCompat
 import com.deploygate.gradle.plugins.entities.DeployGateExtension
 import com.deploygate.gradle.plugins.entities.DeployTarget
 import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.UploadTask
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 
 class DeployGate implements Plugin<Project> {
-    HashSet<String> tasksToCreate
+    private static final String GROUP_NAME = 'DeployGate'
+    private static final String LOGIN_TASK_NAME = 'loginDeployGate'
+    private static final String LOGOUT_TASK_NAME = 'logoutDeployGate'
 
+    @Override
     void apply(Project project) {
-        tasksToCreate = new HashSet<>()
-        setupExtension project
+        def declaredVariantNames = setupExtension(project)
+
         project.afterEvaluate { prj ->
             if (['com.android.application', 'android'].any { prj.plugins.hasPlugin(it) }) {
-                createDeployGateTasks prj
+                createDeployGateTasks(prj, declaredVariantNames)
             }
         }
         project.gradle.buildFinished { buildResult ->
-            project.deploygate.notifyServer 'finished', [result: Boolean.toString(buildResult.failure == null)]
+            project.deploygate.notifyServer('finished', [result: Boolean.toString(buildResult.failure == null)])
         }
     }
 
-    def setupExtension(Project project) {
-        def apkTargets = project.container(DeployTarget)
-        apkTargets.all {
-            tasksToCreate.add name
-        }
-        project.extensions.add 'deploygate', new DeployGateExtension(apkTargets)
+    private static Set<String> setupExtension(Project project) {
+        NamedDomainObjectContainer<DeployTarget> targets = project.container(DeployTarget)
+        project.extensions.add('deploygate', new DeployGateExtension(targets))
+
+        return targets.collect { it.name }.toSet()
     }
 
-    def createDeployGateTasks(project) {
-        project.task 'logoutDeployGate', type: LogoutTask, group: 'DeployGate'
-        def loginTask = project.task('loginDeployGate', type: LoginTask, group: 'DeployGate')
+    def createDeployGateTasks(Project project, Set<String> declaredVariantNames) {
+        project.task(LOGIN_TASK_NAME, type: LoginTask, group: GROUP_NAME)
+        project.task(LOGOUT_TASK_NAME, type: LogoutTask, group: GROUP_NAME)
 
-        createMultipleUploadTask(project, tasksToCreate)
+        createMultipleUploadTask(project, declaredVariantNames)
+
+        def names = new HashSet(declaredVariantNames)
 
         // @see ApplicationVariantFactory#createVariantData
         // variant is for applicationFlavors
         project.android.applicationVariants.all { variant ->
             // variant is for splits
             variant.outputs.each { output ->
-                createTask(project, output, loginTask, variant)
-                tasksToCreate.remove output.name
+                def apkInfo = ApkInfoCompat.from(variant, output)
+
+                createTask(project, apkInfo, output.assemble)
+
+                names.remove(apkInfo.variantName)
             }
         }
 
-        tasksToCreate.each { name ->
-            createTask(project, name, loginTask)
+        names.collect { ApkInfoCompat.blank(it) }.each { apkInfo ->
+            createTask(project, apkInfo)
         }
     }
 
-    private void createTask(project, output, loginTask, variant = null) {
-        def name
-        def signingReady = true
-        def isUniversal = true
-        def assemble = null
-        def outputFile = null
+    private void createTask(Project project, ApkInfo apkInfo, Task assembleTask = null) {
+        def tasksDependsOn = project.getTasksByName(LOGIN_TASK_NAME, false).toList()
 
-        if (output instanceof String) {
-            name = output
-        } else {
-            name = variant?.name ?: output.name
-            isUniversal = output.outputs.get(0).filters.size() == 0
-            assemble = output.assemble
-
-            // TODO Workaround for 3.0.0 Preview, until the new API released
-            signingReady = output.hasProperty('variantOutputData') ? output.variantOutputData.variantData.signed : true
-            outputFile = findOutputFile(output, variant)
+        if (assembleTask && !project.deploygate.apks.findByName(apkInfo.variantName)?.noAssemble) {
+            tasksDependsOn.add(0, assembleTask)
         }
 
-        def capitalized = name.capitalize()
-        def dependsOn = []
-        DeployTarget target = project.deploygate.apks.findByName(name)
-        if (!target || !target.noAssemble) {
-            dependsOn.add(assemble)
-        }
-        dependsOn.add(loginTask)
+        project.task([type: UploadTask, overwrite: true], "uploadDeployGate${apkInfo.variantName.capitalize()}") {
 
-        def taskName = "uploadDeployGate${capitalized}"
-        project.task(taskName,
-                type: UploadTask,
-                dependsOn: (dependsOn - null),
-                overwrite: true) {
-
-            def desc = "Deploy assembled ${capitalized} to DeployGate"
+            def desc = "Deploy assembled ${apkInfo.variantName.capitalize()} to DeployGate"
 
             // require signing config to build a signed APKs
-            if (!signingReady) {
+            if (!apkInfo.signingReady) {
                 desc += " (requires valid signingConfig setting)"
             }
 
+            description desc
+
             // universal builds show in DeployGate group
-            if (isUniversal) {
-                group 'DeployGate'
+            if (apkInfo.universalApk) {
+                group GROUP_NAME
             }
 
-            description desc
-            outputName name
-            hasSigningConfig signingReady
+            dependsOn tasksDependsOn
 
-            defaultSourceFile outputFile
+            // UploadTask properties
+
+            outputName apkInfo.variantName
+            hasSigningConfig apkInfo.signingReady
+
+            defaultSourceFile apkInfo.apkFile
         }
     }
 
-    def findOutputFile(output, variant) {
-        try {
-            // Android plugin < 3.0.0 way
-            return output.outputFile
-        } catch (Exception ignored) {}
+    private static void createMultipleUploadTask(Project project, Set<String> declaredVariantNames) {
+        if (declaredVariantNames.empty) {
+            return
+        }
 
-        if (variant) try {
-            // Android plugin 3.0.0-alpha way
-            return variant.variantData.scope.apkLocation
-        } catch (Exception ignored) {}
-    }
+        project.task('uploadDeployGate') {
+            description 'Upload all builds defined in build.gradle to DeployGate'
+            group GROUP_NAME
 
-    def createMultipleUploadTask(Project project, HashSet<String> dependsOn) {
-        if (dependsOn.empty) return
-        project.task 'uploadDeployGate',
-                dependsOn: dependsOn.toArray().collect { "uploadDeployGate${it.capitalize()}" },
-                description: 'Upload all builds defined in build.gradle to DeployGate',
-                group: 'DeployGate'
+            // Don't need to let this task depend on undeclared variants
+            dependsOn declaredVariantNames.collect { "uploadDeployGate${it.capitalize()}" }
+        }
     }
 }
