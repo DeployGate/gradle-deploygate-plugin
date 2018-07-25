@@ -40,12 +40,13 @@ class ApkInfoCompat {
 
     private static String getVersionString() {
         try {
-            return Class.forName("com.android.builder.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
+            return Class.forName("com.android.builder.model.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
         } catch (Throwable ignored) {
         }
 
+        // before 3.1
         try {
-            return Class.forName("com.android.builder.model.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
+            return Class.forName("com.android.builder.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
         } catch (Throwable ignored) {
         }
 
