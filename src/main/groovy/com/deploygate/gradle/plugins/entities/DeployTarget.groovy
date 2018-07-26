@@ -12,10 +12,16 @@ class DeployTarget implements Named {
     String visibility
     boolean noAssemble
 
+    AppBundleTarget bundle
+
     DeployTarget() {}
 
     DeployTarget(String name) {
         this.name = name
+    }
+
+    def bundle(Closure closure) {
+        bundle.configure(closure)
     }
 
     HashMap<String, String> toParams() {

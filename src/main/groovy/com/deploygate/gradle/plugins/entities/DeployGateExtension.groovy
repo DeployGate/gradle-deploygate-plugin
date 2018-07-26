@@ -13,6 +13,8 @@ class DeployGateExtension {
     NamedDomainObjectContainer<DeployTarget> apks
     String notifyKey = null
 
+    String aapt2Path
+
     DeployGateExtension(NamedDomainObjectContainer<DeployTarget> apkTargets) {
         this.apks = apkTargets
     }

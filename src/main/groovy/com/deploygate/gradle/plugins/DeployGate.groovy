@@ -1,12 +1,16 @@
 package com.deploygate.gradle.plugins
 
+import com.android.tools.build.bundletool.commands.BuildApksCommand
+import com.android.tools.build.bundletool.model.Aapt2Command
 import com.deploygate.gradle.plugins.artifacts.ApkInfo
 import com.deploygate.gradle.plugins.artifacts.ApkInfoCompat
+import com.deploygate.gradle.plugins.artifacts.AppBundleInfo
 import com.deploygate.gradle.plugins.entities.DeployGateExtension
 import com.deploygate.gradle.plugins.entities.DeployTarget
 import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.UploadTask
+import com.deploygate.gradle.plugins.utils.AndroidPlatformUtils
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -54,20 +58,23 @@ class DeployGate implements Plugin<Project> {
                 def apkInfo = ApkInfoCompat.from(variant, output)
 
                 createTask(project, apkInfo, output.assemble)
+                createAABAwareUploadTasks(project, apkInfo)
 
                 names.remove(apkInfo.variantName)
             }
         }
 
         names.collect { ApkInfoCompat.blank(it) }.each { apkInfo ->
+
             createTask(project, apkInfo)
         }
     }
 
     private void createTask(Project project, ApkInfo apkInfo, Task assembleTask = null) {
+        def deployTarget = project.deploygate.apks.findByName(apkInfo.variantName) as DeployTarget
         def tasksDependsOn = project.getTasksByName(LOGIN_TASK_NAME, false).toList()
 
-        if (assembleTask && !project.deploygate.apks.findByName(apkInfo.variantName)?.noAssemble) {
+        if (assembleTask && !deployTarget?.noAssemble) {
             tasksDependsOn.add(0, assembleTask)
         }
 
@@ -95,6 +102,37 @@ class DeployGate implements Plugin<Project> {
             hasSigningConfig apkInfo.signingReady
 
             defaultSourceFile apkInfo.apkFile
+        }
+    }
+
+    private void createAABAwareUploadTasks(Project project, ApkInfo apkInfo) {
+        if (!AndroidPlatformUtils.isAppBundleSupported()) {
+            return
+        }
+
+        def deployTarget = project.deploygate.apks.findByName(apkInfo.variantName) as DeployTarget
+        def tasksDependsOn = project.getTasksByName("loginDeployGate", false).toList()
+        def bundleTask = project.getTasksByName("bundle${apkInfo.variantName.capitalize()}", false)
+
+        if (!bundleTask.empty && !deployTarget?.bundle?.skipBundle) {
+            tasksDependsOn.add(0, bundleTask.first())
+        }
+
+        project.task([type: UploadTask, overwrite: true], "uploadBundleAwareDeployGate${apkInfo.variantName.capitalize()}") {
+
+            description "Deploy an universal apk which is generated from an app bundle of ${apkInfo.variantName.capitalize()} to DeployGate"
+
+            group GROUP_NAME
+
+            dependsOn tasksDependsOn
+
+            // UploadTask properties
+
+            outputName apkInfo.variantName
+            hasSigningConfig apkInfo.signingConfig != null
+
+            defaultSourceFile apkInfo.apkFile
+            appBundleInfo new AppBundleInfo(apkInfo)
         }
     }
 

@@ -1,78 +1,82 @@
 package com.deploygate.gradle.plugins.artifacts
 
+import com.deploygate.gradle.plugins.utils.AndroidPlatformUtils
+
+//import com.android.build.gradle.api.ApplicationVariant
+//import com.android.build.gradle.api.BaseVariantOutput
+
 class ApkInfoCompat {
     private ApkInfoCompat() {
     }
 
     static ApkInfo blank(String name) {
-        return new ApkInfo() {
-            @Override
-            String getVariantName() {
-                return name
-            }
-
-            @Override
-            File getApkFile() {
-                return null
-            }
-
-            @Override
-            boolean isSigningReady() {
-                return true
-            }
-
-            @Override
-            boolean isUniversalApk() {
-                return true
-            }
-        }
+        return new BlankApkInfo(name)
     }
 
     static ApkInfo from(/*ApplicationVariant*/ applicationVariant, /*BaseVariantOutput*/ variantOutput) {
-        if (isBefore300Preview()) {
+        def agpVersion = AndroidPlatformUtils.getAGPVersion()
+
+        if (agpVersion.isBefore300Preview()) {
             return new ApkInfoCompatBefore300Preview(applicationVariant, variantOutput)
-        } else if (is300Preview()) {
+        } else if (agpVersion.is300Preview()) {
             return new ApkInfoCompat300Preview(applicationVariant, variantOutput)
         } else {
             return new ApkInfoCompatLatest(applicationVariant, variantOutput)
         }
     }
 
-    private static String getVersionString() {
-        try {
-            return Class.forName("com.android.builder.model.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
-        } catch (Throwable ignored) {
+    private static class BlankApkInfo implements ApkInfo {
+        private final String name
+
+        private BlankApkInfo(String name) {
+            this.name = name
         }
 
-        // before 3.1
-        try {
-            return Class.forName("com.android.builder.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
-        } catch (Throwable ignored) {
+        @Override
+        String getVariantName() {
+            return name
         }
 
-        return Integer.MAX_VALUE + ".0.0"
-    }
+        @Override
+        File getApkFile() {
+            return null
+        }
 
-    private static boolean isBefore300Preview() {
-        int majorVersion = Integer.parseInt(getVersionString().split("\\.")[0])
+        @Override
+        boolean isSigningReady() {
+            return true
+        }
 
-        return majorVersion < 3
-    }
+        @Override
+        boolean isUniversalApk() {
+            return true
+        }
 
-    private static boolean is300Preview() {
-        return getVersionString().startsWith("3.0.0-")
+        @Override
+        SigningConfig getSigningConfig() {
+            return null
+        }
     }
 
     private static abstract class BaseApkInfo implements ApkInfo {
         // Remove comment-out while debugging
-//        private final ApplicationVariant applicationVariant
-//        private final BaseVariantOutput variantOutput
+//        protected final ApplicationVariant applicationVariant
+//        protected final BaseVariantOutput variantOutput
         protected def applicationVariant
         protected def variantOutput
+        private final SigningConfig signingConfig
 
         BaseApkInfo(applicationVariant, variantOutput) {
             this.applicationVariant = applicationVariant
             this.variantOutput = variantOutput
+
+            def signingConfig = this.applicationVariant.packageApplication.signingConfig
+
+            if (signingConfig != null) {
+                this.signingConfig = new SigningConfig(signingConfig.storeFile, signingConfig.keyPassword, signingConfig.keyAlias, signingConfig.storePassword)
+            } else {
+                this.signingConfig = null
+            }
         }
 
         @Override
@@ -93,6 +97,11 @@ class ApkInfoCompat {
         @Override
         boolean isUniversalApk() {
             return variantOutput.outputs.get(0).filters.empty
+        }
+
+        @Override
+        SigningConfig getSigningConfig() {
+            return signingConfig
         }
     }
 
