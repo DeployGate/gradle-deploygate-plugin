@@ -20,6 +20,8 @@ class ApkInfoCompat {
             return new ApkInfoCompatBefore300Preview(applicationVariant, variantOutput)
         } else if (agpVersion.is300Preview()) {
             return new ApkInfoCompat300Preview(applicationVariant, variantOutput)
+        } else if (agpVersion.isBefore320()) {
+            return new ApkInfoCompatBefore320(applicationVariant, variantOutput)
         } else {
             return new ApkInfoCompatLatest(applicationVariant, variantOutput)
         }
@@ -74,6 +76,8 @@ class ApkInfoCompat {
 
             if (signingConfig != null) {
                 this.signingConfig = new SigningConfig(signingConfig.storeFile, signingConfig.keyPassword, signingConfig.keyAlias, signingConfig.storePassword)
+            } else if (this.applicationVariant.packageApplication.debugBuild) {
+                this.signingConfig = new SigningConfig(new File(System.getProperty("user.home"), ".android/debug.keystore"), "android", "androiddebugkey", "android")
             } else {
                 this.signingConfig = null
             }
@@ -132,6 +136,17 @@ class ApkInfoCompat {
         }
     }
 
+    private static class ApkInfoCompatBefore320 extends BaseApkInfo {
+        ApkInfoCompatBefore320(applicationVariant, variantOutput) {
+            super(applicationVariant, variantOutput)
+        }
+
+        @Override
+        boolean isUniversalApk() {
+            return variantOutput.filters.empty
+        }
+    }
+
     private static class ApkInfoCompatLatest extends BaseApkInfo {
         ApkInfoCompatLatest(applicationVariant, variantOutput) {
             super(applicationVariant, variantOutput)
@@ -140,6 +155,11 @@ class ApkInfoCompat {
         @Override
         boolean isUniversalApk() {
             return variantOutput.filters.empty
+        }
+
+        @Override
+        String getVariantName() {
+            return applicationVariant.name
         }
     }
 }
