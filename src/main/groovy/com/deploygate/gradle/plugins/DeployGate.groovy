@@ -46,7 +46,7 @@ class DeployGate implements Plugin<Project> {
         project.task(LOGIN_TASK_NAME, type: LoginTask, group: GROUP_NAME)
         project.task(LOGOUT_TASK_NAME, type: LogoutTask, group: GROUP_NAME)
 
-        createMultipleUploadTask(project, declaredVariantNames)
+        createMultipleUploadApkTask(project, declaredVariantNames)
 
         def names = new HashSet(declaredVariantNames)
 
@@ -57,8 +57,8 @@ class DeployGate implements Plugin<Project> {
             variant.outputs.each { output ->
                 def apkInfo = ApkInfoCompat.from(variant, output)
 
-                createTask(project, apkInfo, output.assemble)
-                createAABAwareUploadTasks(project, apkInfo)
+                createUploadApkTask(project, apkInfo, output.assemble)
+                createFromAabUploadTasks(project, apkInfo)
 
                 names.remove(apkInfo.variantName)
             }
@@ -66,11 +66,11 @@ class DeployGate implements Plugin<Project> {
 
         names.collect { ApkInfoCompat.blank(it) }.each { apkInfo ->
 
-            createTask(project, apkInfo)
+            createUploadApkTask(project, apkInfo)
         }
     }
 
-    private void createTask(Project project, ApkInfo apkInfo, Task assembleTask = null) {
+    private void createUploadApkTask(Project project, ApkInfo apkInfo, Task assembleTask = null) {
         def deployTarget = project.deploygate.apks.findByName(apkInfo.variantName) as DeployTarget
         def tasksDependsOn = project.getTasksByName(LOGIN_TASK_NAME, false).toList()
 
@@ -78,6 +78,7 @@ class DeployGate implements Plugin<Project> {
             tasksDependsOn.add(0, assembleTask)
         }
 
+        // FIXME to support aab, uploadDeployGate naming will be deprecated.
         project.task([type: UploadTask, overwrite: true], "uploadDeployGate${apkInfo.variantName.capitalize()}") {
 
             def desc = "Deploy assembled ${apkInfo.variantName.capitalize()} to DeployGate"
@@ -105,7 +106,7 @@ class DeployGate implements Plugin<Project> {
         }
     }
 
-    private void createAABAwareUploadTasks(Project project, ApkInfo apkInfo) {
+    private void createFromAabUploadTasks(Project project, ApkInfo apkInfo) {
         if (!AndroidPlatformUtils.isAppBundleSupported()) {
             return
         }
@@ -117,7 +118,7 @@ class DeployGate implements Plugin<Project> {
             tasksDependsOn.add(0, bundleTask.first())
         }
 
-        project.task([type: UploadTask, overwrite: true], "uploadBundleAwareDeployGate${apkInfo.variantName.capitalize()}") {
+        project.task([type: UploadTask, overwrite: true], "uploadFromAabDeployGate${apkInfo.variantName.capitalize()}") {
 
             description "Deploy an universal apk which is generated from an app bundle of ${apkInfo.variantName.capitalize()} to DeployGate"
 
@@ -135,11 +136,12 @@ class DeployGate implements Plugin<Project> {
         }
     }
 
-    private static void createMultipleUploadTask(Project project, Set<String> declaredVariantNames) {
+    private static void createMultipleUploadApkTask(Project project, Set<String> declaredVariantNames) {
         if (declaredVariantNames.empty) {
             return
         }
 
+        // FIXME to support aab, uploadDeployGate naming will be deprecated.
         project.task('uploadDeployGate') {
             description 'Upload all builds defined in build.gradle to DeployGate'
             group GROUP_NAME
