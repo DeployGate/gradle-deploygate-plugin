@@ -74,6 +74,8 @@ class ApkInfoCompat {
 
             if (signingConfig != null) {
                 this.signingConfig = new SigningConfig(signingConfig.storeFile, signingConfig.keyPassword, signingConfig.keyAlias, signingConfig.storePassword)
+            } else if (this.applicationVariant.packageApplication.debugBuild) {
+                this.signingConfig = new SigningConfig(new File(System.getProperty("user.home"), ".android/debug.keystore"), "android", "androiddebugkey", "android")
             } else {
                 this.signingConfig = null
             }

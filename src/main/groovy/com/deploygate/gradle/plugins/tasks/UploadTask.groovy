@@ -64,7 +64,7 @@ class UploadTask extends DefaultTask {
             def apksPath = universalApkGenerateCommand.execute()
             def apksFile = new ZipFile(apksPath.toFile())
 
-            apksFile.getInputStream(apksFile.getEntry('universal.apk')).withObjectInputStream {
+            apksFile.getInputStream(apksFile.getEntry('universal.apk')).withStream {
                 Files.copy(it, target.sourceFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
         }
