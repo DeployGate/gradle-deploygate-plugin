@@ -53,9 +53,13 @@ You can deploy an update of your application by running the same task.
 
 Run `./gradlew tasks` on your project root to see all available tasks. 
 
-* `uploadDeployGate[FlavorName]` - Build and upload app of [FlavorName]
+* `uploadDeployGate[capitalized VariantName]` - Build and upload apk of [VariantName]
+* `uploadFromAabDeployGate[capitalized VariantName]` - Build and upload a universal apk of Android App Bundle [VariantName]
 * `loginDeployGate` - Log in to DeployGate and save credentials locally
 * `logoutDeployGate` - Delete current credentials
+
+[VariantName] is built by appending capitalized flavor name and capitalized build type name.
+For example, `fooBar` is a variant name if you have `foo` product flavor and `bar` build type.
 
 If you define flavors in `apks` section, there will also be `uploadDeployGate` task which can upload all the flavors at once.   
 
@@ -86,6 +90,11 @@ deploygate {
   // If you are using automated build, you can specify your account credentials like this
   userName = "[username of app owner]"
   token = "[your API token]"
+
+  // Experimental field for apk upload from aab
+  // aapt2 which supports generating universal apk is embedded since build tool 28.0.0
+  // But Android Gradle Plugin 3.2.0-beta's default build tool is less than it.
+  aapt2Path = ... (absolute path)
 
   // You can also specify additional options for each flavor.
   apks {
@@ -126,7 +135,8 @@ to provide default values for DeployGate Plugin instead of writing in `build.gra
  * `DEPLOYGATE_DISTRIBUTION_KEY`
  * `DEPLOYGATE_RELEASE_NOTE`
  * `DEPLOYGATE_SOURCE_FILE`
- * `DEPLOYGATE_OPEN_BROWSER` (Env only; open the app page after the uploading finished) 
+ * `DEPLOYGATE_OPEN_BROWSER` (Env only; open the app page after the uploading finished)
+ * `DEPLOYGATE_AAPT2_PATH`
 
 By using environment variables, you can avoid storing your credentials
 in your source code repository and compose deployment messages dynamically.
