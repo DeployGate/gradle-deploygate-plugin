@@ -19,6 +19,9 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
 import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.zip.ZipFile
 
 class UploadTask extends DefaultTask {
     String outputName
@@ -46,9 +49,8 @@ class UploadTask extends DefaultTask {
 
     private void buildApkFromAppBundleIfNeeded(DeployTarget target) {
         if (appBundleInfo) {
-            def outputDir = appBundleInfo.getApksFile().parentFile
-
-            outputDir.mkdirs()
+            appBundleInfo.getApksFile().parentFile.mkdirs()
+            target.sourceFile.parentFile.mkdirs()
 
             def universalApkGenerateCommand = BuildApksCommand.builder()
                     .setGenerateOnlyUniversalApk(true)
@@ -59,14 +61,12 @@ class UploadTask extends DefaultTask {
                     .setAapt2Command(Aapt2Command.createFromExecutablePath(new File(AndroidPlatformUtils.getAapt2Location(project)).toPath()))
                     .build()
 
-            def path = universalApkGenerateCommand.execute()
-            def p = "unzip -d ${outputDir} ${path}".execute()
-            if (p.waitFor() != 0) {
-                throw new GradleException('unzipping apks file failed')
-            }
+            def apksPath = universalApkGenerateCommand.execute()
+            def apksFile = new ZipFile(apksPath.toFile())
 
-            target.sourceFile.parentFile.mkdirs()
-            new File(outputDir, 'universal.apk').renameTo(target.sourceFile)
+            apksFile.getInputStream(apksFile.getEntry('universal.apk')).withObjectInputStream {
+                Files.copy(it, target.sourceFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            }
         }
     }
 
