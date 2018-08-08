@@ -88,5 +88,9 @@ class AndroidPlatformUtils {
         boolean is300Preview() {
             return fullVersion.startsWith("3.0.0-")
         }
+
+        boolean isBefore320() {
+            return major == 3 && minor < 2
+        }
     }
 }
