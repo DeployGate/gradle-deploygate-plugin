@@ -6,7 +6,7 @@ class AndroidPlatformUtils {
     private static AGPVersion AGP_VERSION
 
     static String getAapt2Location(Project project) {
-        return project.deploygate.aapt2Path ?: System.getenv('DEPLOYGATE_APPT2_PATH') ?: "${getSdkHome(project)}/build-tools/${getBuildToolsVersion(project)}/aapt2"
+        return project.deploygate.aapt2Path ?: System.getenv('DEPLOYGATE_APPT2_PATH') ?: new File(project.android.sdkDirectory, "build-tools/${getBuildToolsVersion(project)}/aapt2").toString()
     }
 
     static AGPVersion getAGPVersion() {
@@ -50,20 +50,6 @@ class AndroidPlatformUtils {
         } catch (Throwable ignored) {
             // print error
             return null
-        }
-    }
-
-    private static String getSdkHome(Project project) {
-        return project.rootProject.file('local.properties').with {
-            String temp = null
-
-            if (exists()) {
-                def m = text =~ /sdk\.dir=(.*)/
-
-                temp = m.find() ? m.group(1) : null
-            }
-
-            temp ?: System.getenv('ANDROID_HOME')
         }
     }
 
