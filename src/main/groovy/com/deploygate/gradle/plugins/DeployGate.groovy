@@ -110,11 +110,10 @@ class DeployGate implements Plugin<Project> {
             return
         }
 
-        def deployTarget = project.deploygate.apks.findByName(apkInfo.variantName) as DeployTarget
         def tasksDependsOn = project.getTasksByName("loginDeployGate", false).toList()
         def bundleTask = project.getTasksByName("bundle${apkInfo.variantName.capitalize()}", false)
 
-        if (!bundleTask.empty && !deployTarget?.bundle?.skipBundle) {
+        if (!bundleTask.empty) {
             tasksDependsOn.add(0, bundleTask.first())
         }
 
