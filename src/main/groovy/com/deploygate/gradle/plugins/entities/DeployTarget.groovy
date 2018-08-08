@@ -18,7 +18,7 @@ class DeployTarget implements Named {
         this.name = name
     }
 
-    public HashMap<String, String> toParams() {
+    HashMap<String, String> toParams() {
         HashMap<String, String> params = new HashMap<String, String>()
         if (message != null) {
             params.put("message", message)

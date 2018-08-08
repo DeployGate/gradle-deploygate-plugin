@@ -5,29 +5,32 @@ import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import groovyx.net.http.ContentType
 import org.gradle.api.NamedDomainObjectContainer
 
-public class DeployGateExtension {
-    def String token
-    def String userName
-    def String endpoint = Config.DEPLOYGATE_ROOT
+class DeployGateExtension {
+    String token
+    String userName
+    String endpoint = Config.DEPLOYGATE_ROOT
 
-    def NamedDomainObjectContainer<DeployTarget> apks
-    def String notifyKey = null
+    NamedDomainObjectContainer<DeployTarget> apks
+    String notifyKey = null
 
-    public DeployGateExtension(NamedDomainObjectContainer<DeployTarget> apkTargets) {
+    DeployGateExtension(NamedDomainObjectContainer<DeployTarget> apkTargets) {
         this.apks = apkTargets
     }
 
-    public apks(Closure closure) {
+    def apks(Closure closure) {
         apks.configure(closure)
     }
 
     def notifyServer(String action, HashMap<String, String> data = null) {
-        if (!notifyKey)
+        if (!notifyKey) {
             return
+        }
 
         def query = ['key': notifyKey, 'command_action': action]
-        if (data)
+
+        if (data) {
             query = query + data
+        }
 
         try {
             HTTPBuilderFactory.httpBuilder(endpoint).post path: "/cli/notify",
