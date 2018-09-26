@@ -18,7 +18,7 @@ buildscript {
         // export DEPLOYGATE_API_TOKEN=...
         // ./gradlew uploadDeployGateDebug
 
-        def version = new File(rootProject.projectDir, '../VERSION').text.trim()
+        def version = new File(rootProject.projectDir, '../src/main/resources/VERSION').text.trim()
 
         println(version)
 
