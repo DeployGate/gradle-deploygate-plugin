@@ -1,5 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 group = 'com.deploygate'
@@ -10,13 +11,16 @@ sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
 repositories {
-    mavenCentral()
+    google()
+    jcenter()
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
 
+//    compile 'com.android.tools.build:gradle:3.2.0-beta05'
+    compile 'com.android.tools.build:bundletool:0.5.0'
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
     compile 'org.apache.httpcomponents:httpmime:4.2.5'
     runtime 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
@@ -47,7 +51,7 @@ bintray {
     key = System.getenv('BINTRAY_KEY')
     pkg {
         repo = 'maven'
-        name = 'gradle'
+        name = project.archivesBaseName
         userOrg = 'deploygate'
         licenses = ['Apache-2.0']
         websiteUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin'
@@ -55,12 +59,24 @@ bintray {
         vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin.git'
         githubRepo = 'DeployGate/gradle-deploygate-plugin'
         version {
-            name = '1.1.5'
+            name = project.version
             released = new Date()
         }
     }
 
     configurations = ['archives']
+}
+
+// For publishToMavenLocal
+publishing {
+    publications {
+        pluginPublication(MavenPublication) {
+            from components.java
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+        }
+    }
 }
 
 buildscript {

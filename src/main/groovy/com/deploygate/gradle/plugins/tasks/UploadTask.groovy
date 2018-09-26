@@ -1,9 +1,12 @@
 package com.deploygate.gradle.plugins.tasks
 
+import com.android.tools.build.bundletool.commands.BuildApksCommand
+import com.android.tools.build.bundletool.model.Aapt2Command
+import com.deploygate.gradle.plugins.artifacts.AppBundleInfo
 import com.deploygate.gradle.plugins.entities.DeployTarget
+import com.deploygate.gradle.plugins.utils.AndroidPlatformUtils
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
-import com.deploygate.gradle.plugins.utils.UrlUtils
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.Method
@@ -16,11 +19,16 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
 import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.zip.ZipFile
 
 class UploadTask extends DefaultTask {
     String outputName
     boolean hasSigningConfig
     File defaultSourceFile
+
+    AppBundleInfo appBundleInfo
 
     @TaskAction
     def upload() {
@@ -28,12 +36,38 @@ class UploadTask extends DefaultTask {
             throw new GradleException('Cannot upload a build without code signature to DeployGate')
 
         DeployTarget target = findTarget()
+
+        buildApkFromAppBundleIfNeeded(target)
+
         if (!target.sourceFile?.exists())
             throw new GradleException("APK file ${target.sourceFile} was not found. If you are using Android Build Tools >= 3.0.0, you need to set `sourceFile` in your build.gradle. See https://docs.deploygate.com/docs/gradle-plugin")
 
         onBeforeUpload(target)
         def res = uploadProject(project, target)
         onAfterUpload(res)
+    }
+
+    private void buildApkFromAppBundleIfNeeded(DeployTarget target) {
+        if (appBundleInfo) {
+            appBundleInfo.getApksFile().parentFile.mkdirs()
+            target.sourceFile.parentFile.mkdirs()
+
+            def universalApkGenerateCommand = BuildApksCommand.builder()
+                    .setGenerateOnlyUniversalApk(true)
+                    .setOverwriteOutput(true)
+                    .setBundlePath(appBundleInfo.getBundleFile(project).toPath())
+                    .setSigningConfiguration(appBundleInfo.signingConfig.toSigningConfiguration())
+                    .setOutputFile(appBundleInfo.getApksFile().toPath())
+                    .setAapt2Command(Aapt2Command.createFromExecutablePath(new File(AndroidPlatformUtils.getAapt2Location(project)).toPath()))
+                    .build()
+
+            def apksPath = universalApkGenerateCommand.execute()
+            def apksFile = new ZipFile(apksPath.toFile())
+
+            apksFile.getInputStream(apksFile.getEntry('universal.apk')).withStream {
+                Files.copy(it, target.sourceFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            }
+        }
     }
 
     private DeployTarget findTarget() {
