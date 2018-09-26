@@ -5,7 +5,7 @@ apply plugin: 'com.jfrog.bintray'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
-version = '1.1.5'
+version = new File(rootProject.projectDir, 'VERSION').text.trim()
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
