@@ -20,8 +20,6 @@ class ApkInfoCompat {
             return new ApkInfoCompatBefore300Preview(applicationVariant, variantOutput)
         } else if (agpVersion.is300Preview()) {
             return new ApkInfoCompat300Preview(applicationVariant, variantOutput)
-        } else if (agpVersion.isBefore320()) {
-            return new ApkInfoCompatBefore320(applicationVariant, variantOutput)
         } else {
             return new ApkInfoCompatLatest(applicationVariant, variantOutput)
         }
@@ -60,6 +58,13 @@ class ApkInfoCompat {
         }
     }
 
+    // Keep the latest just extend BaseApkInfo!
+    private static class ApkInfoCompatLatest extends BaseApkInfo {
+        ApkInfoCompatLatest(applicationVariant, variantOutput) {
+            super(applicationVariant, variantOutput)
+        }
+    }
+
     private static abstract class BaseApkInfo implements ApkInfo {
         // Remove comment-out while debugging
 //        protected final ApplicationVariant applicationVariant
@@ -85,7 +90,7 @@ class ApkInfoCompat {
 
         @Override
         String getVariantName() {
-            return variantOutput.name
+            return applicationVariant.name
         }
 
         @Override
@@ -100,7 +105,7 @@ class ApkInfoCompat {
 
         @Override
         boolean isUniversalApk() {
-            return variantOutput.outputs.get(0).filters.empty
+            return variantOutput.filters.empty
         }
 
         @Override
@@ -113,9 +118,19 @@ class ApkInfoCompat {
         ApkInfoCompatBefore300Preview(applicationVariant, variantOutput) {
             super(applicationVariant, variantOutput)
         }
+
+        @Override
+        String getVariantName() {
+            return variantOutput.name
+        }
+
+        @Override
+        boolean isUniversalApk() {
+            return variantOutput.outputs.get(0).filters.empty
+        }
     }
 
-    private static class ApkInfoCompat300Preview extends BaseApkInfo {
+    private static class ApkInfoCompat300Preview extends ApkInfoCompatBefore300Preview {
 
         ApkInfoCompat300Preview(applicationVariant, variantOutput) {
             super(applicationVariant, variantOutput)
@@ -128,38 +143,11 @@ class ApkInfoCompat {
 
         @Override
         boolean isSigningReady() {
-            if (output.hasProperty('variantOutputData')) {
-                return output.variantOutputData.variantData.signed
+            if (variantOutput.hasProperty('variantOutputData')) {
+                return variantOutput.variantOutputData.variantData.signed
             } else {
                 return super.isSigningReady()
             }
-        }
-    }
-
-    private static class ApkInfoCompatBefore320 extends BaseApkInfo {
-        ApkInfoCompatBefore320(applicationVariant, variantOutput) {
-            super(applicationVariant, variantOutput)
-        }
-
-        @Override
-        boolean isUniversalApk() {
-            return variantOutput.filters.empty
-        }
-    }
-
-    private static class ApkInfoCompatLatest extends BaseApkInfo {
-        ApkInfoCompatLatest(applicationVariant, variantOutput) {
-            super(applicationVariant, variantOutput)
-        }
-
-        @Override
-        boolean isUniversalApk() {
-            return variantOutput.filters.empty
-        }
-
-        @Override
-        String getVariantName() {
-            return applicationVariant.name
         }
     }
 }
