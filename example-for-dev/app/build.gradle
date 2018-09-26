@@ -43,7 +43,7 @@ deploygate {
     apks {
         custom {
             noAssemble = true
-            sourceFile = file("${project.projectDir}/app/build/outputs/apk/debug/app-debug.apk")
+            sourceFile = file("${project.projectDir}/build/outputs/apk/p1//debug/app-p1-debug.apk")
         }
     }
 }
