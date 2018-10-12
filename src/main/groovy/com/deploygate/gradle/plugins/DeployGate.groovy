@@ -37,9 +37,16 @@ class DeployGate implements Plugin<Project> {
 
     private static Set<String> setupExtension(Project project) {
         NamedDomainObjectContainer<DeployTarget> targets = project.container(DeployTarget)
+
+        def declaredVariantNames = new HashSet<>()
+
+        targets.all {
+            declaredVariantNames.add(name)
+        }
+
         project.extensions.add('deploygate', new DeployGateExtension(targets))
 
-        return targets.collect { it.name }.toSet()
+        return declaredVariantNames
     }
 
     def createDeployGateTasks(Project project, Set<String> declaredVariantNames) {
@@ -48,7 +55,7 @@ class DeployGate implements Plugin<Project> {
 
         createMultipleUploadApkTask(project, declaredVariantNames)
 
-        def names = new HashSet(declaredVariantNames)
+        def names = new HashSet<String>(declaredVariantNames)
 
         // @see ApplicationVariantFactory#createVariantData
         // variant is for applicationFlavors
@@ -65,7 +72,6 @@ class DeployGate implements Plugin<Project> {
         }
 
         names.collect { ApkInfoCompat.blank(it) }.each { apkInfo ->
-
             createUploadApkTask(project, apkInfo)
         }
     }
