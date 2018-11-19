@@ -136,7 +136,7 @@ to provide default values for DeployGate Plugin instead of writing in `build.gra
  * `DEPLOYGATE_RELEASE_NOTE`
  * `DEPLOYGATE_SOURCE_FILE`
  * `DEPLOYGATE_OPEN_BROWSER` (Env only; open the app page after the uploading finished)
- * `DEPLOYGATE_AAPT2_PATH`
+ * `DEPLOYGATE_AAPT2_PATH` (Basically needless. This was required iff you are using AGP 3.2.0-betaXX)
 
 By using environment variables, you can avoid storing your credentials
 in your source code repository and compose deployment messages dynamically.
