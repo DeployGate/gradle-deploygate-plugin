@@ -1,16 +1,15 @@
 package com.deploygate.gradle.plugins
 
-import com.android.tools.build.bundletool.commands.BuildApksCommand
-import com.android.tools.build.bundletool.model.Aapt2Command
+import com.android.build.gradle.api.ApplicationVariant
 import com.deploygate.gradle.plugins.artifacts.ApkInfo
-import com.deploygate.gradle.plugins.artifacts.ApkInfoCompat
 import com.deploygate.gradle.plugins.artifacts.AppBundleInfo
+import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
 import com.deploygate.gradle.plugins.entities.DeployGateExtension
 import com.deploygate.gradle.plugins.entities.DeployTarget
 import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.UploadTask
-import com.deploygate.gradle.plugins.utils.AndroidPlatformUtils
+import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -50,29 +49,88 @@ class DeployGate implements Plugin<Project> {
     }
 
     def createDeployGateTasks(Project project, Set<String> declaredVariantNames) {
-        project.task(LOGIN_TASK_NAME, type: LoginTask, group: GROUP_NAME)
+        def loginTask = project.task(LOGIN_TASK_NAME, type: LoginTask, group: GROUP_NAME)
         project.task(LOGOUT_TASK_NAME, type: LogoutTask, group: GROUP_NAME)
 
-        createMultipleUploadApkTask(project, declaredVariantNames)
+//        createMultipleUploadApkTask(project, declaredVariantNames)
 
         def names = new HashSet<String>(declaredVariantNames)
 
         // @see ApplicationVariantFactory#createVariantData
         // variant is for applicationFlavors
         project.android.applicationVariants.all { variant ->
-            // variant is for splits
-            variant.outputs.each { output ->
-                def apkInfo = ApkInfoCompat.from(variant, output)
+            createUploadApkTask(project, variant, loginTask)
+            names.remove(variant.name)
+        }
 
-                createUploadApkTask(project, apkInfo, output.assemble)
-                createFromAabUploadTasks(project, apkInfo)
+//        names.collect { ApkInfoCompat.blank(it) }.each { apkInfo ->
+//            createUploadApkTask(project, apkInfo)
+//        }
+    }
 
-                names.remove(apkInfo.variantName)
+    private static String uploadApkTaskName(String flavorName) {
+        return "uploadDeployGate${flavorName.capitalize()}"
+    }
+
+    private static DeployGateExtension deployGateExtension(Project project) {
+        return project.deploygate as DeployGateExtension
+    }
+
+    private void createUploadApkTask(Project project, ApplicationVariant applicationVariant, Task loginTask) {
+        def taskProvider = project.tasks.register(uploadApkTaskName(applicationVariant.name), UploadTask)
+
+        def deployGate = deployGateExtension(project)
+        final DeployTarget configuration = deployGate.apks.findByName(applicationVariant.name)
+
+        project.tasks.register()
+
+        if (!configuration.noAssemble) {
+            applicationVariant.assembleProvider.configure { assembleTask ->
+                taskProvider.configure { dgTask ->
+                    dgTask.dependsOn(assembleTask, loginTask)
+                }
+            }
+        } else {
+            taskProvider.configure { dgTask ->
+                dgTask.dependsOn(loginTask)
             }
         }
 
-        names.collect { ApkInfoCompat.blank(it) }.each { apkInfo ->
-            createUploadApkTask(project, apkInfo)
+        applicationVariant.packageApplicationProvider.configure { packageAppTask ->
+            taskProvider.configure { dgTask ->
+                def isUniversal = packageAppTask.apkNames.size() == 1
+                def isSigingReady = !packageAppTask.signingConfig.isEmpty()
+
+                def apkInfo = new DirectApkInfo(
+                        applicationVariant.name,
+                        new File(packageAppTask.outputDirectory, packageAppTask.apkNames.first()),
+                        isSigingReady,
+                        isUniversal,
+                )
+
+                dgTask.with {
+                    def desc = "Deploy assembled ${apkInfo.variantName.capitalize()} to DeployGate"
+
+                    // require signing config to build a signed APKs
+                    if (!apkInfo.signingReady) {
+                        desc += " (requires valid signingConfig setting)"
+                    }
+
+                    description = desc
+
+                    // universal builds show in DeployGate group
+                    if (apkInfo.universalApk) {
+                        group = GROUP_NAME
+                    }
+
+                    // UploadTask properties
+
+                    outputName apkInfo.variantName
+                    hasSigningConfig apkInfo.signingReady
+
+                    defaultSourceFile apkInfo.apkFile
+                }
+            }
         }
     }
 
@@ -113,7 +171,7 @@ class DeployGate implements Plugin<Project> {
     }
 
     private void createFromAabUploadTasks(Project project, ApkInfo apkInfo) {
-        if (!AndroidPlatformUtils.isAppBundleSupported()) {
+        if (!AndroidGradlePlugin.isAppBundleSupported()) {
             return
         }
 

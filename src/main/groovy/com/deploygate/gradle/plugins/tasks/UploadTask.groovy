@@ -4,7 +4,7 @@ import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.model.Aapt2Command
 import com.deploygate.gradle.plugins.artifacts.AppBundleInfo
 import com.deploygate.gradle.plugins.entities.DeployTarget
-import com.deploygate.gradle.plugins.utils.AndroidPlatformUtils
+import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import groovyx.net.http.ContentType
@@ -58,7 +58,7 @@ class UploadTask extends DefaultTask {
                     .setBundlePath(appBundleInfo.getBundleFile(project).toPath())
                     .setSigningConfiguration(appBundleInfo.signingConfig.toSigningConfiguration())
                     .setOutputFile(appBundleInfo.getApksFile().toPath())
-                    .setAapt2Command(Aapt2Command.createFromExecutablePath(new File(AndroidPlatformUtils.getAapt2Location(project)).toPath()))
+                    .setAapt2Command(Aapt2Command.createFromExecutablePath(new File(AndroidGradlePlugin.getAapt2Location(project)).toPath()))
                     .build()
 
             def apksPath = universalApkGenerateCommand.execute()

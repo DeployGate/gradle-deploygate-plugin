@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins.artifacts
 
-import com.deploygate.gradle.plugins.utils.AndroidPlatformUtils
+import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 
 //import com.android.build.gradle.api.ApplicationVariant
 //import com.android.build.gradle.api.BaseVariantOutput
@@ -14,11 +14,9 @@ class ApkInfoCompat {
     }
 
     static ApkInfo from(/*ApplicationVariant*/ applicationVariant, /*BaseVariantOutput*/ variantOutput) {
-        def agpVersion = AndroidPlatformUtils.getAGPVersion()
-
-        if (agpVersion.isBefore300Preview()) {
+        if (AndroidGradlePlugin.isBefore3xx()) {
             return new ApkInfoCompatBefore300Preview(applicationVariant, variantOutput)
-        } else if (agpVersion.is300Preview()) {
+        } else if (AndroidGradlePlugin.is3xxPreview()) {
             return new ApkInfoCompat300Preview(applicationVariant, variantOutput)
         } else {
             return new ApkInfoCompatLatest(applicationVariant, variantOutput)
@@ -51,11 +49,6 @@ class ApkInfoCompat {
         boolean isUniversalApk() {
             return true
         }
-
-        @Override
-        SigningConfig getSigningConfig() {
-            return null
-        }
     }
 
     // Keep the latest just extend BaseApkInfo!
@@ -71,21 +64,10 @@ class ApkInfoCompat {
 //        protected final BaseVariantOutput variantOutput
         protected def applicationVariant
         protected def variantOutput
-        private final SigningConfig signingConfig
 
         BaseApkInfo(applicationVariant, variantOutput) {
             this.applicationVariant = applicationVariant
             this.variantOutput = variantOutput
-
-            def signingConfig = this.applicationVariant.packageApplication.signingConfig
-
-            if (signingConfig != null) {
-                this.signingConfig = new SigningConfig(signingConfig.storeFile, signingConfig.keyPassword, signingConfig.keyAlias, signingConfig.storePassword)
-            } else if (this.applicationVariant.packageApplication.debugBuild) {
-                this.signingConfig = new SigningConfig(new File(System.getProperty("user.home"), ".android/debug.keystore"), "android", "androiddebugkey", "android")
-            } else {
-                this.signingConfig = null
-            }
         }
 
         @Override
@@ -106,11 +88,6 @@ class ApkInfoCompat {
         @Override
         boolean isUniversalApk() {
             return variantOutput.filters.empty
-        }
-
-        @Override
-        SigningConfig getSigningConfig() {
-            return signingConfig
         }
     }
 

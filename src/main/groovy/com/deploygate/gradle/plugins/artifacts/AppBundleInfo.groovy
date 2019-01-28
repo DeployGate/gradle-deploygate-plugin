@@ -30,8 +30,4 @@ class AppBundleInfo {
 
         return bundleFile = project.file(deployTarget?.bundle?.source ?: "build/outputs/bundle/${apkInfo.variantName}/${project.name}.aab")
     }
-
-    SigningConfig getSigningConfig() {
-        return apkInfo.signingConfig
-    }
 }

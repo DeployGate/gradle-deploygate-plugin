@@ -8,6 +8,4 @@ interface ApkInfo {
     boolean isSigningReady()
 
     boolean isUniversalApk()
-
-    SigningConfig getSigningConfig()
 }
