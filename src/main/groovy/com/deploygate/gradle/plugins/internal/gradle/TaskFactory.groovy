@@ -18,11 +18,11 @@ class TaskFactory {
         this.gradleVersion = VersionString.tryParse(project.gradle.gradleVersion)
     }
 
-    final <T extends Task> LazyConfigurableTask<T> register(String name, Class<T> klass) {
+    final <T extends Task> LazyConfigurableTask<T> register(String taskName, Class<T> klass) {
         if (gradleVersion.major >= 4 && gradleVersion.minor >= 8) {
-            return new TaskProvider(project.tasks.register(name, klass))
+            return new TaskProvider(project.tasks.register(taskName, klass))
         } else {
-            return new SingleTask(project.tasks.create(name, klass))
+            return new SingleTask(project.tasks.create(taskName, klass))
         }
     }
 }

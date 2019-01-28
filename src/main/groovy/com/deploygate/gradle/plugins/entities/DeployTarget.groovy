@@ -1,8 +1,25 @@
 package com.deploygate.gradle.plugins.entities
 
 import org.gradle.api.Named
+import org.gradle.api.Project
+
+import javax.annotation.Nonnull
 
 class DeployTarget implements Named {
+    static DeployTarget fromEnvVars(@Nonnull Project project) {
+        def deployTarget = new DeployTarget()
+
+        deployTarget.with {
+            sourceFile = System.getenv('DEPLOYGATE_SOURCE_FILE')?.with { project.file(this) }
+            message = System.getenv('DEPLOYGATE_MESSAGE')
+            distributionKey = System.getenv('DEPLOYGATE_DISTRIBUTION_KEY')
+            releaseNote = System.getenv('DEPLOYGATE_RELEASE_NOTE')
+            visibility = System.getenv('DEPLOYGATE_VISIBILITY')
+        }
+
+        deployTarget
+    }
+
     String name
 
     File sourceFile
@@ -22,6 +39,17 @@ class DeployTarget implements Named {
 
     def bundle(Closure closure) {
         bundle.configure(closure)
+    }
+
+    DeployTarget merge(DeployTarget other) {
+        with {
+            sourceFile = sourceFile ?: other.sourceFile
+            message = message ?: other.message
+            distributionKey = distributionKey ?: other.distributionKey
+            releaseNote = releaseNote ?: other.releaseNote
+            visibility = visibility ?: other.visibility
+        }
+        return this
     }
 
     HashMap<String, String> toParams() {

@@ -14,6 +14,10 @@ class AndroidGradlePlugin {
         return AGP_VERSION
     }
 
+    static boolean isApplied(Project project) {
+        return ['com.android.application', 'android'].any { project.plugins.hasPlugin(it) }
+    }
+
     static String getAapt2Location(Project project) {
         return project.deploygate.aapt2Path ?: System.getenv('DEPLOYGATE_APPT2_PATH') ?: new File(project.android.sdkDirectory, "build-tools/${getBuildToolsVersion(project)}/aapt2").toString()
     }

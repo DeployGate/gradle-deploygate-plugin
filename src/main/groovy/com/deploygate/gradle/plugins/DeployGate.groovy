@@ -6,31 +6,43 @@ import com.deploygate.gradle.plugins.artifacts.AppBundleInfo
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
 import com.deploygate.gradle.plugins.entities.DeployGateExtension
 import com.deploygate.gradle.plugins.entities.DeployTarget
+import com.deploygate.gradle.plugins.factory.UploadApkTaskFactory
+import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.UploadTask
-import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 
 class DeployGate implements Plugin<Project> {
+    private static final String EXTENSION_NAME = 'deploygate'
     private static final String GROUP_NAME = 'DeployGate'
     private static final String LOGIN_TASK_NAME = 'loginDeployGate'
     private static final String LOGOUT_TASK_NAME = 'logoutDeployGate'
 
+    // env names must start with 'DEPLOYGATE_'
+    static final String ENV_NAME_SOURCE_FILE = "DEPLOYGATE_SOURCE_FILE"
+    static final String ENV_NAME_UPLOAD_MESSAGE = "DEPLOYGATE_MESSAGE"
+    static final String ENV_NAME_DISTRIBUTION_KEY = "DEPLOYGATE_DISTRIBUTION_KEY"
+    static final String ENV_NAME_RELEASE_NOTE = "DEPLOYGATE_RELEASE_NOTE"
+    static final String ENV_NAME_VISIBILITY = "DEPLOYGATE_VISIBILITY"
+
     @Override
     void apply(Project project) {
-        def declaredVariantNames = setupExtension(project)
+        NamedDomainObjectContainer<DeployTarget> targets = project.container(DeployTarget)
+        project.extensions.add(EXTENSION_NAME, new DeployGateExtension(targets))
 
-        project.afterEvaluate { prj ->
-            if (['com.android.application', 'android'].any { prj.plugins.hasPlugin(it) }) {
+        project.afterEvaluate { Project prj ->
+            if (AndroidGradlePlugin.isApplied(prj)) {
+                UploadApkTaskFactory.onAGPApplied(prj)
                 createDeployGateTasks(prj, declaredVariantNames)
+
+                prj.gradle.buildFinished { buildResult ->
+                    project.deploygate.notifyServer('finished', [result: Boolean.toString(buildResult.failure == null)])
+                }
             }
-        }
-        project.gradle.buildFinished { buildResult ->
-            project.deploygate.notifyServer('finished', [result: Boolean.toString(buildResult.failure == null)])
         }
     }
 
