@@ -34,7 +34,7 @@ class AndroidGradlePlugin {
         return getVersion().major >= 3 && getVersion().minor >= 2
     }
 
-    static boolean isTaskProviderBase() {
+    static boolean isTaskProviderBased() {
         return getVersion().major >= 3 && getVersion().minor >= 3
     }
 

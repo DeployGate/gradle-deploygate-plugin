@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 
 import javax.annotation.Nonnull
+import javax.annotation.Nullable
 
 class TaskFactory {
     @Nonnull
@@ -18,7 +19,18 @@ class TaskFactory {
         this.gradleVersion = VersionString.tryParse(project.gradle.gradleVersion)
     }
 
-    final <T extends Task> LazyConfigurableTask<T> register(String taskName, Class<T> klass) {
+    @Nullable
+    final <T extends Task> LazyConfigurableTask<T> register(String taskName, Class<T> klass, boolean allowExisting = true) {
+        def existingTask = project.tasks.findByName(taskName)
+
+        if (existingTask) {
+            if (allowExisting) {
+                return new SingleTask(existingTask as T)
+            } else {
+                return null
+            }
+        }
+
         if (gradleVersion.major >= 4 && gradleVersion.minor >= 8) {
             return new TaskProvider(project.tasks.register(taskName, klass))
         } else {

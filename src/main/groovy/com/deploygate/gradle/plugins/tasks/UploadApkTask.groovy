@@ -28,12 +28,11 @@ class UploadApkTask extends DefaultTask {
     private Configuration configuration
 
     void setVariantName(@Nonnull String variantName) {
-        if (this.variantName) {
-            throw new IllegalStateException("variant name cannot be assigned twice")
+        if (this.variantName && this.variantName != variantName) {
+            throw new IllegalStateException("different variant name cannot be assigned")
         }
 
         this.variantName = variantName
-        setDescription("Deploy assembled $variantName to DeployGate")
     }
 
     void setConfiguration(@Nonnull Configuration configuration) {
@@ -42,10 +41,14 @@ class UploadApkTask extends DefaultTask {
         }
 
         if (this.configuration) {
-            throw new IllegalStateException("configuration cannot be assigned twice")
+            logger.debug("$variantName upload apk task configuration has been overwritten")
         }
 
         this.configuration = configuration
+    }
+
+    void applyTaskProfile() {
+        setDescription("Deploy assembled $variantName to DeployGate")
 
         if (!configuration.apkInfo.signingReady) {
             // require signing config to build a signed APKs

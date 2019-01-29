@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins.factory
 
-import com.android.build.gradle.AndroidConfig
+
 import com.deploygate.gradle.plugins.entities.DeployGateExtension
 import com.deploygate.gradle.plugins.internal.gradle.TaskFactory
 import org.gradle.api.Project
@@ -8,7 +8,7 @@ import org.gradle.api.Project
 import javax.annotation.Nonnull
 
 abstract class DeployGateTaskFactory {
-    static final String GROUP_NAME = 'DeployGate'
+    public static final String GROUP_NAME = 'DeployGate'
 
     @Nonnull
     final Project project
@@ -30,18 +30,5 @@ abstract class DeployGateTaskFactory {
         _deployGateExtension = project.deploygate
 
         return _deployGateExtension
-    }
-
-    private AndroidConfig _androidConfig
-
-    @Nonnull
-    AndroidConfig getAndroidExtension() {
-        if (_androidConfig) {
-            return _androidConfig
-        }
-
-        _androidConfig = project.android
-
-        return _androidConfig
     }
 }

@@ -1,9 +1,13 @@
 package com.deploygate.gradle.plugins.internal
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 import javax.annotation.Nullable
 import java.util.regex.Pattern
 
 class VersionString {
+    private static final Logger LOGGER = LoggerFactory.getLogger(this.getClass())
     private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)[\\-]?([\\d]+)?")
 
     @Nullable
@@ -12,10 +16,12 @@ class VersionString {
             return null
         }
 
+        LOGGER.info(version)
+
         def matcher = VERSION_PATTERN.matcher(version)
 
         try {
-            if (matcher.groupCount() < 3) {
+            if (!matcher.find() || matcher.groupCount() < 3) {
                 return null
             }
 
