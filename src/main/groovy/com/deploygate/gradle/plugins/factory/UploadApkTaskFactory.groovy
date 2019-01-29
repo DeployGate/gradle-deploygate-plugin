@@ -1,7 +1,5 @@
 package com.deploygate.gradle.plugins.factory
 
-import com.android.build.gradle.api.ApplicationVariant
-import com.android.build.gradle.tasks.PackageApplication
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
 import com.deploygate.gradle.plugins.entities.DeployTarget
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
@@ -28,7 +26,8 @@ class UploadApkTaskFactory extends DeployGateTaskFactory {
         super(project)
     }
 
-    void registerVariantAwareUploadApkTask(ApplicationVariant applicationVariant, Object... dependsOn) {
+//    void registerVariantAwareUploadApkTask(com.android.build.gradle.api.ApplicationVariant applicationVariant, Object... dependsOn) {
+    void registerVariantAwareUploadApkTask(applicationVariant, Object... dependsOn) {
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(applicationVariant.name), UploadApkTask)
 
         final DeployTarget deployTarget = deployGateExtension.apks.findByName(applicationVariant.name)
@@ -58,7 +57,9 @@ class UploadApkTaskFactory extends DeployGateTaskFactory {
         lazyPackageApplication(applicationVariant).configure { packageAppTask ->
             lazyUploadApkTask.configure { dgTask ->
                 def isUniversal = packageAppTask.apkNames.size() == 1
-                def isSigingReady = !packageAppTask.signingConfig.isEmpty()
+                // before 3.3.0 -> signing config object
+                // eq and after 3.3.0 -> file collection
+                def isSigingReady = !packageAppTask.signingConfig
 
                 def apkInfo = new DirectApkInfo(
                         applicationVariant.name,
@@ -138,7 +139,8 @@ class UploadApkTaskFactory extends DeployGateTaskFactory {
         }
     }
 
-    private static LazyConfigurableTask<PackageApplication> lazyPackageApplication(ApplicationVariant applicationVariant) {
+//    private static LazyConfigurableTask<com.android.build.gradle.tasks.PackageApplication> lazyPackageApplication(com.android.build.gradle.api.ApplicationVariant applicationVariant) {
+    private static LazyConfigurableTask lazyPackageApplication(applicationVariant) {
         if (AndroidGradlePlugin.taskProviderBased) {
             return new TaskProvider(applicationVariant.packageApplicationProvider as org.gradle.api.tasks.TaskProvider)
         } else {
@@ -146,11 +148,11 @@ class UploadApkTaskFactory extends DeployGateTaskFactory {
         }
     }
 
-    private static LazyConfigurableTask<PackageApplication> lazyAssemble(ApplicationVariant applicationVariant) {
-        if (AndroidGradlePlugin.taskProviderBased) {
-            return new TaskProvider(applicationVariant.assembleProvider as org.gradle.api.tasks.TaskProvider)
-        } else {
-            return new SingleTask(applicationVariant.assemble)
-        }
-    }
+//    private static LazyConfigurableTask<Task> lazyAssemble(ApplicationVariant applicationVariant) {
+//        if (AndroidGradlePlugin.taskProviderBased) {
+//            return new TaskProvider(applicationVariant.assembleProvider as org.gradle.api.tasks.TaskProvider)
+//        } else {
+//            return new SingleTask(applicationVariant.assemble)
+//        }
+//    }
 }

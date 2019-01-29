@@ -1,12 +1,10 @@
 package com.deploygate.gradle.plugins
 
-import com.android.build.gradle.api.ApplicationVariant
 import com.deploygate.gradle.plugins.factory.LoginTaskFactory
 import com.deploygate.gradle.plugins.factory.LogoutTaskFactory
 import com.deploygate.gradle.plugins.factory.UploadApkTaskFactory
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 
 import javax.annotation.Nonnull
 
@@ -52,14 +50,17 @@ class Processor {
     }
 
     def registerAggregatedDeclarationAwareUploadApkTask(List<String> variantOrCustomNames) {
-        uploadApkTaskFactory.registerAggregatedDeclarationAwareUploadApkTask(variantOrCustomNames.collect { UploadApkTaskFactory.uploadApkTaskName(it) })
+        uploadApkTaskFactory.registerAggregatedDeclarationAwareUploadApkTask(variantOrCustomNames.collect {
+            UploadApkTaskFactory.uploadApkTaskName(it)
+        })
     }
 
-    def registerVariantAwareUploadApkTask(ApplicationVariant variant) {
+//    def registerVariantAwareUploadApkTask(com.android.build.gradle.api.ApplicationVariant variant) {
+    def registerVariantAwareUploadApkTask(variant) {
         uploadApkTaskFactory.registerVariantAwareUploadApkTask(variant, dependencyAncestorOfUploadTaskName)
     }
 
-    private String getDependencyAncestorOfUploadTaskName() {
+    private static String getDependencyAncestorOfUploadTaskName() {
         return LoginTaskFactory.TASK_NAME
     }
 }

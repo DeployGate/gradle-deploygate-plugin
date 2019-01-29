@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins
 
-import com.android.build.gradle.AppExtension
 import com.deploygate.gradle.plugins.entities.DeployGateExtension
 import com.deploygate.gradle.plugins.entities.DeployTarget
 import org.gradle.api.NamedDomainObjectContainer
@@ -40,6 +39,8 @@ class DeployGatePlugin implements Plugin<Project> {
         NamedDomainObjectContainer<DeployTarget> targets = project.container(DeployTarget)
         project.extensions.add(EXTENSION_NAME, new DeployGateExtension(targets))
 
+        project.logger.error("size is ${targets.size()}")
+
         def declaredNames = []
 
         targets.all { declaredNames += name }
@@ -78,9 +79,8 @@ class DeployGatePlugin implements Plugin<Project> {
             }
         }
 
-        def androidExtension = project.android as AppExtension
-
-        androidExtension.applicationVariants.all { /* com.android.build.gradle.api.ApplicationVariant */ variant ->
+//        (project.android as com.android.build.gradle.AppExtension).applicationVariants.all { com.android.build.gradle.api.ApplicationVariant variant ->
+        project.android.applicationVariants.all { variant ->
             processor.registerVariantAwareUploadApkTask(variant)
         }
     }
