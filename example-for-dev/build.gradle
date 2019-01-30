@@ -10,12 +10,12 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.3.0'
 //        classpath 'io.fabric.tools:gradle:1.+'
 
         // cd /path/to/repo
         // Edit version info in build.gradle
-        // Run ./gradlew publishToMavenLocal
+        // Run ./gradlew install
         // cd example-for-dev
         // export DEPLOYGATE_USER_NAME=...
         // export DEPLOYGATE_API_TOKEN=...

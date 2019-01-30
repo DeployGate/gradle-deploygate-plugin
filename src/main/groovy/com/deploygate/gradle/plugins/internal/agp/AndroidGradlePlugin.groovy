@@ -31,11 +31,15 @@ class AndroidGradlePlugin {
     }
 
     static boolean isAppBundleSupported() {
-        return getVersion().major >= 3 && getVersion().minor >= 2
+        return getVersion().major >= 3 && getVersion().minor > 1
+    }
+
+    static boolean isSigningConfigCollectionSupported() {
+        return getVersion().major >= 3 && getVersion().minor > 2
     }
 
     static boolean isTaskProviderBased() {
-        return getVersion().major >= 3 && getVersion().minor >= 3
+        return getVersion().major >= 3 && getVersion().minor > 2
     }
 
     private static String getVersionString() {

@@ -2,7 +2,6 @@ package com.deploygate.gradle.plugins.dsl
 
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
-import com.google.common.annotations.VisibleForTesting
 import groovyx.net.http.ContentType
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -66,7 +65,6 @@ class DeployGateExtension {
         return result
     }
 
-    @VisibleForTesting
     static void mergeDeployTarget(@Nonnull DeployTarget base, @Nullable DeployTarget other) {
         base.sourceFile = base.sourceFile ?: other.sourceFile
         base.message = base.message ?: other.message

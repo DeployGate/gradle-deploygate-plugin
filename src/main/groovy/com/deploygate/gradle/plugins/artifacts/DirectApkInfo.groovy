@@ -1,5 +1,8 @@
 package com.deploygate.gradle.plugins.artifacts
 
+import groovy.transform.PackageScope
+
+@PackageScope
 class DirectApkInfo implements ApkInfo {
     private final String variantName
     private final File apkFile

@@ -7,11 +7,11 @@ class BrowserUtils {
     static boolean openBrowser(String url) {
         if (hasBrowser()) {
             try {
-                if(isMac()) {
+                if (isMac()) {
                     return openBrowserForMac(url)
-                } else if(isWindows()) {
+                } else if (isWindows()) {
                     return openBrowserForWindows(url)
-                } else if(isLinux()) {
+                } else if (isLinux()) {
                     return openBrowserForLinux(url)
                 } else {
                     return false
@@ -33,7 +33,7 @@ class BrowserUtils {
     static boolean openBrowserForLinux(String url) {
         try {
             int result = ['xdg-open', url].execute().waitFor()
-            if(result == 0) {
+            if (result == 0) {
                 return true
             } else {
                 throw new RuntimeException()

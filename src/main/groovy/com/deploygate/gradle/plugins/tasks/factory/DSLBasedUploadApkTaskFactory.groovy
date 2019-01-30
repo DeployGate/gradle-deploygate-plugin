@@ -1,7 +1,6 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
-import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
+import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
 import com.deploygate.gradle.plugins.dsl.DeployTarget
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.DefaultTask
@@ -40,16 +39,10 @@ class DSLBasedUploadApkTaskFactory extends UploadApkTaskFactory<String> {
             dgTask.dependsOn(dependsOn)
         }
 
+        def apkInfo = new DefaultPresetApkInfo(variantNameOrCustomName)
+        def configuration = UploadApkTask.createConfiguration(deployTarget, apkInfo)
+
         lazyUploadApkTask.configure { dgTask ->
-            def apkInfo = new DirectApkInfo(
-                    variantNameOrCustomName,
-                    null,
-                    true,
-                    true,
-            )
-
-            def configuration = UploadApkTask.createConfiguration(deployTarget, apkInfo)
-
             dgTask.configuration = configuration
             dgTask.applyTaskProfile()
         }

@@ -1,6 +1,5 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
-apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 group = 'com.deploygate'
@@ -20,7 +19,7 @@ dependencies {
     compile localGroovy()
 
 //    compile 'com.android.tools.build:gradle:3.3.0'
-    compile 'com.android.tools.build:bundletool:0.8.0'
+//    compile 'com.android.tools.build:bundletool:0.8.0'
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
     compile 'org.apache.httpcomponents:httpmime:4.2.5'
     runtime 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
@@ -65,18 +64,6 @@ bintray {
     }
 
     configurations = ['archives']
-}
-
-// For publishToMavenLocal
-publishing {
-    publications {
-        pluginPublication(MavenPublication) {
-            from components.java
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-        }
-    }
 }
 
 buildscript {

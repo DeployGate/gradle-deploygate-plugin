@@ -2,11 +2,38 @@ package com.deploygate.gradle.plugins.artifacts
 
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 
+import javax.annotation.Nonnull
+
 //import com.android.build.gradle.api.ApplicationVariant
 //import com.android.build.gradle.api.BaseVariantOutput
 
-class ApkInfoCompat {
-    private ApkInfoCompat() {
+class PackageAppTaskCompat {
+    private PackageAppTaskCompat() {
+    }
+
+    @Nonnull
+    //    static ApkInfo getApkInfo(com.android.build.gradle.tasks.PackageApplication packageAppTask) {
+    static ApkInfo getApkInfo(packageAppTask) {
+        String variantName = packageAppTask.name
+        Collection<String> apkNames = packageAppTask.outputScope.apkDatas*.outputFileName
+        File outputDir = packageAppTask.outputDirectory
+        boolean isUniversal = apkNames.size() == 1
+        boolean isSigningReady = hasSigningConfig(packageAppTask)
+
+        return new DirectApkInfo(
+                variantName,
+                new File(outputDir, (String) apkNames[0]),
+                isSigningReady,
+                isUniversal,
+        )
+    }
+
+    private static boolean hasSigningConfig(packageAppTask) {
+        if (!AndroidGradlePlugin.isSigningConfigCollectionSupported()) {
+            return packageAppTask.signingConfig != null
+        } else {
+            return packageAppTask.signingConfig != null && !packageAppTask.signingConfig.isEmpty()
+        }
     }
 
     static ApkInfo from(/*ApplicationVariant*/ applicationVariant, /*BaseVariantOutput*/ variantOutput) {

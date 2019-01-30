@@ -142,23 +142,23 @@ class UploadApkTask extends DefaultTask {
     }
 
     private String getToken() {
-        project.deploygate.token.with {
-            if (!this.trim()) {
-                throw new GradleException('token is missing. Please enter the token.')
-            }
+        def taken = project.deploygate.token
 
-            this
+        if (!taken.trim()) {
+            throw new GradleException('token is missing. Please enter the token.')
         }
+
+        taken.trim()
     }
 
     private String getUserName() {
-        project.deploygate.userName.with {
-            if (!this.trim()) {
-                throw new GradleException('userName is missing. Please enter the token.')
-            }
+        def userName = project.deploygate.userName
 
-            this
+        if (!userName.trim()) {
+            throw new GradleException('userName is missing. Please enter the token.')
         }
+
+        userName.trim()
     }
 
     private HttpResponseDecorator postRequestToUpload(String userName, String token, File apkFile, Map<String, String> params) {

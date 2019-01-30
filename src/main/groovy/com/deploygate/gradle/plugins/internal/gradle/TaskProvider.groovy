@@ -9,7 +9,7 @@ import javax.annotation.Nonnull
 
 /**
  * This is just a delegation of TaskProvider which has been introduced since Gradle 4.0
- * @param < T >
+ * @param <T >
  */
 class TaskProvider<T extends Task> implements LazyConfigurableTask<T> {
 
