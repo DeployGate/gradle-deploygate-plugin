@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins
 
-import com.deploygate.gradle.plugins.entities.DeployTarget
+import com.deploygate.gradle.plugins.dsl.DeployTarget
 import org.junit.Test
 
 class DeployTargetTest {

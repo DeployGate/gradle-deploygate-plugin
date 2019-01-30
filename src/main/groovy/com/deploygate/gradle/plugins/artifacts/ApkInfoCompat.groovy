@@ -9,10 +9,6 @@ class ApkInfoCompat {
     private ApkInfoCompat() {
     }
 
-    static ApkInfo blank(String name) {
-        return new BlankApkInfo(name)
-    }
-
     static ApkInfo from(/*ApplicationVariant*/ applicationVariant, /*BaseVariantOutput*/ variantOutput) {
         if (AndroidGradlePlugin.isBefore3xx()) {
             return new ApkInfoCompatBefore300Preview(applicationVariant, variantOutput)
@@ -20,34 +16,6 @@ class ApkInfoCompat {
             return new ApkInfoCompat300Preview(applicationVariant, variantOutput)
         } else {
             return new ApkInfoCompatLatest(applicationVariant, variantOutput)
-        }
-    }
-
-    private static class BlankApkInfo implements ApkInfo {
-        private final String name
-
-        private BlankApkInfo(String name) {
-            this.name = name
-        }
-
-        @Override
-        String getVariantName() {
-            return name
-        }
-
-        @Override
-        File getApkFile() {
-            return null
-        }
-
-        @Override
-        boolean isSigningReady() {
-            return true
-        }
-
-        @Override
-        boolean isUniversalApk() {
-            return true
         }
     }
 

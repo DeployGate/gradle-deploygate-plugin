@@ -1,13 +1,11 @@
 package com.deploygate.gradle.plugins
 
-import com.deploygate.gradle.plugins.entities.DeployGateExtension
-import com.deploygate.gradle.plugins.entities.DeployTarget
+import com.deploygate.gradle.plugins.dsl.DeployGateExtension
+import com.deploygate.gradle.plugins.dsl.DeployTarget
+import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 
 class DeployGatePlugin implements Plugin<Project> {
     private static final String EXTENSION_NAME = 'deploygate'
@@ -19,125 +17,66 @@ class DeployGatePlugin implements Plugin<Project> {
     static final String ENV_NAME_RELEASE_NOTE = "DEPLOYGATE_RELEASE_NOTE"
     static final String ENV_NAME_VISIBILITY = "DEPLOYGATE_VISIBILITY"
 
-    enum ArtifactType {
-        Apk,
-        ApkViaAab
-    }
+    static final String ENV_NAME_OPEN_APP_DETAIL_AFTER_UPLOAD = "DEPLOYGATE_OPEN_BROWSER"
 
-    private Map<ArtifactType, List<String>> variantNamesMap = new ConcurrentHashMap<>()
+    private Processor processor
 
     @Override
     void apply(Project project) {
-        onPluginApplied(project)
+        setupExtension(project)
+        initProcessor(project)
 
         project.afterEvaluate { Project evaluatedProject ->
-            onProjectEvaluated(project)
+            onProjectEvaluated(evaluatedProject)
         }
     }
 
-    private void onPluginApplied(Project project) {
+    private static void setupExtension(Project project) {
         NamedDomainObjectContainer<DeployTarget> targets = project.container(DeployTarget)
-        project.extensions.add(EXTENSION_NAME, new DeployGateExtension(targets))
+        project.extensions.add(EXTENSION_NAME, new DeployGateExtension(project, targets))
+    }
 
-        project.logger.error("size is ${targets.size()}")
+    private void initProcessor(Project project) {
+        processor = new Processor(this, project)
 
-        def declaredNames = []
-
-        targets.all { declaredNames += name }
-
-        ArtifactType.values().each {
-            variantNamesMap[it] = new CopyOnWriteArrayList<>(declaredNames)
+        project.deploygate.apks.all { DeployTarget target ->
+            processor.addVariantOrCustomName(target.name)
         }
     }
 
     private void onProjectEvaluated(Project project) {
-        if (!Processor.isProcessable(project)) {
-            project.logger.warn("DeployGate Gradle Plugin cannot be applied. Android Gradle Plugin must be applied before.")
-            return
-        }
-
         project.gradle.buildFinished { buildResult ->
             project.deploygate.notifyServer('finished', [result: Boolean.toString(buildResult.failure == null)])
         }
 
-        Processor processor = new Processor(this, project)
-
         processor.registerLoginTask()
         processor.registerLogoutTask()
 
-        variantNamesMap.forEach { artifactType, variantNames ->
-            switch (artifactType) {
-                case ArtifactType.Apk:
-                    variantNames.forEach { variantName ->
-                        processor.registerDeclarationAwareUploadApkTask(variantName)
-                    }
+        processor.declaredNames.forEach { variantOrCustomName ->
+            processor.registerDeclarationAwareUploadApkTask(variantOrCustomName)
 
-                    processor.registerAggregatedDeclarationAwareUploadApkTask(variantNames)
-                    break
-                case ArtifactType.ApkViaAab:
-                    break
+            if (AndroidGradlePlugin.isAppBundleSupported()) {
+                // TODO create tasks for app bundle
             }
+        }
+
+        processor.registerAggregatedDeclarationAwareUploadApkTask(processor.declaredNames)
+
+        if (!processor.canProcessVariantAware()) {
+            project.logger.warn("DeployGate Gradle Plugin is stopped because Android Gradle Plugin must be applied before.")
+            return
         }
 
 //        (project.android as com.android.build.gradle.AppExtension).applicationVariants.all { com.android.build.gradle.api.ApplicationVariant variant ->
         project.android.applicationVariants.all { variant ->
             processor.registerVariantAwareUploadApkTask(variant)
+
+            if (AndroidGradlePlugin.isAppBundleSupported()) {
+                // TODO create tasks for app bundle
+            }
         }
     }
 
-//    def createDeployGateTasks(Project project, Set<String> declaredVariantNames) {
-////        createMultipleUploadApkTask(project, declaredVariantNames)
-//
-//        def names = new HashSet<String>(declaredVariantNames)
-//
-//        // @see ApplicationVariantFactory#createVariantData
-//        // variant is for applicationFlavors
-//        project.android.applicationVariants.all { variant ->
-//            registerVariantAwareUploadApkTask(project, variant, loginTask)
-//            names.remove(variant.name)
-//        }
-//
-////        names.collect { ApkInfoCompat.blank(it) }.each { apkInfo ->
-////            registerVariantAwareUploadApkTask(project, apkInfo)
-////        }
-//    }
-//
-//    private void registerVariantAwareUploadApkTask(Project project, ApkInfo apkInfo, Task assembleTask = null) {
-//        def deployTarget = project.deploygate.apks.findByName(apkInfo.variantName) as DeployTarget
-//        def tasksDependsOn = project.getTasksByName(LOGIN_TASK_NAME, false).toList()
-//
-//        if (assembleTask && !deployTarget?.noAssemble) {
-//            tasksDependsOn.add(0, assembleTask)
-//        }
-//
-//        // FIXME to support aab, uploadDeployGate naming will be deprecated.
-//        project.task([type: UploadTask, overwrite: true], "uploadDeployGate${apkInfo.variantName.capitalize()}") {
-//
-//            def desc = "Deploy assembled ${apkInfo.variantName.capitalize()} to DeployGate"
-//
-//            // require signing config to build a signed APKs
-//            if (!apkInfo.signingReady) {
-//                desc += " (requires valid signingConfig setting)"
-//            }
-//
-//            description desc
-//
-//            // universal builds show in DeployGate group
-//            if (apkInfo.universalApk) {
-//                group GROUP_NAME
-//            }
-//
-//            dependsOn tasksDependsOn
-//
-//            // UploadTask properties
-//
-//            outputName apkInfo.variantName
-//            hasSigningConfig apkInfo.signingReady
-//
-//            defaultSourceFile apkInfo.apkFile
-//        }
-//    }
-//
 //    private void createFromAabUploadTasks(Project project, ApkInfo apkInfo) {
 //        if (!AndroidGradlePlugin.isAppBundleSupported()) {
 //            return
@@ -165,21 +104,6 @@ class DeployGatePlugin implements Plugin<Project> {
 //
 //            defaultSourceFile apkInfo.apkFile
 //            appBundleInfo new AppBundleInfo(apkInfo)
-//        }
-//    }
-//
-//    private static void createMultipleUploadApkTask(Project project, Set<String> declaredVariantNames) {
-//        if (declaredVariantNames.empty) {
-//            return
-//        }
-//
-//        // FIXME to support aab, uploadDeployGate naming will be deprecated.
-//        project.task('uploadDeployGate') {
-//            description 'Upload all builds defined in build.gradle to DeployGate'
-//            group GROUP_NAME
-//
-//            // Don't need to let this task depend on undeclared variants
-//            dependsOn declaredVariantNames.collect { "uploadDeployGate${it.capitalize()}" }
 //        }
 //    }
 }

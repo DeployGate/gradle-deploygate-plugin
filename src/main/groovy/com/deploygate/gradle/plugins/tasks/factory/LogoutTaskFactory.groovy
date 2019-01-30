@@ -1,4 +1,4 @@
-package com.deploygate.gradle.plugins.factory
+package com.deploygate.gradle.plugins.tasks.factory
 
 
 import com.deploygate.gradle.plugins.tasks.LogoutTask
