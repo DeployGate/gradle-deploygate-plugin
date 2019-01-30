@@ -4,15 +4,15 @@ import com.deploygate.gradle.plugins.DeployGatePlugin
 import org.gradle.api.Named
 import org.gradle.api.Project
 
-class DeployTarget implements Named {
-    static DeployTarget getDefaultDeployTarget(Project project) {
+class VariantBasedDeployTarget implements Named {
+    static VariantBasedDeployTarget getDefaultDeployTarget(Project project) {
         File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { project.file(this) }
         String uploadMessage = System.getenv(DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE)
         String distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
         String releaseNote = System.getenv(DeployGatePlugin.ENV_NAME_RELEASE_NOTE)
         String visibility = System.getenv(DeployGatePlugin.ENV_NAME_VISIBILITY)
 
-        return new DeployTarget(
+        return new VariantBasedDeployTarget(
                 sourceFile: sourceFile,
                 message: uploadMessage,
                 distributionKey: distributionKey,
@@ -30,10 +30,10 @@ class DeployTarget implements Named {
     String visibility
     boolean noAssemble
 
-    DeployTarget() {
+    VariantBasedDeployTarget() {
     }
 
-    DeployTarget(String name) {
+    VariantBasedDeployTarget(String name) {
         this.name = name
     }
 }

@@ -11,22 +11,36 @@ import javax.annotation.Nullable
 
 class DeployGateExtension {
     String token
+
+    @Deprecated
     String userName
+
+    String appOwnerName
+
+    @Deprecated
     String endpoint = Config.DEPLOYGATE_ROOT
 
-    NamedDomainObjectContainer<DeployTarget> apks
+    @Deprecated
     String notifyKey = null
 
     @Nonnull
     private final Project project
 
-    DeployGateExtension(@Nonnull Project project, NamedDomainObjectContainer<DeployTarget> apkTargets) {
+    @Nonnull
+    private final NamedDomainObjectContainer<VariantBasedDeployTarget> variantConfigurations
+
+    DeployGateExtension(@Nonnull Project project, NamedDomainObjectContainer<VariantBasedDeployTarget> variantConfigurations) {
         this.project = project
-        this.apks = apkTargets
+        this.variantConfigurations = variantConfigurations
     }
 
+    @Deprecated
     def apks(Closure closure) {
-        apks.configure(closure)
+        deployments(closure)
+    }
+
+    def deployments(Closure closure) {
+        variantConfigurations.configure(closure)
     }
 
     def notifyServer(String action, HashMap<String, String> data = null) {
@@ -48,13 +62,13 @@ class DeployGateExtension {
     }
 
     boolean hasDeployTarget(@Nonnull String name) {
-        return apks.findByName(name)
+        return variantConfigurations.findByName(name)
     }
 
-    DeployTarget findDeployTarget(@Nonnull String name) {
-        def result = new DeployTarget(name)
-        def defaultTarget = DeployTarget.getDefaultDeployTarget(project)
-        DeployTarget declaredTarget = apks.findByName(name)
+    VariantBasedDeployTarget findDeployTarget(@Nonnull String name) {
+        def result = new VariantBasedDeployTarget(name)
+        def defaultTarget = VariantBasedDeployTarget.getDefaultDeployTarget(project)
+        VariantBasedDeployTarget declaredTarget = variantConfigurations.findByName(name)
 
         if (declaredTarget) {
             mergeDeployTarget(result, declaredTarget)
@@ -65,7 +79,7 @@ class DeployGateExtension {
         return result
     }
 
-    static void mergeDeployTarget(@Nonnull DeployTarget base, @Nullable DeployTarget other) {
+    static void mergeDeployTarget(@Nonnull VariantBasedDeployTarget base, @Nullable VariantBasedDeployTarget other) {
         base.sourceFile = base.sourceFile ?: other.sourceFile
         base.message = base.message ?: other.message
         base.distributionKey = base.distributionKey ?: other.distributionKey

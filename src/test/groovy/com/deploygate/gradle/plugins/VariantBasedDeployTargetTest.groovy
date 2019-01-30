@@ -1,9 +1,9 @@
 package com.deploygate.gradle.plugins
 
-import com.deploygate.gradle.plugins.dsl.DeployTarget
+import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
 import org.junit.Test
 
-class DeployTargetTest {
+class VariantBasedDeployTargetTest {
     @Test
     public void apkTest() {
         String name            = "name"
@@ -14,7 +14,7 @@ class DeployTargetTest {
         String visibility      = "public"
         boolean noAssemble     = true
 
-        DeployTarget apk = new DeployTarget(name: name, sourceFile: file, message: message, distributionKey: distributionKey, releaseNote: releaseNote, visibility: visibility, noAssemble: noAssemble)
+        VariantBasedDeployTarget apk = new VariantBasedDeployTarget(name: name, sourceFile: file, message: message, distributionKey: distributionKey, releaseNote: releaseNote, visibility: visibility, noAssemble: noAssemble)
         checkDeployTarget(apk, name, file, message, distributionKey, releaseNote, visibility, noAssemble)
         checkParams(apk, message, distributionKey, releaseNote, visibility)
     }
@@ -29,14 +29,14 @@ class DeployTargetTest {
         String visibility      = null
         boolean noAssemble     = false
 
-        DeployTarget apk = new DeployTarget(name)
+        VariantBasedDeployTarget apk = new VariantBasedDeployTarget(name)
         apk.sourceFile = file
         checkDeployTarget(apk, name, file, message, distributionKey, releaseNote, visibility, noAssemble)
         checkParams(apk, message, distributionKey, releaseNote, visibility)
     }
 
-    public void checkDeployTarget(DeployTarget apk, String name, File file, String message, String distributionKey, String releaseNote, String visibility, boolean noAssemble) {
-        assert apk instanceof DeployTarget
+    public void checkDeployTarget(VariantBasedDeployTarget apk, String name, File file, String message, String distributionKey, String releaseNote, String visibility, boolean noAssemble) {
+        assert apk instanceof VariantBasedDeployTarget
         assert apk.name == name
         assert apk.sourceFile == file
         assert apk.message == message
@@ -46,7 +46,7 @@ class DeployTargetTest {
         assert apk.noAssemble == noAssemble
     }
 
-    public void checkParams(DeployTarget apk, String message, String distributionKey, String releaseNote, String visibility) {
+    public void checkParams(VariantBasedDeployTarget apk, String message, String distributionKey, String releaseNote, String visibility) {
         HashMap<String, String> params = apk.toParams()
         assert params["message"] == message
         assert params["distribution_key"] == distributionKey
