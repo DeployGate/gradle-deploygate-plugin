@@ -8,7 +8,7 @@ import java.util.regex.Pattern
 
 class VersionString {
     private static final Logger LOGGER = LoggerFactory.getLogger(this.getClass())
-    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)[\\-]?([\\d]+)?")
+    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?[\\-]?([\\d]+)?")
 
     @Nullable
     static VersionString tryParse(@Nullable String version) {
@@ -21,13 +21,17 @@ class VersionString {
         def matcher = VERSION_PATTERN.matcher(version)
 
         try {
-            if (!matcher.find() || matcher.groupCount() < 3) {
+            if (!matcher.find() || matcher.groupCount() < 2) {
                 return null
             }
 
             def major = matcher.group(1).toInteger()
             def minor = matcher.group(2).toInteger()
-            def patch = matcher.group(3).toInteger()
+            def patch = 0
+
+            if (matcher.groupCount() >= 3) {
+                patch = matcher.group(3)?.toInteger() ?: 0
+            }
 
             String addition = null
 

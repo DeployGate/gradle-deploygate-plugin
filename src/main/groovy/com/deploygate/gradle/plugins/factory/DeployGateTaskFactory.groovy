@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins.factory
 
-
 import com.deploygate.gradle.plugins.entities.DeployGateExtension
 import com.deploygate.gradle.plugins.internal.gradle.TaskFactory
 import org.gradle.api.Project

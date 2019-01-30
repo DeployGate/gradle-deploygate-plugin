@@ -1,10 +1,10 @@
 package com.deploygate.gradle.plugins.internal.gradle
 
 import org.gradle.api.Action
-import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Task
+import org.gradle.api.provider.Provider
 
-interface LazyConfigurableTask<T extends Task> extends NamedDomainObjectProvider<T> {
+interface LazyConfigurableTask<T extends Task> extends Provider<T> {
     /**
      * Configures the task with the given action. Actions are run in the order added.
      *

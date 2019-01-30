@@ -31,7 +31,7 @@ class DeployGatePlugin implements Plugin<Project> {
         onPluginApplied(project)
 
         project.afterEvaluate { Project evaluatedProject ->
-            onProjectEvaluated(evaluatedProject)
+            onProjectEvaluated(project)
         }
     }
 
@@ -52,7 +52,7 @@ class DeployGatePlugin implements Plugin<Project> {
 
     private void onProjectEvaluated(Project project) {
         if (!Processor.isProcessable(project)) {
-            project.logger.warn("DeployGate Gradle Plugin cannot be applied")
+            project.logger.warn("DeployGate Gradle Plugin cannot be applied. Android Gradle Plugin must be applied before.")
             return
         }
 

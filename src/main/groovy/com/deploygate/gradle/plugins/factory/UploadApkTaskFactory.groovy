@@ -128,14 +128,14 @@ class UploadApkTaskFactory extends DeployGateTaskFactory {
     }
 
     void registerAggregatedDeclarationAwareUploadApkTask(Object... dependsOn) {
-        if (!dependsOn) {
+        if (!dependsOn?.flatten()) {
             project.logger.debug("skipped register aggregation tasks")
             return
         }
 
         taskFactory.register(AGGREGATION_TASK_NAME, DefaultTask).configure { dgTask ->
             dgTask.group = GROUP_NAME
-            dgTask.dependsOn(dependsOn)
+            dgTask.dependsOn(dependsOn.flatten())
         }
     }
 
