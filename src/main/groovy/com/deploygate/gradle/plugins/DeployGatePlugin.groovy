@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTargetImpl
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
@@ -32,14 +32,14 @@ class DeployGatePlugin implements Plugin<Project> {
     }
 
     private static void setupExtension(Project project) {
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        NamedDomainObjectContainer<VariantBasedDeployTargetImpl> targets = project.container(VariantBasedDeployTargetImpl)
         project.extensions.add(EXTENSION_NAME, new DeployGateExtension(project, targets))
     }
 
     private void initProcessor(Project project) {
         processor = new Processor(this, project)
 
-        project.deploygate.apks.all { VariantBasedDeployTarget target ->
+        project.deploygate.apks.all { VariantBasedDeployTargetImpl target ->
             processor.addVariantOrCustomName(target.name)
         }
     }

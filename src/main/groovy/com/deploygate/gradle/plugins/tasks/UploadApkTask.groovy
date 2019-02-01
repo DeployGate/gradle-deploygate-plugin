@@ -2,7 +2,7 @@ package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.artifacts.ApkInfo
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTargetImpl
 import com.deploygate.gradle.plugins.tasks.factory.DeployGateTaskFactory
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
@@ -49,7 +49,7 @@ class UploadApkTask extends DefaultTask {
         }
     }
 
-    static Configuration createConfiguration(@Nonnull VariantBasedDeployTarget deployTarget, @Nonnull ApkInfo apkInfo) {
+    static Configuration createConfiguration(@Nonnull VariantBasedDeployTargetImpl deployTarget, @Nonnull ApkInfo apkInfo) {
         return new Configuration(
                 isSigningReady: apkInfo.isSigningReady(),
                 isUniversalApk: apkInfo.isUniversalApk(),

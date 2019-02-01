@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins.artifacts
 
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
+import groovy.transform.PackageScope
 
 import javax.annotation.Nonnull
 
@@ -28,7 +29,8 @@ class PackageAppTaskCompat {
         )
     }
 
-    private static boolean hasSigningConfig(packageAppTask) {
+    @PackageScope
+    static boolean hasSigningConfig(packageAppTask) {
         if (!AndroidGradlePlugin.isSigningConfigCollectionSupported()) {
             return packageAppTask.signingConfig != null
         } else {

@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTargetImpl
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.gradle.LazyConfigurableTask
 import com.deploygate.gradle.plugins.internal.gradle.SingleTask
@@ -23,7 +23,7 @@ class AGPBasedUploadApkTaskFactory extends UploadApkTaskFactory {
 
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantName), UploadApkTask)
 
-        final VariantBasedDeployTarget deployTarget = deployGateExtension.findDeployTarget(variantName)
+        final VariantBasedDeployTargetImpl deployTarget = deployGateExtension.findDeployTarget(variantName)
 
         lazyUploadApkTask.configure { dgTask ->
             dgTask.variantName = variantName
