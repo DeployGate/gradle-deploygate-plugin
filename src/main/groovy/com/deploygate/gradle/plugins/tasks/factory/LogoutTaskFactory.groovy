@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
-
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import org.gradle.api.Project
 

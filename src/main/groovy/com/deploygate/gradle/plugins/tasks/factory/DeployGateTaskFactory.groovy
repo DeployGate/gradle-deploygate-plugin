@@ -11,6 +11,7 @@ abstract class DeployGateTaskFactory {
 
     @Nonnull
     final Project project
+    @Nonnull
     final TaskFactory taskFactory
 
     DeployGateTaskFactory(@Nonnull Project project) {

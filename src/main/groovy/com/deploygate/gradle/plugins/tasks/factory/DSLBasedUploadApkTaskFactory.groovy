@@ -1,19 +1,21 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTargetImpl
+import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
+import javax.annotation.Nonnull
+
 class DSLBasedUploadApkTaskFactory extends UploadApkTaskFactory<String> {
-    DSLBasedUploadApkTaskFactory(Project project) {
+    DSLBasedUploadApkTaskFactory(@Nonnull Project project) {
         super(project)
     }
 
     @Override
-    void registerUploadApkTask(String variantNameOrCustomName, Object... dependsOn) {
+    void registerUploadApkTask(@Nonnull String variantNameOrCustomName, Object... dependsOn) {
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantNameOrCustomName), UploadApkTask, false)
 
         if (!lazyUploadApkTask) {
@@ -28,7 +30,7 @@ class DSLBasedUploadApkTaskFactory extends UploadApkTaskFactory<String> {
             throw new GradleException("$variantNameOrCustomName could not be handled by DeployGate plugin")
         }
 
-        final VariantBasedDeployTargetImpl deployTarget = deployGateExtension.findDeployTarget(variantNameOrCustomName)
+        final VariantBasedDeployTarget deployTarget = deployGateExtension.findDeployTarget(variantNameOrCustomName)
 
         if (!deployTarget.noAssemble) {
             project.logger.debug("$variantNameOrCustomName required assmble but ignored")

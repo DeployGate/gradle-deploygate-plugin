@@ -18,16 +18,9 @@ class AndroidGradlePlugin {
         return ['com.android.application', 'android'].any { project.plugins.hasPlugin(it) }
     }
 
+    // FIXME buildtools' aapt2 is not for bundletool
     static String getAapt2Location(Project project) {
-        return System.getenv('DEPLOYGATE_APPT2_PATH') ?: new File(project.android.sdkDirectory, "build-tools/${getBuildToolsVersion(project)}/aapt2").toString()
-    }
-
-    static boolean isBefore3xx() {
-        return getVersion().major < 3
-    }
-
-    static boolean is3xxPreview() {
-        return getVersion().major == 3 && getVersion().minor == 0 && getVersion().patch == 0 && getVersion().addition != null
+        return System.getenv('DEPLOYGATE_APPT2_PATH') ?: new File(project.android.sdkDirectory as File, "build-tools/${getBuildToolsVersion(project)}/aapt2").toString()
     }
 
     static boolean isAppBundleSupported() {

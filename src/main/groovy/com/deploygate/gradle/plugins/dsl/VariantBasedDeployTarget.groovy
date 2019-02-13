@@ -1,37 +1,52 @@
 package com.deploygate.gradle.plugins.dsl
 
+import com.deploygate.gradle.plugins.dsl.syntax.DeployTargetSyntax
 import org.gradle.api.Named
 
+import javax.annotation.Nonnull
 import javax.annotation.Nullable
 
-interface VariantBasedDeployTarget extends Named {
-
-    void setSourceFile(@Nullable File sourceFile)
-
-    @Nullable
-    File getSourceFile()
-
-    void setUploadMessage(@Nullable String uploadMessage)
+class VariantBasedDeployTarget implements Named, DeployTargetSyntax {
+    @Nonnull
+    private String name
 
     @Nullable
-    String getUploadMessage()
-
-    void setDistributionKey(@Nullable String distributionKey)
+    File sourceFile
 
     @Nullable
-    String getDistributionKey()
-
-    void setReleaseNote(@Nullable String releaseNote)
+    String uploadMessage
 
     @Nullable
-    String getReleaseNote()
-
-    void setVisibility(@Nullable String visibility)
+    String distributionKey
 
     @Nullable
-    String getVisibility()
+    String releaseNote
 
-    void setSkipAssemble(boolean skipAssemble)
+    @Nullable
+    String visibility
 
-    boolean isSkipAssemble()
+    boolean skipAssemble
+
+    VariantBasedDeployTarget(@Nonnull String name) {
+        this.name = name
+    }
+
+    @Override
+    String getName() {
+        return name
+    }
+
+    // backward compatibility
+
+    @Deprecated
+    void setMessage(@Nullable String message) {
+        setUploadMessage(message)
+    }
+
+    @Deprecated
+    void setNoAssemble(boolean noAssemble) {
+        setSkipAssemble(noAssemble)
+    }
+
+    // end: backward compatibility
 }

@@ -6,6 +6,11 @@ import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
+/**
+ * A processor class to generate tasks, etc.
+ *
+ * Do not touch the actual classes from Android DSL directly
+ */
 class Processor {
 
     @Nonnull
@@ -21,7 +26,7 @@ class Processor {
     private final LogoutTaskFactory logoutTaskFactory
 
     @Nonnull
-    private final AGPBasedUploadApkTaskFactory agpBasedUploadApkTaskFactory
+    private final Closure<UploadApkTaskFactory> agpBasedUploadApkTaskFactory
 
     @Nonnull
     private final DSLBasedUploadApkTaskFactory dslBasedUploadApkTaskFactory
@@ -33,7 +38,11 @@ class Processor {
         this.project = project
         this.loginTaskFactory = new LoginTaskFactory(project)
         this.logoutTaskFactory = new LogoutTaskFactory(project)
-        this.agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
+        this.agpBasedUploadApkTaskFactory = { ->
+            // Be lazy to avoid touching AGPBasedUploadApkTaskFactory on initialize
+            // cuz AGPBasedUploadApkTaskFactory has a dependency on Android DSL
+            new AGPBasedUploadApkTaskFactory(project)
+        }
         this.dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
     }
 
@@ -41,7 +50,7 @@ class Processor {
         return AndroidGradlePlugin.isApplied(project)
     }
 
-    def addVariantOrCustomName(String variantOrCustomName) {
+    def addVariantOrCustomName(@Nonnull String variantOrCustomName) {
         project.logger.debug("${variantOrCustomName} is declared")
         declaredNames.add(variantOrCustomName)
     }
@@ -64,8 +73,7 @@ class Processor {
         })
     }
 
-//    def registerVariantAwareUploadApkTask(com.android.build.gradle.api.ApplicationVariant variant) {
-    def registerVariantAwareUploadApkTask(variant) {
+    def registerVariantAwareUploadApkTask(@Nonnull /* ApplicationVariant */ variant) {
         if (!canProcessVariantAware()) {
             project.logger.error("android gradle plugin not found but tried to create android-specific tasks. Ignored...")
             return

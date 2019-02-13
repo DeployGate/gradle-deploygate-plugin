@@ -1,7 +1,9 @@
 package com.deploygate.gradle.plugins
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.api.ApplicationVariant
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTargetImpl
+import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
@@ -32,14 +34,14 @@ class DeployGatePlugin implements Plugin<Project> {
     }
 
     private static void setupExtension(Project project) {
-        NamedDomainObjectContainer<VariantBasedDeployTargetImpl> targets = project.container(VariantBasedDeployTargetImpl)
+        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
         project.extensions.add(EXTENSION_NAME, new DeployGateExtension(project, targets))
     }
 
     private void initProcessor(Project project) {
         processor = new Processor(this, project)
 
-        project.deploygate.apks.all { VariantBasedDeployTargetImpl target ->
+        project.deploygate.apks.all { VariantBasedDeployTarget target ->
             processor.addVariantOrCustomName(target.name)
         }
     }
@@ -67,8 +69,7 @@ class DeployGatePlugin implements Plugin<Project> {
             return
         }
 
-//        (project.android as com.android.build.gradle.AppExtension).applicationVariants.all { com.android.build.gradle.api.ApplicationVariant variant ->
-        project.android.applicationVariants.all { variant ->
+        (project.android as AppExtension).applicationVariants.all { ApplicationVariant variant ->
             processor.registerVariantAwareUploadApkTask(variant)
 
             if (AndroidGradlePlugin.isAppBundleSupported()) {
