@@ -17,12 +17,18 @@ class TestAndroidProject {
             copy(f, temporaryFolder.root)
         }
 
-        def androidSdk = System.getenv("ANDROID_HOME") ?: System.getenv("HOME") + "/Library/Android/sdk"
-        def localProperties = temporaryFolder.newFile("local.properties")
-        localProperties << """
+        def localProperties = new File(projectDir, "local.properties")
+
+        if (!localProperties.exists()) {
+            localProperties.createNewFile()
+
+            def androidSdk = System.getenv("ANDROID_HOME") ?: (System.getenv("HOME") + "/Library/Android/sdk")
+
+            localProperties << """
 sdk.dir=${androidSdk}
 ndk.dir=${androidSdk}/ndk-bundle
 """
+        }
     }
 
     private void copy(File copyFrom, File copyTo) {
