@@ -1,7 +1,5 @@
 package com.deploygate.gradle.plugins.artifacts
 
-
-import com.android.build.gradle.tasks.PackageApplication
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import groovy.transform.PackageScope
 
@@ -12,7 +10,7 @@ class PackageAppTaskCompat {
     }
 
     @Nonnull
-    static ApkInfo getApkInfo(@Nonnull PackageApplication packageAppTask) {
+    static ApkInfo getApkInfo(@Nonnull /* PackageApplication */ packageAppTask) {
         String variantName = packageAppTask.name
         // outputScope is retrieved by the reflection
         Collection<String> apkNames = packageAppTask.outputScope.apkDatas*.outputFileName

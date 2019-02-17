@@ -10,6 +10,8 @@ interface ExtensionSyntax {
 
     void setAppOwnerName(@Nonnull String appOwnerName)
 
+    void deployments(Closure closure)
+
     @Nonnull
     NamedDomainObjectContainer<VariantBasedDeployTarget> getDeployments()
 }

@@ -1,10 +1,9 @@
 package com.deploygate.gradle.plugins
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.api.ApplicationVariant
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
+import com.deploygate.gradle.plugins.internal.agp.ApplicationVariantProxy
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -26,6 +25,7 @@ class DeployGatePlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         setupExtension(project)
+        AndroidGradlePlugin.init(project)
         initProcessor(project)
 
         project.afterEvaluate { Project evaluatedProject ->
@@ -69,42 +69,14 @@ class DeployGatePlugin implements Plugin<Project> {
             return
         }
 
-        (project.android as AppExtension).applicationVariants.all { ApplicationVariant variant ->
-            processor.registerVariantAwareUploadApkTask(variant)
+        project.android.applicationVariants.all { /* ApplicationVariant */ variant ->
+            def variantProxy = new ApplicationVariantProxy(variant)
+
+            processor.registerVariantAwareUploadApkTask(variantProxy)
 
             if (AndroidGradlePlugin.isAppBundleSupported()) {
                 // TODO create tasks for app bundle
             }
         }
     }
-
-//    private void createFromAabUploadTasks(Project project, ApkInfo apkInfo) {
-//        if (!AndroidGradlePlugin.isAppBundleSupported()) {
-//            return
-//        }
-//
-//        def tasksDependsOn = project.getTasksByName("loginDeployGate", false).toList()
-//        def bundleTask = project.getTasksByName("bundle${apkInfo.variantName.capitalize()}", false)
-//
-//        if (!bundleTask.empty) {
-//            tasksDependsOn.add(0, bundleTask.first())
-//        }
-//
-//        project.task([type: UploadTask, overwrite: true], "uploadFromAabDeployGate${apkInfo.variantName.capitalize()}") {
-//
-//            description "Deploy an universal apk which is generated from an app bundle of ${apkInfo.variantName.capitalize()} to DeployGate"
-//
-//            group GROUP_NAME
-//
-//            dependsOn tasksDependsOn
-//
-//            // UploadTask properties
-//
-//            outputName apkInfo.variantName
-//            hasSigningConfig apkInfo.signingConfig != null
-//
-//            defaultSourceFile apkInfo.apkFile
-//            appBundleInfo new AppBundleInfo(apkInfo)
-//        }
-//    }
 }

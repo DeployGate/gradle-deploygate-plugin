@@ -52,7 +52,16 @@ class DeployGateExtension implements ExtensionSyntax {
      */
     @Deprecated
     def getApks() {
-        return variantConfigurations
+        return getDeployments()
+    }
+
+    /**
+     * @depreacted use {@link DeployGateExtension#getDeployments()} instead
+     * @return
+     */
+    @Deprecated
+    def apks(Closure closure) {
+        deployments(closure)
     }
 
     // end: backward compatibility
@@ -61,6 +70,11 @@ class DeployGateExtension implements ExtensionSyntax {
     @Override
     NamedDomainObjectContainer<VariantBasedDeployTarget> getDeployments() {
         return variantConfigurations
+    }
+
+    @Override
+    void deployments(Closure closure) {
+        deployments.configure(closure)
     }
 
     boolean hasDeployTarget(@Nonnull String name) {

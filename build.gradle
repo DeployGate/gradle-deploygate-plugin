@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
+}
+
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'com.jfrog.bintray'
@@ -15,9 +24,11 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-dependencies {
-    def agpVersion = '3.3.0'
+ext {
+    agpVersion = '3.3.0'
+}
 
+dependencies {
     compileOnly gradleApi()
     compileOnly localGroovy()
     compileOnly "com.android.tools.build:gradle:$agpVersion"
@@ -30,6 +41,24 @@ dependencies {
     testImplementation 'org.spockframework.spock:spock-core:spock-1.2'
     testImplementation "com.android.tools.build:gradle:$agpVersion"
 }
+
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
+dependencies {
+    testRuntimeOnly files(createClasspathManifest)
+}
+
+test.dependsOn(['createClasspathManifest'])
 
 task javadocJar(type: Jar, dependsOn: groovydoc) {
     classifier = 'javadoc'
@@ -67,13 +96,4 @@ bintray {
     }
 
     configurations = ['archives']
-}
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-    }
 }

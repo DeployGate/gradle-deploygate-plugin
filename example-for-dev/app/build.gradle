@@ -6,34 +6,34 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
 
-android {
-    compileSdkVersion 28
-    defaultConfig {
-        applicationId "com.deploygate.gradlesample"
-        minSdkVersion 14
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    flavorDimensions "sample"
-    productFlavors {
-        p1 {
-            dimension "sample"
-            applicationIdSuffix ".p1"
-        }
-        p2 {
-            dimension "sample"
-            applicationIdSuffix ".p2"
-        }
-    }
-}
+ android {
+     compileSdkVersion 28
+     defaultConfig {
+         applicationId "com.deploygate.gradlesample"
+         minSdkVersion 14
+         targetSdkVersion 28
+         versionCode 1
+         versionName "1.0"
+         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+     }
+     buildTypes {
+         release {
+             minifyEnabled false
+             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+         }
+     }
+     flavorDimensions "sample"
+     productFlavors {
+         p1 {
+             dimension "sample"
+             applicationIdSuffix ".p1"
+         }
+         p2 {
+             dimension "sample"
+             applicationIdSuffix ".p2"
+         }
+     }
+ }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

@@ -1,7 +1,6 @@
 package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
-import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
@@ -16,7 +15,6 @@ class ApplyPluginSpec extends Specification {
 
         then:
         project.extensions.deploygate instanceof DeployGateExtension
-        !AndroidGradlePlugin.isApplied(project)
     }
 
     def "can apply this plugin to a project which has AGP"() {
@@ -29,6 +27,5 @@ class ApplyPluginSpec extends Specification {
 
         then:
         project.extensions.deploygate instanceof DeployGateExtension
-        AndroidGradlePlugin.isApplied(project)
     }
 }

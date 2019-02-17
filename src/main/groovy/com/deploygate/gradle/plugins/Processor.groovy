@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
+import com.deploygate.gradle.plugins.internal.agp.ApplicationVariantProxy
 import com.deploygate.gradle.plugins.tasks.factory.*
 import org.gradle.api.Project
 
@@ -26,7 +27,7 @@ class Processor {
     private final LogoutTaskFactory logoutTaskFactory
 
     @Nonnull
-    private final Closure<UploadApkTaskFactory> agpBasedUploadApkTaskFactory
+    private final AGPBasedUploadApkTaskFactory agpBasedUploadApkTaskFactory
 
     @Nonnull
     private final DSLBasedUploadApkTaskFactory dslBasedUploadApkTaskFactory
@@ -38,11 +39,7 @@ class Processor {
         this.project = project
         this.loginTaskFactory = new LoginTaskFactory(project)
         this.logoutTaskFactory = new LogoutTaskFactory(project)
-        this.agpBasedUploadApkTaskFactory = { ->
-            // Be lazy to avoid touching AGPBasedUploadApkTaskFactory on initialize
-            // cuz AGPBasedUploadApkTaskFactory has a dependency on Android DSL
-            new AGPBasedUploadApkTaskFactory(project)
-        }
+        this.agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
         this.dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
     }
 
@@ -73,7 +70,7 @@ class Processor {
         })
     }
 
-    def registerVariantAwareUploadApkTask(@Nonnull /* ApplicationVariant */ variant) {
+    def registerVariantAwareUploadApkTask(@Nonnull ApplicationVariantProxy variant) {
         if (!canProcessVariantAware()) {
             project.logger.error("android gradle plugin not found but tried to create android-specific tasks. Ignored...")
             return

@@ -32,7 +32,7 @@ class DSLBasedUploadApkTaskFactory extends UploadApkTaskFactory<String> {
 
         final VariantBasedDeployTarget deployTarget = deployGateExtension.findDeployTarget(variantNameOrCustomName)
 
-        if (!deployTarget.noAssemble) {
+        if (!deployTarget.skipAssemble) {
             project.logger.debug("$variantNameOrCustomName required assmble but ignored")
         }
 
