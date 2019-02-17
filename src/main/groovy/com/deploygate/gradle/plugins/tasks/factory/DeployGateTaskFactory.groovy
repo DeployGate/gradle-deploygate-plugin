@@ -19,16 +19,12 @@ abstract class DeployGateTaskFactory {
         this.taskFactory = new TaskFactory(project)
     }
 
-    private DeployGateExtension _deployGateExtension
+    private Closure<DeployGateExtension> deployGateExtensionClosure = { ->
+        project.deploygate
+    }.memoize()
 
     @Nonnull
     DeployGateExtension getDeployGateExtension() {
-        if (_deployGateExtension) {
-            return _deployGateExtension
-        }
-
-        _deployGateExtension = project.deploygate
-
-        return _deployGateExtension
+        return deployGateExtensionClosure.call()
     }
 }

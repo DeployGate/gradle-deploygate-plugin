@@ -17,6 +17,40 @@ class DeployGateExtensionSpec extends Specification {
         buildGradle = testProjectDir.newFile("build.gradle")
     }
 
+    def "backward check"() {
+        given:
+        Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+        testProjectDir.newFile("settings.gradle") << "rootProject.name = 'ok'"
+
+        and:
+        def buildFileContent = """
+deploygate {
+  userName = "user1"
+  token = "token1"
+  apks {
+    dep1 {
+    }
+  }
+}
+"""
+
+        buildGradle.exists() && buildGradle.delete() && buildGradle.createNewFile()
+        buildGradle << buildFileContent
+
+        and:
+        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        project.evaluate()
+
+        when:
+        def result = project.deploygate as DeployGateExtension
+
+        then:
+        result.appOwnerName == "user1"
+        result.apiToken == "token1"
+        result.deployments*.name.sort() == ["dep1"].sort()
+    }
+
     def "can accept a given extension"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
@@ -37,10 +71,6 @@ deploygate {
       uploadMessage = "message1"
       skipAssemble = true
     }
-    backward {
-      message = "backward message"
-      noAssemble = true
-    }
   }
 }
 """
@@ -59,7 +89,7 @@ deploygate {
         then:
         result.appOwnerName == "user1"
         result.apiToken == "token1"
-        result.deployments*.name.sort() == ["dep1", "dep2", "backward"].sort()
+        result.deployments*.name.sort() == ["dep1", "dep2"].sort()
 
         when:
         def dep1 = result.deployments.findByName("dep1")
@@ -80,12 +110,5 @@ deploygate {
         dep2.releaseNote == "note1"
         dep2.distributionKey == "distKey"
         dep2.skipAssemble
-
-        when:
-        def backward = result.deployments.findByName("backward")
-
-        then:
-        backward.uploadMessage == "backward message"
-        backward.skipAssemble
     }
 }

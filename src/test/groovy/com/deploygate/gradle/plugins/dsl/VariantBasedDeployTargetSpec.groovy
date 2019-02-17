@@ -58,7 +58,7 @@ class VariantBasedDeployTargetSpec extends Specification {
         expect:
         deployTarget.name == "name"
         deployTarget.uploadMessage == null
-        deployTarget.skipAssemble == false
+        !deployTarget.skipAssemble
         deployTarget.sourceFile == null
         deployTarget.distributionKey == null
         deployTarget.releaseNote == null
