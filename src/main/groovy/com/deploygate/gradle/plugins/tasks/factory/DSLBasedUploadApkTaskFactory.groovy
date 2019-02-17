@@ -7,13 +7,15 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
+import javax.annotation.Nonnull
+
 class DSLBasedUploadApkTaskFactory extends UploadApkTaskFactory<String> {
-    DSLBasedUploadApkTaskFactory(Project project) {
+    DSLBasedUploadApkTaskFactory(@Nonnull Project project) {
         super(project)
     }
 
     @Override
-    void registerUploadApkTask(String variantNameOrCustomName, Object... dependsOn) {
+    void registerUploadApkTask(@Nonnull String variantNameOrCustomName, Object... dependsOn) {
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantNameOrCustomName), UploadApkTask, false)
 
         if (!lazyUploadApkTask) {
@@ -30,7 +32,7 @@ class DSLBasedUploadApkTaskFactory extends UploadApkTaskFactory<String> {
 
         final VariantBasedDeployTarget deployTarget = deployGateExtension.findDeployTarget(variantNameOrCustomName)
 
-        if (!deployTarget.noAssemble) {
+        if (!deployTarget.skipAssemble) {
             project.logger.debug("$variantNameOrCustomName required assmble but ignored")
         }
 

@@ -8,7 +8,7 @@ import java.util.regex.Pattern
 
 class VersionString {
     private static final Logger LOGGER = LoggerFactory.getLogger(this.getClass())
-    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?[\\-]?([\\d]+)?")
+    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?\$")
 
     @Nullable
     static VersionString tryParse(@Nullable String version) {
@@ -18,9 +18,11 @@ class VersionString {
 
         LOGGER.info(version)
 
-        def matcher = VERSION_PATTERN.matcher(version)
+        def versions = version.split("-")
 
         try {
+            def matcher = VERSION_PATTERN.matcher(versions[0])
+
             if (!matcher.find() || matcher.groupCount() < 2) {
                 return null
             }
@@ -35,8 +37,8 @@ class VersionString {
 
             String addition = null
 
-            if (matcher.groupCount() >= 4) {
-                addition = matcher.group(4)
+            if (versions.length >= 2) {
+                addition = versions.toList().subList(1, versions.length).join("-")
             }
 
             new VersionString(major, minor, patch, addition)
@@ -57,5 +59,23 @@ class VersionString {
         this.minor = minor
         this.patch = patch
         this.addition = addition
+    }
+
+    @Override
+    String toString() {
+        def builder = new StringBuffer()
+
+        builder.append(major)
+        builder.append(".")
+        builder.append(minor)
+        builder.append(".")
+        builder.append(patch)
+
+        if (addition != null) {
+            builder.append("-")
+            builder.append(addition)
+        }
+
+        return builder.toString()
     }
 }

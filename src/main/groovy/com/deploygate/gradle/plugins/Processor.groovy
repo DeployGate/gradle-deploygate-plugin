@@ -1,11 +1,17 @@
 package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
+import com.deploygate.gradle.plugins.internal.agp.ApplicationVariantProxy
 import com.deploygate.gradle.plugins.tasks.factory.*
 import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
+/**
+ * A processor class to generate tasks, etc.
+ *
+ * Do not touch the actual classes from Android DSL directly
+ */
 class Processor {
 
     @Nonnull
@@ -41,7 +47,7 @@ class Processor {
         return AndroidGradlePlugin.isApplied(project)
     }
 
-    def addVariantOrCustomName(String variantOrCustomName) {
+    def addVariantOrCustomName(@Nonnull String variantOrCustomName) {
         project.logger.debug("${variantOrCustomName} is declared")
         declaredNames.add(variantOrCustomName)
     }
@@ -64,8 +70,7 @@ class Processor {
         })
     }
 
-//    def registerVariantAwareUploadApkTask(com.android.build.gradle.api.ApplicationVariant variant) {
-    def registerVariantAwareUploadApkTask(variant) {
+    def registerVariantAwareUploadApkTask(@Nonnull ApplicationVariantProxy variant) {
         if (!canProcessVariantAware()) {
             project.logger.error("android gradle plugin not found but tried to create android-specific tasks. Ignored...")
             return

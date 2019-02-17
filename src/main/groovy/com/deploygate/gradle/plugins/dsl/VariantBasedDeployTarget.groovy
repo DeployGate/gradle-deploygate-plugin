@@ -1,39 +1,52 @@
 package com.deploygate.gradle.plugins.dsl
 
-import com.deploygate.gradle.plugins.DeployGatePlugin
+import com.deploygate.gradle.plugins.dsl.syntax.DeployTargetSyntax
 import org.gradle.api.Named
-import org.gradle.api.Project
 
-class VariantBasedDeployTarget implements Named {
-    static VariantBasedDeployTarget getDefaultDeployTarget(Project project) {
-        File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { project.file(this) }
-        String uploadMessage = System.getenv(DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE)
-        String distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
-        String releaseNote = System.getenv(DeployGatePlugin.ENV_NAME_RELEASE_NOTE)
-        String visibility = System.getenv(DeployGatePlugin.ENV_NAME_VISIBILITY)
+import javax.annotation.Nonnull
+import javax.annotation.Nullable
 
-        return new VariantBasedDeployTarget(
-                sourceFile: sourceFile,
-                message: uploadMessage,
-                distributionKey: distributionKey,
-                releaseNote: releaseNote,
-                visibility: visibility,
-        )
-    }
+class VariantBasedDeployTarget implements Named, DeployTargetSyntax {
+    @Nonnull
+    private String name
 
-    String name
-
+    @Nullable
     File sourceFile
-    String message
+
+    @Nullable
+    String uploadMessage
+
+    @Nullable
     String distributionKey
+
+    @Nullable
     String releaseNote
+
+    @Nullable
     String visibility
-    boolean noAssemble
 
-    VariantBasedDeployTarget() {
-    }
+    boolean skipAssemble
 
-    VariantBasedDeployTarget(String name) {
+    VariantBasedDeployTarget(@Nonnull String name) {
         this.name = name
     }
+
+    @Override
+    String getName() {
+        return name
+    }
+
+    // backward compatibility
+
+    @Deprecated
+    void setMessage(@Nullable String message) {
+        setUploadMessage(message)
+    }
+
+    @Deprecated
+    void setNoAssemble(boolean noAssemble) {
+        setSkipAssemble(noAssemble)
+    }
+
+    // end: backward compatibility
 }

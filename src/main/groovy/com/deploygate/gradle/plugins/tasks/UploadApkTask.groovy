@@ -54,7 +54,7 @@ class UploadApkTask extends DefaultTask {
                 isSigningReady: apkInfo.isSigningReady(),
                 isUniversalApk: apkInfo.isUniversalApk(),
                 apkFile: deployTarget.sourceFile ?: apkInfo.apkFile,
-                uploadMessage: deployTarget.message,
+                uploadMessage: deployTarget.uploadMessage,
                 distributionKey: deployTarget.distributionKey,
                 releaseNote: deployTarget.releaseNote,
                 visibility: deployTarget.releaseNote

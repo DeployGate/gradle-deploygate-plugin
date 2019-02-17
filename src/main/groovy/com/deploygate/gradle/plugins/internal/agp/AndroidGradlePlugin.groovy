@@ -1,12 +1,38 @@
 package com.deploygate.gradle.plugins.internal.agp
 
 import com.deploygate.gradle.plugins.internal.VersionString
+import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.slf4j.Logger
+
+import javax.annotation.Nonnull
 
 class AndroidGradlePlugin {
     private static VersionString AGP_VERSION
 
-    private static VersionString getVersion() {
+    static void init(@Nonnull Project project) {
+        try {
+            def agpPlugin = project.plugins.findPlugin("com.android.application")
+
+            if (agpPlugin) {
+                AGP_VERSION = VersionString.tryParse(getVersionString(agpPlugin.class.classLoader))
+                checkModelLevel(agpPlugin.class.classLoader, project.logger)
+            } else {
+                project.plugins.whenPluginAdded { Plugin plugin ->
+                    if (plugin.class.name == "com.android.build.gradle.AppPlugin") {
+                        project.logger.warn("com.android.application should be applied before DeployGate plugin")
+
+                        AGP_VERSION = VersionString.tryParse(getVersionString(plugin.class.classLoader))
+                        checkModelLevel(agpPlugin.class.classLoader, project.logger)
+                    }
+                }
+            }
+        } catch (Throwable th) {
+            project.logger.warn("unexpected error has occurred", th)
+        }
+    }
+
+    static VersionString getVersion() {
         if (!AGP_VERSION) {
             AGP_VERSION = VersionString.tryParse(getVersionString())
         }
@@ -15,19 +41,7 @@ class AndroidGradlePlugin {
     }
 
     static boolean isApplied(Project project) {
-        return ['com.android.application', 'android'].any { project.plugins.hasPlugin(it) }
-    }
-
-    static String getAapt2Location(Project project) {
-        return System.getenv('DEPLOYGATE_APPT2_PATH') ?: new File(project.android.sdkDirectory, "build-tools/${getBuildToolsVersion(project)}/aapt2").toString()
-    }
-
-    static boolean isBefore3xx() {
-        return getVersion().major < 3
-    }
-
-    static boolean is3xxPreview() {
-        return getVersion().major == 3 && getVersion().minor == 0 && getVersion().patch == 0 && getVersion().addition != null
+        return project.plugins.hasPlugin("com.android.application")
     }
 
     static boolean isAppBundleSupported() {
@@ -42,35 +56,38 @@ class AndroidGradlePlugin {
         return getVersion().major >= 3 && getVersion().minor > 2
     }
 
-    private static String getVersionString() {
+    /**
+     * Get the AGP version from a classloader because `plugins` block will separate class loaders
+     *
+     * @param classLoader might be based on AGP's class loader
+     * @return
+     */
+    private static String getVersionString(ClassLoader classLoader) {
         try {
-            return Class.forName("com.android.builder.model.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
+            return classLoader.loadClass("com.android.builder.model.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
         } catch (Throwable ignored) {
         }
 
         // before 3.1
         try {
-            return Class.forName("com.android.builder.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
+            return classLoader.loadClass("com.android.builder.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
         } catch (Throwable ignored) {
         }
 
         return Integer.MAX_VALUE + ".0.0"
     }
 
-    private static String getBuildToolsVersion(Project project) {
+    private static void checkModelLevel(@Nonnull ClassLoader classLoader, @Nonnull Logger logger) {
         try {
-            def buildToolRevision = Class.forName('com.android.repository.Revision').getMethod('safeParseRevision', String.class).invoke(null, project.android.buildToolsVersion)
+            def modelLevel = classLoader.loadClass("com.android.builder.model.AndroidProject").getField("MODEL_LEVEL_LATEST").get(null).toString().toInteger()
 
-            def klass = Class.forName('com.android.builder.core.AndroidBuilder')
-
-            if (buildToolRevision < klass.getField('MIN_BUILD_TOOLS_REV').get(null)) {
-                buildToolRevision = klass.getField('DEFAULT_BUILD_TOOLS_REVISION').get(null)
+            if (modelLevel > 4) {
+                logger.warn("Model level has been upgraded to $modelLevel")
+            } else {
+                logger.debug("Model version looks fine")
             }
-
-            return buildToolRevision
-        } catch (Throwable ignored) {
-            // print error
-            return null
+        } catch (Throwable th) {
+            logger.warn("the agp might be refactored? unexpected error happened while reading model level", th)
         }
     }
 }

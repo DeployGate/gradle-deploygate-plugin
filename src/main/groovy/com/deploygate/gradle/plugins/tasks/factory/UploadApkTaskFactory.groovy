@@ -2,20 +2,24 @@ package com.deploygate.gradle.plugins.tasks.factory
 
 import org.gradle.api.Project
 
+import javax.annotation.Nonnull
+
 abstract class UploadApkTaskFactory<T> extends DeployGateTaskFactory {
     static String AGGREGATION_TASK_NAME = "uploadDeployGate"
 
-    static String uploadApkTaskName(String variantName) {
+    @Nonnull
+    static String uploadApkTaskName(@Nonnull String variantName) {
         return "$AGGREGATION_TASK_NAME${variantName.capitalize()}"
     }
 
-    static String androidAssembleTaskName(String variantName) {
+    @Nonnull
+    static String androidAssembleTaskName(@Nonnull String variantName) {
         return "assemble${variantName.capitalize()}"
     }
 
-    UploadApkTaskFactory(Project project) {
+    UploadApkTaskFactory(@Nonnull Project project) {
         super(project)
     }
 
-    abstract void registerUploadApkTask(T variantOrVariantNameOrCustomName, Object... dependsOn)
+    abstract void registerUploadApkTask(@Nonnull T variantOrVariantNameOrCustomName, Object... dependsOn)
 }
