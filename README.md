@@ -42,7 +42,7 @@ apply plugin: 'deploygate'
 ./gradlew :app:uploadDeployGateDebug
 ```
 
-By running `uploadDeployGate<FlavorName>` task, it will build your application,
+By running `uploadDeployGate<VariantName>` task, it will build your application,
 set up your DeployGate credentials (for the first time) and upload your application.
 You can deploy an update of your application by running the same task.
 
@@ -53,11 +53,14 @@ You can deploy an update of your application by running the same task.
 
 Run `./gradlew tasks` on your project root to see all available tasks. 
 
-* `uploadDeployGate[FlavorName]` - Build and upload app of [FlavorName]
+* `uploadDeployGate[capitalized VariantName]` - Build and upload apk of [VariantName]
 * `loginDeployGate` - Log in to DeployGate and save credentials locally
 * `logoutDeployGate` - Delete current credentials
 
-If you define flavors in `apks` section, there will also be `uploadDeployGate` task which can upload all the flavors at once.   
+[VariantName] is built by appending capitalized flavor name and capitalized build type name.
+For example, `fooBar` is a variant name if you have `foo` product flavor and `bar` build type.
+
+If you define deployment names in `deployments` section, there will also be `uploadDeployGate` task which can upload all the associated deployments at once. *apks* has been deprecated since 2.0
 
 ## Example of `build.gradle`
 
@@ -84,22 +87,22 @@ apply plugin: 'deploygate'                    // add this *after* 'android' plug
 deploygate {
 
   // If you are using automated build, you can specify your account credentials like this
-  userName = "[username of app owner]"
-  token = "[your API token]"
+  appOwnerName = "[username of app owner]"
+  apiToken = "[your API token]"
 
   // You can also specify additional options for each flavor.
-  apks {
+  deployments {
     
     // this correspond to `debug` flavor and used for `uploadDeployGateDebug` task 
     debug {
       // ProTip: get git hash for current commit for easier troubleshooting
       def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
       // set as build message
-      message = "debug build ${hash}"
+      uploadMessage = "debug build ${hash}"
 
       // If this property is `true` , Skip dependency of `assemble` task from `uploadDeployGate` task
       // The default value is `false`
-      noAssemble = true
+      skipAssemble = true
 
       // if you are using a distribution page, you can update it simultaneously
       distributionKey = "1234567890abcdef1234567890abcdef"
