@@ -18,7 +18,7 @@ class VersionString {
 
         LOGGER.info(version)
 
-        def versions = version.split("-")
+        def versions = version.split("-", 2)
 
         try {
             def matcher = VERSION_PATTERN.matcher(versions[0])
@@ -37,8 +37,8 @@ class VersionString {
 
             String addition = null
 
-            if (versions.length >= 2) {
-                addition = versions.toList().subList(1, versions.length).join("-")
+            if (versions.length == 2) {
+                addition = versions[1]
             }
 
             new VersionString(major, minor, patch, addition)

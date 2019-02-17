@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins.internal.agp
 
 import com.deploygate.gradle.plugins.TestAndroidProject
+import com.deploygate.gradle.plugins.internal.VersionString
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
@@ -55,6 +56,30 @@ class AndroidGradlePluginSpec extends Specification {
 
         then:
         AndroidGradlePlugin.isApplied(project)
+    }
+
+    @Unroll
+    def "feature catalog verification. Unrolled #agpVersion"() {
+        given:
+        AndroidGradlePlugin.metaClass.static.getVersion = { ->
+            VersionString.tryParse(agpVersion)
+        }
+
+        expect:
+        AndroidGradlePlugin.isAppBundleSupported() == isAppBundleSupported
+        AndroidGradlePlugin.isSigningConfigCollectionSupported() == isSigningConfigCollectionSupported
+        AndroidGradlePlugin.isTaskProviderBased() == isTaskProviderBased
+
+        where:
+        agpVersion                 | isAppBundleSupported | isSigningConfigCollectionSupported | isTaskProviderBased
+        "3.0.0"                    | false                | false                              | false
+        "3.1.0"                    | false                | false                              | false
+        "3.2.0"                    | true                 | false                              | false
+        "3.2.1"                    | true                 | false                              | false
+        "3.3.0"                    | true                 | true                               | true
+        "3.4.0"                    | true                 | true                               | true
+        "4.0.0"                    | true                 | true                               | true // for now
+        "${Integer.MAX_VALUE}.0.0" | true                 | true                               | true // fallback
     }
 
     /**

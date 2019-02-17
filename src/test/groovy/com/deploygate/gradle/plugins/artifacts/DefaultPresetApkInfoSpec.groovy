@@ -11,8 +11,8 @@ class DefaultPresetApkInfoSpec extends Specification {
         def presetApkInfo = new DefaultPresetApkInfo(variantName)
         presetApkInfo.variantName == variantName
         presetApkInfo.apkFile == null
-        presetApkInfo.signingReady == true
-        presetApkInfo.universalApk == true
+        presetApkInfo.signingReady
+        presetApkInfo.universalApk
 
         where:
         variantName << ["foo", "bar", "baz", "que"]
