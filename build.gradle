@@ -60,6 +60,13 @@ dependencies {
 
 test.dependsOn(['createClasspathManifest'])
 
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
 task javadocJar(type: Jar, dependsOn: groovydoc) {
     classifier = 'javadoc'
     from "${buildDir}/javadoc"
