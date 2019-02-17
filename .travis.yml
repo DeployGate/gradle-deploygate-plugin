@@ -24,6 +24,8 @@ android:
   - android-sdk-license-.+
   - google-gdk-license-.+
 script:
+- echo $ANDROID_HOME
+- echo $ANDROID_SDK_HOME
 - "./gradlew build test"
 deploy:
   provider: script
