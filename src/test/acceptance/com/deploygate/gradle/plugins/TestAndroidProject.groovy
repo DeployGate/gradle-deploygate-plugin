@@ -2,6 +2,8 @@ package com.deploygate.gradle.plugins
 
 import org.junit.rules.TemporaryFolder
 
+import javax.annotation.Nonnull
+
 class TestAndroidProject {
     private TemporaryFolder temporaryFolder
 
@@ -10,13 +12,7 @@ class TestAndroidProject {
     }
 
     void copyFromResources() {
-        def classLoader = getClass().getClassLoader()
-        def projectDir = classLoader.getResource("project").file as File
-
-        projectDir.listFiles().each { File f ->
-            copy(f, temporaryFolder.root)
-        }
-
+        def projectDir = copyDir("project")
         def localProperties = new File(projectDir, "local.properties")
 
         if (!localProperties.exists()) {
@@ -31,10 +27,28 @@ ndk.dir=${androidSdk}/ndk-bundle
         }
     }
 
+    void setupAcceptance() {
+        copyFromResources()
+        copyDir("acceptance")
+    }
+
+    @Nonnull
+    private File copyDir(String dirName) {
+        def classLoader = getClass().getClassLoader()
+        def dir = classLoader.getResource(dirName).file as File
+
+        dir.listFiles().each { File f ->
+            copy(f, temporaryFolder.root)
+        }
+
+        return dir
+    }
+
     private void copy(File copyFrom, File copyTo) {
         def nextCopyTo = new File(copyTo, copyFrom.name)
 
         if (copyFrom.isFile()) {
+            nextCopyTo.exists() && nextCopyTo.delete() && nextCopyTo.createNewFile()
             nextCopyTo << copyFrom.newInputStream()
         } else if (copyFrom.isDirectory()) {
             if (!nextCopyTo.mkdirs()) {

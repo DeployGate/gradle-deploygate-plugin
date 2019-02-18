@@ -1,0 +1,76 @@
+plugins {
+    id "com.android.application"
+    id "deploygate"
+}
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+    defaultConfig {
+        applicationId "com.deploygate.example"
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        staging {
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+        }
+    }
+    
+    flavorDimensions "dim1", "dim2"
+    productFlavors {
+        flavor1 {
+            dimension "dim1"
+            applicationIdSuffix ".p1"
+        }
+        flavor2 {
+            dimension "dim1"
+            applicationIdSuffix ".p2"
+        }
+        flavor3 {
+            dimension "dim2"
+            applicationIdSuffix ".p3"
+        }
+        flavor4 {
+            dimension "dim2"
+            applicationIdSuffix ".p4"
+        }
+    }
+}
+
+deploygate {
+    deployments {
+        flavor1Flavor3Debug {
+            uploadMessage = "flavor1Flavor3Debug"
+        }
+        flavor2Flavor3Debug {
+            uploadMessage = "flavor2Flavor3Debug"
+        }
+        flavor1Flavor4Debug {
+            uploadMessage = "flavor1Flavor4Debug"
+        }
+        flavor2Flavor4Debug {
+            uploadMessage = "flavor2Flavor4Debug"
+            skipAssemble = true
+        }
+        customApk {
+            uploadMessage = "custom deployment"
+            sourceFile = file("${project.projectDir}/texture/sample.apk")
+        }
+        allParameter {
+            uploadMessage = "allParameter uploadMessage"
+            distributionKey = "allParameter distributionKey"
+            releaseNote = "allParameter releaseNote"
+            visibility = "allParameter visibility"
+        }
+    }
+}
