@@ -47,8 +47,8 @@ class DeployGateExtension implements ExtensionSyntax {
     }
 
     /**
-     * @depreacted use {@link DeployGateExtension#getDeployments()} instead
-     * @return
+     * @depreacted use getDeployments instead
+     * @see DeployGateExtension#getDeployments()
      */
     @Deprecated
     def getApks() {
@@ -56,8 +56,8 @@ class DeployGateExtension implements ExtensionSyntax {
     }
 
     /**
-     * @depreacted use {@link DeployGateExtension#getDeployments()} instead
-     * @return
+     * @depreacted use deployments instead
+     * @see DeployGateExtension#deployments(Closure)
      */
     @Deprecated
     def apks(Closure closure) {
@@ -84,14 +84,13 @@ class DeployGateExtension implements ExtensionSyntax {
     @Nonnull
     VariantBasedDeployTarget findDeployTarget(@Nonnull String name) {
         def result = new VariantBasedDeployTarget(name)
-        def defaultTarget = getDefaultDeployTarget(project)
         VariantBasedDeployTarget declaredTarget = variantConfigurations.findByName(name)
 
         if (declaredTarget) {
             mergeDeployTarget(result, declaredTarget)
         }
 
-        mergeDeployTarget(result, defaultTarget)
+        mergeDeployTarget(result, getDefaultDeployTarget(project))
 
         return result
     }
@@ -103,6 +102,7 @@ class DeployGateExtension implements ExtensionSyntax {
         base.distributionKey = base.distributionKey ?: other.distributionKey
         base.releaseNote = base.releaseNote ?: other.releaseNote
         base.visibility = base.visibility ?: other.visibility
+        base.skipAssemble = base.skipAssemble || other.skipAssemble
     }
 
     @PackageScope

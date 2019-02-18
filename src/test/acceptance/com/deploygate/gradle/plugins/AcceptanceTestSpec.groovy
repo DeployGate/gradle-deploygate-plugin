@@ -2,9 +2,9 @@ package com.deploygate.gradle.plugins
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.junit.WireMockRule
-import com.github.tomakehurst.wiremock.matching.MultipartValuePattern
-import com.github.tomakehurst.wiremock.matching.MultipartValuePatternBuilder
+import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -99,9 +99,11 @@ class AcceptanceTestSpec extends Specification {
                 .withArguments("showUploadDeployGateTaskNames")
 
         and:
-        def result = runner.build().output
+        def buildResult = runner.build()
+        def result = buildResult.output
 
         expect: // declared tasks should be included
+        buildResult.task(":showUploadDeployGateTaskNames").outcome == TaskOutcome.SUCCESS
         !result.contains("loginDeployGate")
         !result.contains("logoutDeployGate")
         !result.contains("uploadDeployGateFlavor1Flavor3Release")
@@ -137,49 +139,201 @@ class AcceptanceTestSpec extends Specification {
                 .withArguments("uploadDeployGateFlavor1Flavor3Debug" /*, "--stacktrace" */)
 
         and:
-        runner.build()
-        def loggedRequests = wireMockRule.findAll(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")))
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
 
         expect:
-        loggedRequests.size() == 1
-        loggedRequests[0].parts.find { it.name == "message" }.body.asString() == "flavor1Flavor3Debug"
-
-//        wireMockRule.verify(1,
-//                postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps"))
-//                        .withRequestBodyPart(equalToInMessageBody("flavor1Flavor3Debug"))
-//        )
+        buildResult.task(":uploadDeployGateFlavor1Flavor3Debug").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        missingPart(request, "message")
+        missingPart(request, "distribution_key")
+        missingPart(request, "release_note")
+        missingPart(request, "visibility")
 
         where:
         agpVersion | minGradleVersion
         "3.0.0"    | "4.1"
-//        "3.1.0"    | "4.4"
-//        "3.2.0"    | "4.6"
-//        "3.3.0"    | "4.10.1"
+        "3.1.0"    | "4.4"
+        "3.2.0"    | "4.6"
+        "3.3.0"    | "4.10.1"
     }
 
-    def "flavor2Flavor3Debug"() {
+    @Unroll
+    def "flavor2Flavor3Debug #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
 
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(minGradleVersion)
+                .withArguments("uploadDeployGateFlavor2Flavor3Debug" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        buildResult.task(":uploadDeployGateFlavor2Flavor3Debug").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        request.getPart("message").body.asString() == "flavor2Flavor3Debug"
+        missingPart(request, "distribution_key")
+        missingPart(request, "release_note")
+        missingPart(request, "visibility")
+
+        where:
+        agpVersion | minGradleVersion
+        "3.0.0"    | "4.1"
+        "3.1.0"    | "4.4"
+        "3.2.0"    | "4.6"
+        "3.3.0"    | "4.10.1"
     }
 
-    def "flavor1Flavor4Debug"() {
+    @Unroll
+    def "flavor1Flavor4Debug #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
 
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(minGradleVersion)
+                .withArguments("uploadDeployGateFlavor1Flavor4Debug" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        buildResult.task(":uploadDeployGateFlavor1Flavor4Debug").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        request.getPart("message").body.asString() == "flavor1Flavor4Debug"
+        missingPart(request, "distribution_key")
+        missingPart(request, "release_note")
+        missingPart(request, "visibility")
+
+        where:
+        agpVersion | minGradleVersion
+        "3.0.0"    | "4.1"
+        "3.1.0"    | "4.4"
+        "3.2.0"    | "4.6"
+        "3.3.0"    | "4.10.1"
     }
 
-    def "flavor2Flavor4Debug"() {
+    @Unroll
+    def "flavor2Flavor4Debug should fail unless assembling #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
 
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(minGradleVersion)
+                .withArguments("uploadDeployGateFlavor2Flavor4Debug" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.buildAndFail()
+
+        expect:
+        buildResult.task(":uploadDeployGateFlavor2Flavor4Debug").getOutcome() == TaskOutcome.FAILED
+
+        where:
+        agpVersion | minGradleVersion
+        "3.0.0"    | "4.1"
+        "3.1.0"    | "4.4"
+        "3.2.0"    | "4.6"
+        "3.3.0"    | "4.10.1"
     }
 
-    def "customApk"() {
+    @Unroll
+    def "flavor2Flavor4Debug needs assembling #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
 
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(minGradleVersion)
+                .withArguments("assembleFlavor2Flavor4Debug", "uploadDeployGateFlavor2Flavor4Debug" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        buildResult.task(":assembleFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
+        buildResult.task(":uploadDeployGateFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        request.getPart("message").body.asString() == "flavor2Flavor4Debug"
+        missingPart(request, "distribution_key")
+        missingPart(request, "release_note")
+        missingPart(request, "visibility")
+
+        where:
+        agpVersion | minGradleVersion
+        "3.0.0"    | "4.1"
+        "3.1.0"    | "4.4"
+        "3.2.0"    | "4.6"
+        "3.3.0"    | "4.10.1"
     }
 
-    def "allParameter"() {
+    @Unroll
+    def "customApk #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
 
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(minGradleVersion)
+                .withArguments("uploadDeployGateCustomApk" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        buildResult.task(":uploadDeployGateCustomApk").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        request.getPart("message").body.asString() == "custom uploadMessage"
+        request.getPart("distribution_key").body.asString() == "custom distributionKey"
+        request.getPart("release_note").body.asString() == "custom releaseNote"
+        request.getPart("visibility").body.asString() == "custom visibility"
+
+        where:
+        agpVersion | minGradleVersion
+        "3.0.0"    | "4.1"
+        "3.1.0"    | "4.4"
+        "3.2.0"    | "4.6"
+        "3.3.0"    | "4.10.1"
     }
 
-    private static MultipartValuePattern equalToInMessageBody(String message) {
-        return new MultipartValuePatternBuilder("message")
-                .withBody(equalTo(message))
-                .build()
+    private static boolean missingPart(LoggedRequest request, String name) {
+        return request.parts.isEmpty() || !request.parts.any { it.name == name }
     }
 }

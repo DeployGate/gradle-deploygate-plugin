@@ -44,6 +44,15 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://jcenter.bintray.com"
+    }
+    maven {
+        url "https://maven.google.com"
+    }
+}
+
 deploygate {
     // for testing
     endpoint = "http://localhost:8888"
@@ -53,7 +62,6 @@ deploygate {
     
     deployments {
         flavor1Flavor3Debug {
-            uploadMessage = "flavor1Flavor3Debug"
         }
         flavor2Flavor3Debug {
             uploadMessage = "flavor2Flavor3Debug"
@@ -66,14 +74,11 @@ deploygate {
             skipAssemble = true
         }
         customApk {
-            uploadMessage = "custom deployment"
             sourceFile = file("${project.projectDir}/texture/sample.apk")
-        }
-        allParameter {
-            uploadMessage = "allParameter uploadMessage"
-            distributionKey = "allParameter distributionKey"
-            releaseNote = "allParameter releaseNote"
-            visibility = "allParameter visibility"
+            uploadMessage = "custom uploadMessage"
+            distributionKey = "custom distributionKey"
+            releaseNote = "custom releaseNote"
+            visibility = "custom visibility"
         }
     }
 }
