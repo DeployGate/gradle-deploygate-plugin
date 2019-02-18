@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins.internal.agp
 
 import com.deploygate.gradle.plugins.TestAndroidProject
+import com.deploygate.gradle.plugins.TestDeployGatePlugin
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -18,20 +19,13 @@ class AndroidGradlePluginAcceptanceSpec extends Specification {
     TestAndroidProject testAndroidProject
 
     @Nonnull
-    List<File> pluginClasspath
+    TestDeployGatePlugin testDeployGatePlugin
 
     def setup() {
         testAndroidProject = new TestAndroidProject(testProjectDir)
+        testDeployGatePlugin = new TestDeployGatePlugin()
 
-        testAndroidProject.copyFromResources()
-
-        def pluginClasspathResource = getClass().classLoader.getResource("plugin-classpath.txt")
-
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-
-        pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+        testAndroidProject.useProjectResourceDir()
     }
 
     /**
@@ -53,7 +47,7 @@ class AndroidGradlePluginAcceptanceSpec extends Specification {
 
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withPluginClasspath(pluginClasspath)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
                 .withGradleVersion(minGradleVersion)
                 .withArguments("printAGPVersion" /*, "--stacktrace" */)
 

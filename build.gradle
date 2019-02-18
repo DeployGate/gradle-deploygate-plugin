@@ -39,7 +39,7 @@ dependencies {
     testImplementation gradleTestKit()
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.spockframework.spock:spock-core:spock-1.2'
-    testImplementation "com.android.tools.build:gradle:$agpVersion"
+    testImplementation "com.github.tomakehurst:wiremock-jre8:2.21.0"
 }
 
 // For testing. The classpaths of this plugin must be specified

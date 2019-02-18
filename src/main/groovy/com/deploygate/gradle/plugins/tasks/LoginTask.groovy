@@ -28,12 +28,12 @@ class LoginTask extends DefaultTask {
             if (!setupCredential())
                 throw new RuntimeException('Failed to retrieve DeployGate credentials. Please try again or specify it in your build.gradle script.')
 
-        project.deploygate.userName =
-                [project.deploygate.userName, System.getenv('DEPLOYGATE_USER_NAME'), localCredential.name].find {
+        project.deploygate.appOwnerName =
+                [project.deploygate.appOwnerName, System.getenv('DEPLOYGATE_USER_NAME'), localCredential.name].find {
                     it != null
                 }
-        project.deploygate.token =
-                [project.deploygate.token, System.getenv('DEPLOYGATE_API_TOKEN'), localCredential.token].find {
+        project.deploygate.apiToken =
+                [project.deploygate.apiToken, System.getenv('DEPLOYGATE_API_TOKEN'), localCredential.token].find {
                     it != null
                 }
     }
@@ -51,7 +51,7 @@ class LoginTask extends DefaultTask {
     }
 
     private boolean hasCreadentialInScript() {
-        project.deploygate.userName && project.deploygate.token
+        project.deploygate.appOwnerName && project.deploygate.apiToken
     }
 
     def setupCredential() {

@@ -11,7 +11,7 @@ class TestAndroidProject {
         this.temporaryFolder = temporaryFolder
     }
 
-    void copyFromResources() {
+    void useProjectResourceDir() {
         def projectDir = copyDir("project")
         def localProperties = new File(projectDir, "local.properties")
 
@@ -27,8 +27,8 @@ ndk.dir=${androidSdk}/ndk-bundle
         }
     }
 
-    void setupAcceptance() {
-        copyFromResources()
+    void useAcceptanceResourceDir() {
+        useProjectResourceDir()
         copyDir("acceptance")
     }
 

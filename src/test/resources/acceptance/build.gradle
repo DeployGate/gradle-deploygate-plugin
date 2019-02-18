@@ -17,9 +17,6 @@ android {
         debug {
             debuggable true
         }
-        staging {
-            debuggable true
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt')
@@ -48,6 +45,12 @@ android {
 }
 
 deploygate {
+    // for testing
+    endpoint = "http://localhost:8888"
+    
+    appOwnerName = "appOwner"
+    apiToken = "api token"
+    
     deployments {
         flavor1Flavor3Debug {
             uploadMessage = "flavor1Flavor3Debug"
@@ -72,5 +75,30 @@ deploygate {
             releaseNote = "allParameter releaseNote"
             visibility = "allParameter visibility"
         }
+    }
+}
+
+task existsTask {
+    doLast {
+        // -PtaskName=...
+        if (project.tasks.findByName(taskName) == null) {
+            throw new IllegalArgumentException("$taskName not found")
+        }
+    }
+}
+
+task showUploadDeployGateTaskNames() {
+    doLast {
+        println project.tasks.findByName("uploadDeployGate").dependsOn.collect {
+            if (it instanceof Task) {
+                it.name
+            } else if (it instanceof String) {
+                it
+            } else if (it.hasProperty("taskName")) {
+                it.taskName
+            } else {
+                it
+            }
+        }.flatten().join("\n")
     }
 }
