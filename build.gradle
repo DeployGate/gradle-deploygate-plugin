@@ -88,6 +88,10 @@ test {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
+
+    environment([
+            "ANDROID_HOME": System.getenv("ANDROID_HOME")
+    ])
 }
 
 task javadocJar(type: Jar, dependsOn: groovydoc) {
