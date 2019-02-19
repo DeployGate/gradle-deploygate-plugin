@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.dsl
 
+import com.deploygate.gradle.plugins.TestSystemEnv
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -10,6 +11,9 @@ import spock.lang.Specification
 class DeployGateExtensionSpec extends Specification {
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
+
+    @Rule
+    TestSystemEnv testSystemEnv
 
     File buildGradle
 
@@ -110,5 +114,8 @@ deploygate {
         dep2.releaseNote == "note1"
         dep2.distributionKey == "distKey"
         dep2.skipAssemble
+    }
+
+    def "mergeDeployTarget should work"() {
     }
 }
