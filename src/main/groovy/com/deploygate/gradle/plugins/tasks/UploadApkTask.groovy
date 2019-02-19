@@ -57,7 +57,7 @@ class UploadApkTask extends DefaultTask {
                 uploadMessage: deployTarget.uploadMessage,
                 distributionKey: deployTarget.distributionKey,
                 releaseNote: deployTarget.releaseNote,
-                visibility: deployTarget.releaseNote
+                visibility: deployTarget.visibility
         )
     }
 
@@ -116,7 +116,7 @@ class UploadApkTask extends DefaultTask {
         onBeforeUpload()
 
         // FIXME token and user name verification should be done before onBeforeUpload
-        def response = postRequestToUpload(getUserName(), getToken(), configuration.apkFile, configuration.toUploadParams())
+        def response = postRequestToUpload(getAppOwnerName(), getApiToken(), configuration.apkFile, configuration.toUploadParams())
 
         handleResponse(response, response.data)
     }
@@ -141,39 +141,39 @@ class UploadApkTask extends DefaultTask {
         }
     }
 
-    private String getToken() {
-        def taken = project.deploygate.token
+    private String getApiToken() {
+        def apiToken = project.deploygate.apiToken
 
-        if (!taken.trim()) {
-            throw new GradleException('token is missing. Please enter the token.')
+        if (!apiToken.trim()) {
+            throw new GradleException('apiToken is missing. Please enter the token.')
         }
 
-        taken.trim()
+        apiToken.trim()
     }
 
-    private String getUserName() {
-        def userName = project.deploygate.userName
+    private String getAppOwnerName() {
+        def appOwnerName = project.deploygate.appOwnerName
 
-        if (!userName.trim()) {
-            throw new GradleException('userName is missing. Please enter the token.')
+        if (!appOwnerName.trim()) {
+            throw new GradleException('appOwnerName is missing. Please enter the token.')
         }
 
-        userName.trim()
+        appOwnerName.trim()
     }
 
-    private HttpResponseDecorator postRequestToUpload(String userName, String token, File apkFile, Map<String, String> params) {
+    private HttpResponseDecorator postRequestToUpload(String appOwnerName, String apiToken, File apkFile, Map<String, String> params) {
         MultipartEntity entity = new MultipartEntity()
         Charset charset = Charset.forName('UTF-8')
 
         entity.addPart("file", new FileBody(apkFile.getAbsoluteFile()))
-        entity.addPart("token", new StringBody(token, charset))
+        entity.addPart("token", new StringBody(apiToken, charset))
 
         for (String key : params.keySet()) {
             entity.addPart(key, new StringBody(params.get(key), charset))
         }
 
         HTTPBuilderFactory.restClient(project.deploygate.endpoint).request(Method.POST, ContentType.JSON) { req ->
-            uri.path = "/api/users/${userName}/apps"
+            uri.path = "/api/users/${appOwnerName}/apps"
             req.entity = entity
         } as HttpResponseDecorator
     }

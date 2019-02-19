@@ -1,0 +1,109 @@
+plugins {
+    id "com.android.application"
+    id "deploygate"
+}
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion '28.0.3'
+    defaultConfig {
+        applicationId "com.deploygate.example"
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+        }
+    }
+    
+    flavorDimensions "dim1", "dim2"
+    productFlavors {
+        flavor1 {
+            dimension "dim1"
+            applicationIdSuffix ".p1"
+        }
+        flavor2 {
+            dimension "dim1"
+            applicationIdSuffix ".p2"
+        }
+        flavor3 {
+            dimension "dim2"
+            applicationIdSuffix ".p3"
+        }
+        flavor4 {
+            dimension "dim2"
+            applicationIdSuffix ".p4"
+        }
+    }
+}
+
+repositories {
+    maven {
+        url "https://jcenter.bintray.com"
+    }
+    maven {
+        url "https://maven.google.com"
+    }
+}
+
+deploygate {
+    // for testing
+    endpoint = "http://localhost:8888"
+    
+    appOwnerName = "appOwner"
+    apiToken = "api token"
+    
+    deployments {
+        flavor1Flavor3Debug {
+        }
+        flavor2Flavor3Debug {
+            uploadMessage = "flavor2Flavor3Debug"
+        }
+        flavor1Flavor4Debug {
+            uploadMessage = "flavor1Flavor4Debug"
+        }
+        flavor2Flavor4Debug {
+            uploadMessage = "flavor2Flavor4Debug"
+            skipAssemble = true
+        }
+        customApk {
+            sourceFile = file("${project.projectDir}/texture/sample.apk")
+            uploadMessage = "custom uploadMessage"
+            distributionKey = "custom distributionKey"
+            releaseNote = "custom releaseNote"
+            visibility = "custom visibility"
+        }
+    }
+}
+
+task existsTask {
+    doLast {
+        // -PtaskName=...
+        if (project.tasks.findByName(taskName) == null) {
+            throw new IllegalArgumentException("$taskName not found")
+        }
+    }
+}
+
+task showUploadDeployGateTaskNames() {
+    doLast {
+        println project.tasks.findByName("uploadDeployGate").dependsOn.collect {
+            if (it instanceof Task) {
+                it.name
+            } else if (it instanceof String) {
+                it
+            } else if (it.hasProperty("taskName")) {
+                it.taskName
+            } else {
+                it
+            }
+        }.flatten().join("\n")
+    }
+}
