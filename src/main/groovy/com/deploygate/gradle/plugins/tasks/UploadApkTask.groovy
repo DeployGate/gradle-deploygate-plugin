@@ -57,7 +57,7 @@ class UploadApkTask extends DefaultTask {
                 uploadMessage: deployTarget.uploadMessage,
                 distributionKey: deployTarget.distributionKey,
                 releaseNote: deployTarget.releaseNote,
-                visibility: deployTarget.releaseNote
+                visibility: deployTarget.visibility
         )
     }
 
