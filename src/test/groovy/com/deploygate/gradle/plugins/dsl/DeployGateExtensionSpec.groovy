@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.dsl
 
+import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.TestSystemEnv
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -7,6 +8,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class DeployGateExtensionSpec extends Specification {
     @Rule
@@ -19,12 +21,12 @@ class DeployGateExtensionSpec extends Specification {
 
     def setup() {
         buildGradle = testProjectDir.newFile("build.gradle")
+        testProjectDir.newFile("settings.gradle") << "rootProject.name = 'ok'"
     }
 
     def "backward check"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
-        testProjectDir.newFile("settings.gradle") << "rootProject.name = 'ok'"
 
         and:
         def buildFileContent = """
@@ -58,7 +60,6 @@ deploygate {
     def "can accept a given extension"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
-        testProjectDir.newFile("settings.gradle") << "rootProject.name = 'ok'"
 
         and:
         def buildFileContent = """
@@ -117,5 +118,114 @@ deploygate {
     }
 
     def "mergeDeployTarget should work"() {
+        given:
+        def base = new VariantBasedDeployTarget("base")
+        base.sourceFile = new File("base")
+        base.uploadMessage = "base"
+        base.distributionKey = "base"
+        base.releaseNote = "base"
+        base.visibility = "base"
+        base.skipAssemble = false
+
+        and:
+        def other = new VariantBasedDeployTarget("other")
+
+        when:
+        DeployGateExtension.mergeDeployTarget(base, other)
+
+        then:
+        base.sourceFile == new File("base")
+        base.uploadMessage == "base"
+        base.distributionKey == "base"
+        base.releaseNote == "base"
+        base.visibility == "base"
+        !base.skipAssemble
+
+        when:
+        other.sourceFile = new File("other")
+        other.uploadMessage = "other uploadMessage"
+        other.distributionKey = "other distributionKey"
+        other.releaseNote = "other releaseNote"
+        other.visibility = "other visibility"
+        other.skipAssemble = true
+
+        and:
+        DeployGateExtension.mergeDeployTarget(base, other)
+
+        then:
+        base.sourceFile == new File("base")
+        base.uploadMessage == "base"
+        base.distributionKey == "base"
+        base.releaseNote == "base"
+        base.visibility == "base"
+        base.skipAssemble // only skip assemble was changed
+
+        when:
+        base.sourceFile = null
+        base.uploadMessage = null
+        base.distributionKey = null
+        base.releaseNote = null
+        base.visibility = null
+        base.skipAssemble = false
+
+        and:
+        DeployGateExtension.mergeDeployTarget(base, other)
+
+        then:
+        base.sourceFile == new File("other")
+        base.uploadMessage == "other uploadMessage"
+        base.distributionKey == "other distributionKey"
+        base.releaseNote == "other releaseNote"
+        base.visibility == "other visibility"
+        base.skipAssemble
+
+        when:
+        base.sourceFile = null
+        base.uploadMessage = ""
+        base.distributionKey = ""
+        base.releaseNote = ""
+        base.visibility = ""
+        base.skipAssemble = false
+
+        and:
+        DeployGateExtension.mergeDeployTarget(base, other)
+
+        then:
+        base.sourceFile == new File("other")
+        base.uploadMessage == "other uploadMessage"
+        base.distributionKey == "other distributionKey"
+        base.releaseNote == "other releaseNote"
+        base.visibility == "other visibility"
+        base.skipAssemble
+    }
+
+    @Unroll
+    def "getDefaultDeployTarget should return based on env. Unrolled #sourceFilePath"() {
+        given:
+        def env = [:]
+        env[DeployGatePlugin.ENV_NAME_SOURCE_FILE] = sourceFilePath
+        env[DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE] = uploadMessage
+        env[DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY] = distributionKey
+        env[DeployGatePlugin.ENV_NAME_RELEASE_NOTE] = releaseNote
+        env[DeployGatePlugin.ENV_NAME_VISIBILITY] = visibility
+        testSystemEnv.setEnv(env)
+
+        Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+
+        and:
+        VariantBasedDeployTarget target = DeployGateExtension.getDefaultDeployTarget(project)
+
+        expect:
+        target.sourceFile == sourceFilePath?.with { project.file(sourceFilePath) }
+        target.uploadMessage == uploadMessage
+        target.distributionKey == distributionKey
+        target.releaseNote == releaseNote
+        target.visibility == visibility
+        !target.skipAssemble // this var cannot be injected from env vars for now
+
+        where:
+        sourceFilePath   | uploadMessage   | distributionKey   | releaseNote   | visibility   | skipAssemble
+        null             | null            | null              | null          | null         | null
+        "sourceFilePath" | "uploadMessage" | "distributionKey" | "releaseNote" | "visibility" | true
     }
 }
