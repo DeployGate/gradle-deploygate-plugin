@@ -49,4 +49,33 @@ class VariantBasedDeployTarget implements Named, DeployTargetSyntax {
     }
 
     // end: backward compatibility
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        VariantBasedDeployTarget that = (VariantBasedDeployTarget) o
+
+        if (skipAssemble != that.skipAssemble) return false
+        if (distributionKey != that.distributionKey) return false
+        if (name != that.name) return false
+        if (releaseNote != that.releaseNote) return false
+        if (sourceFile != that.sourceFile) return false
+        if (uploadMessage != that.uploadMessage) return false
+        if (visibility != that.visibility) return false
+
+        return true
+    }
+
+    int hashCode() {
+        int result
+        result = name.hashCode()
+        result = 31 * result + (sourceFile != null ? sourceFile.hashCode() : 0)
+        result = 31 * result + (uploadMessage != null ? uploadMessage.hashCode() : 0)
+        result = 31 * result + (distributionKey != null ? distributionKey.hashCode() : 0)
+        result = 31 * result + (releaseNote != null ? releaseNote.hashCode() : 0)
+        result = 31 * result + (visibility != null ? visibility.hashCode() : 0)
+        result = 31 * result + (skipAssemble ? 1 : 0)
+        return result
+    }
 }

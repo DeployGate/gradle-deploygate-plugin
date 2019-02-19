@@ -40,7 +40,6 @@ deploygate {
 }
 """
 
-        buildGradle.exists() && buildGradle.delete() && buildGradle.createNewFile()
         buildGradle << buildFileContent
 
         and:
@@ -80,7 +79,6 @@ deploygate {
 }
 """
 
-        buildGradle.exists() && buildGradle.delete() && buildGradle.createNewFile()
         buildGradle << buildFileContent
 
         and:
@@ -115,6 +113,95 @@ deploygate {
         dep2.releaseNote == "note1"
         dep2.distributionKey == "distKey"
         dep2.skipAssemble
+    }
+
+    def "findDeployTarget"() {
+        given:
+        Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+
+        and:
+        def buildFileContent = """
+deploygate {
+  appOwnerName = "user1"
+  apiToken = "token1"
+  deployments {
+    dep1 {
+    }
+    dep2 {
+      sourceFile = "build.gradle" as File
+      distributionKey = "distKey"
+      releaseNote = "note1"
+      uploadMessage = "message1"
+      skipAssemble = true
+    }
+  }
+}
+"""
+
+        buildGradle << buildFileContent
+
+        and:
+        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        project.evaluate()
+
+        when:
+        def result = project.deploygate as DeployGateExtension
+
+        then:
+        result.findDeployTarget("dep1") == result.deployments.findByName("dep1")
+        result.findDeployTarget("dep2") == result.deployments.findByName("dep2")
+
+        when:
+        def dep3 = result.findDeployTarget("dep3")
+
+        then:
+        dep3
+        dep3.name == "dep3"
+        dep3.sourceFile == null
+        dep3.uploadMessage == null
+        dep3.releaseNote == null
+        dep3.distributionKey == null
+        !dep3.skipAssemble
+    }
+
+    def "hasDeployTarget"() {
+        given:
+        Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+
+        and:
+        def buildFileContent = """
+deploygate {
+  appOwnerName = "user1"
+  apiToken = "token1"
+  deployments {
+    dep1 {
+    }
+    dep2 {
+      sourceFile = "build.gradle" as File
+      distributionKey = "distKey"
+      releaseNote = "note1"
+      uploadMessage = "message1"
+      skipAssemble = true
+    }
+  }
+}
+"""
+
+        buildGradle << buildFileContent
+
+        and:
+        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        project.evaluate()
+
+        when:
+        def result = project.deploygate as DeployGateExtension
+
+        then:
+        result.hasDeployTarget("dep1")
+        result.hasDeployTarget("dep2")
+        !result.hasDeployTarget("dep3")
     }
 
     def "mergeDeployTarget should work"() {
