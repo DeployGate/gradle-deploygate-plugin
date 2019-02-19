@@ -28,23 +28,19 @@ ext {
     agpVersion = '3.3.0'
 }
 
-dependencies {
-    compileOnly gradleApi()
-    compileOnly localGroovy()
-    compileOnly "com.android.tools.build:gradle:$agpVersion"
+sourceSets {
+    acceptanceTest {
+        groovy.srcDirs += ["src/test/acceptance"]
+        resources.srcDirs += test.resources.srcDirs
+    }
+}
 
-    implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
-    implementation 'org.apache.httpcomponents:httpmime:4.2.5'
-
-    testImplementation gradleTestKit()
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.spockframework.spock:spock-core:spock-1.2'
-
-    // 2.21.0 will break behaviors of multipart requests :thinking_face:
-    testImplementation "com.github.tomakehurst:wiremock:2.20.0"
-
-    // for ApplyPluginSpec
-    testRuntimeOnly "com.android.tools.build:gradle:$agpVersion"
+configurations {
+    acceptanceTestCompileOnly.extendsFrom testCompileOnly
+    acceptanceTestRuntime.extendsFrom testRuntime
+    acceptanceTestRuntimeOnly.extendsFrom testRuntimeOnly
+    acceptanceTestImplementation.extendsFrom testImplementation
+    acceptanceTestApi.extendsFrom testApi
 }
 
 // For testing. The classpaths of this plugin must be specified
@@ -62,12 +58,30 @@ task createClasspathManifest {
 }
 
 dependencies {
+    compileOnly gradleApi()
+    compileOnly localGroovy()
+    compileOnly "com.android.tools.build:gradle:$agpVersion"
+
+    implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    implementation 'org.apache.httpcomponents:httpmime:4.2.5'
+
+    testImplementation gradleTestKit()
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.spockframework.spock:spock-core:spock-1.2'
+
+    // 2.21.0 will break behaviors of multipart requests :thinking_face:
+    testImplementation "com.github.tomakehurst:wiremock:2.20.0"
+
+    // for ApplyPluginSpec
+    testRuntimeOnly "com.android.tools.build:gradle:$agpVersion"
     testRuntimeOnly files(createClasspathManifest)
 }
 
-test.dependsOn(['createClasspathManifest'])
-
-sourceSets.test.java.srcDirs += ["src/test/acceptance"]
+tasks.create("acceptanceTest", Test) {
+    testClassesDirs = sourceSets.acceptanceTest.output.classesDirs
+    classpath = sourceSets.acceptanceTest.runtimeClasspath
+    dependsOn("createClasspathManifest")
+}
 
 test {
     testLogging {

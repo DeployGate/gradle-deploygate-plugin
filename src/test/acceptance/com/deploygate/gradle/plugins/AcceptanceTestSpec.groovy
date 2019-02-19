@@ -75,7 +75,6 @@ class AcceptanceTestSpec extends Specification {
         runner.withArguments("existsTask", "-PtaskName=uploadDeployGateFlavor1Flavor4Release").build()
         runner.withArguments("existsTask", "-PtaskName=uploadDeployGateFlavor2Flavor4Release").build()
         runner.withArguments("existsTask", "-PtaskName=uploadDeployGateCustomApk").build()
-        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAllParameter").build()
 
         where:
         agpVersion | minGradleVersion
@@ -115,7 +114,6 @@ class AcceptanceTestSpec extends Specification {
         result.contains("uploadDeployGateFlavor1Flavor4Debug")
         result.contains("uploadDeployGateFlavor2Flavor4Debug")
         result.contains("uploadDeployGateCustomApk")
-        result.contains("uploadDeployGateAllParameter")
 
         where:
         agpVersion | minGradleVersion

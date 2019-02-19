@@ -25,10 +25,14 @@ android:
   - android-sdk-preview-license-.+
   - android-sdk-license-.+
   - google-gdk-license-.+
+env:
+  matrix:
+    - TEST_TASK_NAME=test
+    - TEST_TASK_NAME=acceptanceTest
 script:
 - echo "sdk.dir=$ANDROID_HOME" > src/test/resources/project/local.properties
 - echo "ndk.dir=$ANDROID_HOME/ndk-bundle" >> src/test/resources/project/local.properties
-- "./gradlew build test"
+- "./gradlew build $TEST_TASK_NAME"
 deploy:
   provider: script
   script: ./release.sh
