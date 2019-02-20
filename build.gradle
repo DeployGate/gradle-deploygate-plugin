@@ -84,7 +84,7 @@ tasks.create("acceptanceTest", Test) {
     dependsOn("createClasspathManifest")
 }
 
-test {
+project.tasks.withType(Test).configureEach {
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"

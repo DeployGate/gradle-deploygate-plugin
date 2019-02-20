@@ -5,6 +5,7 @@ import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.internal.gradle.LazyConfigurableTask
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.NamedDomainObjectContainer
@@ -27,6 +28,7 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().build()
+        GradleCompat.init(project)
         deployments = project.container(VariantBasedDeployTarget)
 
         project.extensions.add("deploygate", new DeployGateExtension(project, deployments))

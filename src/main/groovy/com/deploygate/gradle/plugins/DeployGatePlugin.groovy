@@ -4,6 +4,7 @@ import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -27,6 +28,7 @@ class DeployGatePlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         setupExtension(project)
+        GradleCompat.init(project)
         AndroidGradlePlugin.init(project)
         initProcessor(project)
 
@@ -71,7 +73,7 @@ class DeployGatePlugin implements Plugin<Project> {
             return
         }
 
-        project.android.applicationVariants.all { /* ApplicationVariant */ variant ->
+        GradleCompat.configureEach(project.android.applicationVariants) { /* ApplicationVariant */ variant ->
             def variantProxy = new IApplicationVariantImpl(variant)
 
             processor.registerVariantAwareUploadApkTask(variantProxy)

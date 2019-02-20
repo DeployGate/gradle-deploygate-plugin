@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.tasks.LoginTask
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -16,6 +17,7 @@ class LoginTaskFactoryImplSpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().build()
+        GradleCompat.init(project)
     }
 
     def "registerLoginTask should add a LoginTask"() {

@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.internal.gradle
 
+import com.deploygate.gradle.plugins.internal.VersionString
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -7,6 +8,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.util.mop.ConfineMetaClassChanges
 
 class TaskFactorySpec extends Specification {
     @Rule
@@ -18,13 +20,14 @@ class TaskFactorySpec extends Specification {
         buildGradle = testProjectDir.newFile("build.gradle")
     }
 
+    @ConfineMetaClassChanges([GradleCompat])
     @Unroll
     def "TaskFactory can add tasks based on Gradle API #gradleVersion"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
-        project.gradle.metaClass.getGradleVersion = { ->
-            gradleVersion
+        GradleCompat.metaClass.static.getVersion = { ->
+            VersionString.tryParse(gradleVersion)
         }
 
         and:
@@ -46,13 +49,14 @@ class TaskFactorySpec extends Specification {
         "agp330" | "4.10.1"      | TaskProvider
     }
 
+    @ConfineMetaClassChanges([GradleCompat])
     @Unroll
     def "TaskFactory can handle duplicated tasks regardless of #gradleVersion"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
-        project.gradle.metaClass.getGradleVersion = { ->
-            gradleVersion
+        GradleCompat.metaClass.static.getVersion = { ->
+            VersionString.tryParse(gradleVersion)
         }
 
         and:

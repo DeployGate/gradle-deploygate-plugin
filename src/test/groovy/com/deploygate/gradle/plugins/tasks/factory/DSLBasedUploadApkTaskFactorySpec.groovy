@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
@@ -26,6 +27,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+        GradleCompat.init(project)
     }
 
     def "registerAggregatedUploadApkTask should not add any task if empty is given"() {

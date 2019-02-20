@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
-
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -17,6 +17,7 @@ class LogoutTaskFactoryImplSpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().build()
+        GradleCompat.init(project)
     }
 
     def "registerLogoutTask should add a LogoutTask"() {
