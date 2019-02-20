@@ -3,6 +3,7 @@ package com.deploygate.gradle.plugins
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.ApplicationVariantProxy
 import com.deploygate.gradle.plugins.tasks.factory.*
+import com.google.common.annotations.VisibleForTesting
 import org.gradle.api.Project
 
 import javax.annotation.Nonnull
@@ -35,12 +36,31 @@ class Processor {
     def declaredNames = new HashSet<String>()
 
     Processor(@Nonnull DeployGatePlugin deployGatePlugin, @Nonnull Project project) {
+        this(
+                deployGatePlugin,
+                project,
+                new LoginTaskFactory(project),
+                new LogoutTaskFactory(project),
+                new AGPBasedUploadApkTaskFactory(project),
+                new DSLBasedUploadApkTaskFactory(project)
+        )
+    }
+
+    @VisibleForTesting
+    Processor(
+            @Nonnull DeployGatePlugin deployGatePlugin,
+            @Nonnull Project project,
+            @Nonnull LoginTaskFactory loginTaskFactory,
+            @Nonnull LogoutTaskFactory logoutTaskFactory,
+            @Nonnull AGPBasedUploadApkTaskFactory agpBasedUploadApkTaskFactory,
+            @Nonnull DSLBasedUploadApkTaskFactory dslBasedUploadApkTaskFactory
+    ) {
         this.deployGatePlugin = deployGatePlugin
         this.project = project
-        this.loginTaskFactory = new LoginTaskFactory(project)
-        this.logoutTaskFactory = new LogoutTaskFactory(project)
-        this.agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
-        this.dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
+        this.loginTaskFactory = loginTaskFactory
+        this.logoutTaskFactory = logoutTaskFactory
+        this.agpBasedUploadApkTaskFactory = agpBasedUploadApkTaskFactory
+        this.dslBasedUploadApkTaskFactory = dslBasedUploadApkTaskFactory
     }
 
     boolean canProcessVariantAware() {
