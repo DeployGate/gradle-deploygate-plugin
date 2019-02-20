@@ -8,6 +8,7 @@ import com.deploygate.gradle.plugins.tasks.factory.UploadApkTaskFactory
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
+import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
 import javax.annotation.Nonnull
@@ -39,7 +40,7 @@ class ProcessorSpec extends Specification {
         stringBasedUploadApkTaskFactory = Mock()
     }
 
-    def "addVariantOrCustomName"() {
+    def "addVariantOrCustomName should store given names except empty"() {
         given:
         processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, stringBasedUploadApkTaskFactory)
 
@@ -69,7 +70,7 @@ class ProcessorSpec extends Specification {
         0 * stringBasedUploadApkTaskFactory._
     }
 
-    def "registerLoginTask"() {
+    def "registerLoginTask should manipulate LoginTaskFactory"() {
         given:
         processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, stringBasedUploadApkTaskFactory)
 
@@ -86,7 +87,7 @@ class ProcessorSpec extends Specification {
         0 * stringBasedUploadApkTaskFactory._
     }
 
-    def "registerLogoutTask"() {
+    def "registerLogoutTask should manipulate LogoutTaskFactory"() {
         given:
         processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, stringBasedUploadApkTaskFactory)
 
@@ -103,7 +104,7 @@ class ProcessorSpec extends Specification {
         0 * stringBasedUploadApkTaskFactory._
     }
 
-    def "registerDeclarationAwareUploadApkTask"() {
+    def "registerDeclarationAwareUploadApkTask should manipulate String-based UploadApkTaskFactory"() {
         given:
         processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, stringBasedUploadApkTaskFactory)
 
@@ -120,7 +121,7 @@ class ProcessorSpec extends Specification {
         0 * stringBasedUploadApkTaskFactory._
     }
 
-    def "registerAggregatedDeclarationAwareUploadApkTask"() {
+    def "registerAggregatedDeclarationAwareUploadApkTask should collect upload tasks"() {
         given:
         processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, stringBasedUploadApkTaskFactory)
 
@@ -159,7 +160,7 @@ class ProcessorSpec extends Specification {
     }
 
     @ConfineMetaClassChanges([AndroidGradlePlugin])
-    def "registerVariantAwareUploadApkTask should work if AndroidGradlePlugin is applied"() {
+    def "registerVariantAwareUploadApkTask should manipulate IApplicationVariant-based UploadApkTaskFactory if AndroidGradlePlugin is applied"() {
         given:
         processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, stringBasedUploadApkTaskFactory)
         IApplicationVariant applicationVariant = Mock()
@@ -182,7 +183,7 @@ class ProcessorSpec extends Specification {
         0 * stringBasedUploadApkTaskFactory._
     }
 
-    def "getDependencyAncestorOfUploadTaskNames"() {
+    def "just check getDependencyAncestorOfUploadTaskNames"() {
         when:
         "do nothing"
 
@@ -190,16 +191,17 @@ class ProcessorSpec extends Specification {
         Processor.getDependencyAncestorOfUploadTaskNames().toList().sort() == [LoginTaskFactory.TASK_NAME].sort()
     }
 
-    def "canProcessVariantAware"() {
-        given:
+    @Unroll
+    def "canProcessVariantAware should depend on AndroidGradlePlugin.isApplied (#isAGPApplied)"() {
+        setup:
         processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, stringBasedUploadApkTaskFactory)
 
-        when:
+        and:
         AndroidGradlePlugin.metaClass.static.isApplied = { Project _ ->
             isAGPApplied
         }
 
-        then:
+        expect:
         processor.canProcessVariantAware() == isAGPApplied
 
         where:
