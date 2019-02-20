@@ -68,7 +68,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         } == ["task1", "task2"]
     }
 
-    def "registerAggregatedUploadApkTask should override itself if called twice"() {
+    def "registerAggregatedUploadApkTask should modify the existing itself if called twice"() {
         given:
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
 

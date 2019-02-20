@@ -1,11 +1,11 @@
 package com.deploygate.gradle.plugins.artifacts
 
-import groovy.transform.PackageScope
+import com.google.common.annotations.VisibleForTesting
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
 
-@PackageScope
+@VisibleForTesting
 class DirectApkInfo implements ApkInfo {
     @Nonnull
     private final String variantName
