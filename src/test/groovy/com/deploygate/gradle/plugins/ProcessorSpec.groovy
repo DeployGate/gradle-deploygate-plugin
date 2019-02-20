@@ -112,7 +112,7 @@ class ProcessorSpec extends Specification {
         processor.registerDeclarationAwareUploadApkTask("dep1")
 
         then:
-        1 * stringBasedUploadApkTaskFactory.registerUploadApkTask("dep1", *Processor.getDependencyAncestorOfUploadTaskNames())
+        1 * stringBasedUploadApkTaskFactory.registerUploadApkTask("dep1", LoginTaskFactory.TASK_NAME)
 
         and:
         0 * loginTaskFactory._
@@ -174,7 +174,7 @@ class ProcessorSpec extends Specification {
         processor.registerVariantAwareUploadApkTask(applicationVariant)
 
         then:
-        1 * applicationVariantBasedUploadApkTaskFactory.registerUploadApkTask(applicationVariant, *Processor.getDependencyAncestorOfUploadTaskNames())
+        1 * applicationVariantBasedUploadApkTaskFactory.registerUploadApkTask(applicationVariant, LoginTaskFactory.TASK_NAME)
 
         and:
         0 * loginTaskFactory._

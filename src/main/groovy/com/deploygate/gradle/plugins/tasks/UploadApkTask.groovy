@@ -125,7 +125,7 @@ class UploadApkTask extends DefaultTask {
         project.deploygate.notifyServer 'start_upload', ['length': Long.toString(configuration.apkFile.length())]
     }
 
-    def handleResponse(response, data) {
+    def handleResponse(HttpResponseDecorator response, data) {
         if (!(200 <= response.status && response.status < 300) || data.error) {
             throw new GradleException("${variantName} failed due to ${data.message}")
         }

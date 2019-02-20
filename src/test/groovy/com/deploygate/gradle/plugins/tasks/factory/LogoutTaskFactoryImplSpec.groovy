@@ -27,7 +27,7 @@ class LogoutTaskFactoryImplSpec extends Specification {
         logoutTaskFactory.registerLogoutTask()
 
         and:
-        def task = project.tasks.findByName(LogoutTaskFactory.TASK_NAME)
+        def task = project.tasks.findByName("logoutDeployGate")
 
         then:
         task
@@ -43,7 +43,7 @@ class LogoutTaskFactoryImplSpec extends Specification {
         logoutTaskFactory.registerLogoutTask()
 
         and:
-        def firstTask = project.tasks.findByName(LogoutTaskFactory.TASK_NAME)
+        def firstTask = project.tasks.findByName("logoutDeployGate")
         firstTask.description = "dummy description"
 
         then:
@@ -53,7 +53,7 @@ class LogoutTaskFactoryImplSpec extends Specification {
         logoutTaskFactory.registerLogoutTask()
 
         and:
-        def secondTask = project.tasks.findByName(LogoutTaskFactory.TASK_NAME)
+        def secondTask = project.tasks.findByName("logoutDeployGate")
 
         then:
         firstTask == secondTask

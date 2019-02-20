@@ -26,7 +26,7 @@ class LoginTaskFactoryImplSpec extends Specification {
         loginTaskFactory.registerLoginTask()
 
         and:
-        def task = project.tasks.findByName(LoginTaskFactory.TASK_NAME)
+        def task = project.tasks.findByName("loginDeployGate")
 
         then:
         task
@@ -42,7 +42,7 @@ class LoginTaskFactoryImplSpec extends Specification {
         loginTaskFactory.registerLoginTask()
 
         and:
-        def firstTask = project.tasks.findByName(LoginTaskFactory.TASK_NAME)
+        def firstTask = project.tasks.findByName("loginDeployGate")
         firstTask.description = "dummy description"
 
         then:
@@ -52,7 +52,7 @@ class LoginTaskFactoryImplSpec extends Specification {
         loginTaskFactory.registerLoginTask()
 
         and:
-        def secondTask = project.tasks.findByName(LoginTaskFactory.TASK_NAME)
+        def secondTask = project.tasks.findByName("loginDeployGate")
 
         then:
         firstTask == secondTask
