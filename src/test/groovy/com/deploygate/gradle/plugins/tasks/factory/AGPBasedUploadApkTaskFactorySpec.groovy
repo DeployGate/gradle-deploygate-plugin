@@ -15,7 +15,6 @@ import spock.util.mop.ConfineMetaClassChanges
 
 import javax.annotation.Nonnull
 
-@ConfineMetaClassChanges([DeployGateTaskFactory])
 class AGPBasedUploadApkTaskFactorySpec extends Specification {
     @Nonnull
     private Project project
@@ -33,6 +32,10 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         DeployGateTaskFactory.metaClass.getDeployGateExtension = { ->
             new DeployGateExtension(project, deployments)
         }
+    }
+
+    def cleanup() {
+        DeployGateTaskFactory.metaClass.getDeployGateExtension = null
     }
 
     def "registerAggregatedUploadApkTask should not be supported"() {
