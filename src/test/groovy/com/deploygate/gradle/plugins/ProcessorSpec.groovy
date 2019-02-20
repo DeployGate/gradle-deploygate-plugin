@@ -191,6 +191,7 @@ class ProcessorSpec extends Specification {
         Processor.getDependencyAncestorOfUploadTaskNames().toList().sort() == [LoginTaskFactory.TASK_NAME].sort()
     }
 
+    @ConfineMetaClassChanges([AndroidGradlePlugin])
     @Unroll
     def "canProcessVariantAware should depend on AndroidGradlePlugin.isApplied (#isAGPApplied)"() {
         setup:

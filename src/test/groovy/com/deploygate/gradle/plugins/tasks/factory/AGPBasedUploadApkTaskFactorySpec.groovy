@@ -27,15 +27,9 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().build()
-
         deployments = project.container(VariantBasedDeployTarget)
-        DeployGateTaskFactory.metaClass.getDeployGateExtension = { ->
-            new DeployGateExtension(project, deployments)
-        }
-    }
 
-    def cleanup() {
-        DeployGateTaskFactory.metaClass.getDeployGateExtension = null
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
     }
 
     def "registerAggregatedUploadApkTask should not be supported"() {
