@@ -56,6 +56,11 @@ class AndroidGradlePlugin {
         return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor > 2
     }
 
+    @Nonnull
+    static String androidAssembleTaskName(@Nonnull String variantName) {
+        return "assemble${variantName.capitalize()}"
+    }
+
     /**
      * Get the AGP version from a classloader because `plugins` block will separate class loaders
      *

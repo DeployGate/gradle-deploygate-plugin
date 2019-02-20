@@ -9,7 +9,7 @@ import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
-class DSLBasedUploadApkTaskFactory extends UploadApkTaskFactory<String> {
+class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements UploadApkTaskFactory<String> {
     DSLBasedUploadApkTaskFactory(@Nonnull Project project) {
         super(project)
     }
@@ -50,6 +50,7 @@ class DSLBasedUploadApkTaskFactory extends UploadApkTaskFactory<String> {
         }
     }
 
+    @Override
     void registerAggregatedUploadApkTask(Object... dependsOn) {
         if (!dependsOn?.flatten()) {
             project.logger.debug("skipped register aggregation tasks")

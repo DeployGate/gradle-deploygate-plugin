@@ -29,18 +29,16 @@ class DeployGateExtensionSpec extends Specification {
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
         and:
-        def buildFileContent = """
-deploygate {
-  userName = "user1"
-  token = "token1"
-  apks {
-    dep1 {
-    }
-  }
-}
-"""
-
-        buildGradle << buildFileContent
+        buildGradle << """
+        deploygate {
+          userName = "user1"
+          token = "token1"
+          apks {
+            dep1 {
+            }
+          }
+        }
+        """
 
         and:
         NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
@@ -61,25 +59,23 @@ deploygate {
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
         and:
-        def buildFileContent = """
-deploygate {
-  appOwnerName = "user1"
-  apiToken = "token1"
-  deployments {
-    dep1 {
-    }
-    dep2 {
-      sourceFile = "build.gradle" as File
-      distributionKey = "distKey"
-      releaseNote = "note1"
-      uploadMessage = "message1"
-      skipAssemble = true
-    }
-  }
-}
-"""
-
-        buildGradle << buildFileContent
+        buildGradle << """
+        deploygate {
+          appOwnerName = "user1"
+          apiToken = "token1"
+          deployments {
+            dep1 {
+            }
+            dep2 {
+              sourceFile = "build.gradle" as File
+              distributionKey = "distKey"
+              releaseNote = "note1"
+              uploadMessage = "message1"
+              skipAssemble = true
+            }
+          }
+        }
+        """
 
         and:
         NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
@@ -120,25 +116,23 @@ deploygate {
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
         and:
-        def buildFileContent = """
-deploygate {
-  appOwnerName = "user1"
-  apiToken = "token1"
-  deployments {
-    dep1 {
-    }
-    dep2 {
-      sourceFile = "build.gradle" as File
-      distributionKey = "distKey"
-      releaseNote = "note1"
-      uploadMessage = "message1"
-      skipAssemble = true
-    }
-  }
-}
-"""
-
-        buildGradle << buildFileContent
+        buildGradle << """
+        deploygate {
+          appOwnerName = "user1"
+          apiToken = "token1"
+          deployments {
+            dep1 {
+            }
+            dep2 {
+              sourceFile = "build.gradle" as File
+              distributionKey = "distKey"
+              releaseNote = "note1"
+              uploadMessage = "message1"
+              skipAssemble = true
+            }
+          }
+        }
+        """
 
         and:
         NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
@@ -170,25 +164,23 @@ deploygate {
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
         and:
-        def buildFileContent = """
-deploygate {
-  appOwnerName = "user1"
-  apiToken = "token1"
-  deployments {
-    dep1 {
-    }
-    dep2 {
-      sourceFile = "build.gradle" as File
-      distributionKey = "distKey"
-      releaseNote = "note1"
-      uploadMessage = "message1"
-      skipAssemble = true
-    }
-  }
-}
-"""
-
-        buildGradle << buildFileContent
+        buildGradle << """
+        deploygate {
+          appOwnerName = "user1"
+          apiToken = "token1"
+          deployments {
+            dep1 {
+            }
+            dep2 {
+              sourceFile = "build.gradle" as File
+              distributionKey = "distKey"
+              releaseNote = "note1"
+              uploadMessage = "message1"
+              skipAssemble = true
+            }
+          }
+        }
+        """
 
         and:
         NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)

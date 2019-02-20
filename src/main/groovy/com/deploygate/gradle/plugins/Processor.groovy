@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
-import com.deploygate.gradle.plugins.internal.agp.ApplicationVariantProxy
+import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
 import com.deploygate.gradle.plugins.tasks.factory.*
 import com.google.common.annotations.VisibleForTesting
 import org.gradle.api.Project
@@ -16,9 +16,6 @@ import javax.annotation.Nonnull
 class Processor {
 
     @Nonnull
-    private final DeployGatePlugin deployGatePlugin
-
-    @Nonnull
     private final Project project
 
     @Nonnull
@@ -28,19 +25,18 @@ class Processor {
     private final LogoutTaskFactory logoutTaskFactory
 
     @Nonnull
-    private final AGPBasedUploadApkTaskFactory agpBasedUploadApkTaskFactory
+    private final UploadApkTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory
 
     @Nonnull
-    private final DSLBasedUploadApkTaskFactory dslBasedUploadApkTaskFactory
+    private final UploadApkTaskFactory<String> stringBasedUploadApkTaskFactory
 
     def declaredNames = new HashSet<String>()
 
-    Processor(@Nonnull DeployGatePlugin deployGatePlugin, @Nonnull Project project) {
+    Processor(@Nonnull Project project) {
         this(
-                deployGatePlugin,
                 project,
-                new LoginTaskFactory(project),
-                new LogoutTaskFactory(project),
+                new LoginTaskFactoryImpl(project),
+                new LogoutTaskFactoryImpl(project),
                 new AGPBasedUploadApkTaskFactory(project),
                 new DSLBasedUploadApkTaskFactory(project)
         )
@@ -48,19 +44,17 @@ class Processor {
 
     @VisibleForTesting
     Processor(
-            @Nonnull DeployGatePlugin deployGatePlugin,
             @Nonnull Project project,
             @Nonnull LoginTaskFactory loginTaskFactory,
             @Nonnull LogoutTaskFactory logoutTaskFactory,
-            @Nonnull AGPBasedUploadApkTaskFactory agpBasedUploadApkTaskFactory,
-            @Nonnull DSLBasedUploadApkTaskFactory dslBasedUploadApkTaskFactory
+            @Nonnull UploadApkTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory,
+            @Nonnull UploadApkTaskFactory<String> stringBasedUploadApkTaskFactory
     ) {
-        this.deployGatePlugin = deployGatePlugin
         this.project = project
         this.loginTaskFactory = loginTaskFactory
         this.logoutTaskFactory = logoutTaskFactory
-        this.agpBasedUploadApkTaskFactory = agpBasedUploadApkTaskFactory
-        this.dslBasedUploadApkTaskFactory = dslBasedUploadApkTaskFactory
+        this.applicationVariantBasedUploadApkTaskFactory = applicationVariantBasedUploadApkTaskFactory
+        this.stringBasedUploadApkTaskFactory = stringBasedUploadApkTaskFactory
     }
 
     boolean canProcessVariantAware() {
@@ -68,8 +62,12 @@ class Processor {
     }
 
     def addVariantOrCustomName(@Nonnull String variantOrCustomName) {
-        project.logger.debug("${variantOrCustomName} is declared")
-        declaredNames.add(variantOrCustomName)
+        if (variantOrCustomName) {
+            project.logger.debug("${variantOrCustomName} is declared")
+            declaredNames.add(variantOrCustomName)
+        } else {
+            project.logger.warn("the given argument was empty")
+        }
     }
 
     def registerLoginTask() {
@@ -81,25 +79,26 @@ class Processor {
     }
 
     def registerDeclarationAwareUploadApkTask(String variantOrCustomName) {
-        dslBasedUploadApkTaskFactory.registerUploadApkTask(variantOrCustomName, dependencyAncestorOfUploadTaskName)
+        stringBasedUploadApkTaskFactory.registerUploadApkTask(variantOrCustomName, *dependencyAncestorOfUploadTaskNames)
     }
 
     def registerAggregatedDeclarationAwareUploadApkTask(Collection<String> variantOrCustomNames) {
-        dslBasedUploadApkTaskFactory.registerAggregatedUploadApkTask(variantOrCustomNames.collect {
-            UploadApkTaskFactory.uploadApkTaskName(it)
+        stringBasedUploadApkTaskFactory.registerAggregatedUploadApkTask(variantOrCustomNames.collect {
+            DeployGateTaskFactory.uploadApkTaskName(it)
         })
     }
 
-    def registerVariantAwareUploadApkTask(@Nonnull ApplicationVariantProxy variant) {
+    def registerVariantAwareUploadApkTask(@Nonnull IApplicationVariant variant) {
         if (!canProcessVariantAware()) {
             project.logger.error("android gradle plugin not found but tried to create android-specific tasks. Ignored...")
             return
         }
 
-        agpBasedUploadApkTaskFactory.registerUploadApkTask(variant, dependencyAncestorOfUploadTaskName)
+        applicationVariantBasedUploadApkTaskFactory.registerUploadApkTask(variant, *dependencyAncestorOfUploadTaskNames)
     }
 
-    private static String getDependencyAncestorOfUploadTaskName() {
-        return LoginTaskFactory.TASK_NAME
+    @VisibleForTesting
+    static String[] getDependencyAncestorOfUploadTaskNames() {
+        return [LoginTaskFactory.TASK_NAME]
     }
 }

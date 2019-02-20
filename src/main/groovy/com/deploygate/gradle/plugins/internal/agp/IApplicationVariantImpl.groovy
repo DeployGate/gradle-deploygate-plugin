@@ -7,23 +7,22 @@ import org.gradle.api.Task
 
 import javax.annotation.Nonnull
 
-class ApplicationVariantProxy {
+class IApplicationVariantImpl implements IApplicationVariant {
     @Nonnull
 //    private com.android.build.gradle.api.ApplicationVariant applicationVariant
     private def applicationVariant
 
-    ApplicationVariantProxy(@Nonnull /* ApplicationVariant */ applicationVariant) {
+    IApplicationVariantImpl(@Nonnull /* ApplicationVariant */ applicationVariant) {
         this.applicationVariant = applicationVariant
     }
 
+    @Override
     @Nonnull
     String getName() {
         return applicationVariant.name
     }
 
-    /**
-     * @return LazyConfigurableTask of com.android.build.gradle.tasks.PackageApplication
-     */
+    @Override
     @Nonnull
     LazyConfigurableTask lazyPackageApplication() {
         if (AndroidGradlePlugin.taskProviderBased) {

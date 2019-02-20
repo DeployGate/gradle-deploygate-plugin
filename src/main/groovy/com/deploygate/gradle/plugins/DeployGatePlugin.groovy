@@ -3,10 +3,12 @@ package com.deploygate.gradle.plugins
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
-import com.deploygate.gradle.plugins.internal.agp.ApplicationVariantProxy
+import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+
+import javax.annotation.Nonnull
 
 class DeployGatePlugin implements Plugin<Project> {
     private static final String EXTENSION_NAME = 'deploygate'
@@ -38,8 +40,8 @@ class DeployGatePlugin implements Plugin<Project> {
         project.extensions.add(EXTENSION_NAME, new DeployGateExtension(project, targets))
     }
 
-    private void initProcessor(Project project) {
-        processor = new Processor(this, project)
+    private void initProcessor(@Nonnull Project project) {
+        processor = new Processor(project)
 
         project.deploygate.apks.all { VariantBasedDeployTarget target ->
             processor.addVariantOrCustomName(target.name)
@@ -70,7 +72,7 @@ class DeployGatePlugin implements Plugin<Project> {
         }
 
         project.android.applicationVariants.all { /* ApplicationVariant */ variant ->
-            def variantProxy = new ApplicationVariantProxy(variant)
+            def variantProxy = new IApplicationVariantImpl(variant)
 
             processor.registerVariantAwareUploadApkTask(variantProxy)
 
