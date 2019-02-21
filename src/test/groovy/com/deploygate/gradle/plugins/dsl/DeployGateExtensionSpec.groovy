@@ -35,6 +35,10 @@ class DeployGateExtensionSpec extends Specification {
           token = "token1"
           apks {
             dep1 {
+              distributionKey = "distributionKey1"
+              releaseNote = "releaseNote1"
+            }
+            dep2 {
             }
           }
         }
@@ -46,12 +50,27 @@ class DeployGateExtensionSpec extends Specification {
         project.evaluate()
 
         when:
-        def result = project.deploygate as DeployGateExtension
+        def extension = project.deploygate as DeployGateExtension
 
         then:
-        result.appOwnerName == "user1"
-        result.apiToken == "token1"
-        result.deployments*.name.sort() == ["dep1"].sort()
+        extension.appOwnerName == "user1"
+        extension.apiToken == "token1"
+
+        when:
+        def dep1 = extension.deployments.findByName("dep1")
+
+        then:
+        dep1.name == "dep1"
+        dep1.distribution
+        dep1.distribution?.key == "distributionKey1"
+        dep1.distribution?.releaseNote == "releaseNote1"
+
+        when:
+        def dep2 = extension.deployments.findByName("dep2")
+
+        then:
+        dep2.name == "dep2"
+        !dep2.distribution
     }
 
     def "can accept a given extension"() {
