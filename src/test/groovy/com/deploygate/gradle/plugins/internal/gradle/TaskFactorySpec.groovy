@@ -40,14 +40,15 @@ class TaskFactorySpec extends Specification {
         expectedTaskClass.isInstance(result)
 
         where:
-        taskName | gradleVersion | expectedTaskClass
-        "agp300" | "4.1"         | SingleTask
-        "agp310" | "4.4"         | SingleTask
-        "agp320" | "4.6"         | SingleTask
-        "border" | "4.7"         | SingleTask
-        "border" | "4.8"         | SingleTask
-        "border" | "4.9"         | TaskProvider
-        "agp330" | "4.10.1"      | TaskProvider
+        taskName        | gradleVersion | expectedTaskClass
+        "agp300"        | "4.1"         | SingleTask
+        "agp310"        | "4.4"         | SingleTask
+        "agp320"        | "4.6"         | SingleTask
+        "border"        | "4.7"         | SingleTask
+        "border"        | "4.8"         | SingleTask
+        "border"        | "4.9"         | TaskProvider
+        "agp330"        | "4.10.1"      | TaskProvider
+        "agp340-beta04" | "5.1.1"       | TaskProvider
     }
 
     @ConfineMetaClassChanges([GradleCompat])
@@ -71,18 +72,20 @@ class TaskFactorySpec extends Specification {
         !allowExisting && result == null || expectedTaskClass.isInstance(result)
 
         where:
-        taskName | gradleVersion | allowExisting | expectedTaskClass
-        "agp300" | "4.1"         | true          | SingleTask
-        "agp310" | "4.4"         | true          | SingleTask
-        "agp320" | "4.6"         | true          | SingleTask
-        "border" | "4.7"         | true          | SingleTask
-        "border" | "4.8"         | true          | SingleTask
-        "agp330" | "4.10.1"      | true          | SingleTask
-        "agp300" | "4.1"         | false         | null
-        "agp310" | "4.4"         | false         | null
-        "agp320" | "4.6"         | false         | null
-        "border" | "4.7"         | false         | null
-        "border" | "4.8"         | false         | null
-        "agp330" | "4.10.1"      | false         | null
+        taskName        | gradleVersion | allowExisting | expectedTaskClass
+        "agp300"        | "4.1"         | true          | SingleTask
+        "agp310"        | "4.4"         | true          | SingleTask
+        "agp320"        | "4.6"         | true          | SingleTask
+        "border"        | "4.7"         | true          | SingleTask
+        "border"        | "4.8"         | true          | SingleTask
+        "agp330"        | "4.10.1"      | true          | SingleTask
+        "agp340-beta04" | "5.1.1"       | true          | SingleTask
+        "agp300"        | "4.1"         | false         | null
+        "agp310"        | "4.4"         | false         | null
+        "agp320"        | "4.6"         | false         | null
+        "border"        | "4.7"         | false         | null
+        "border"        | "4.8"         | false         | null
+        "agp330"        | "4.10.1"      | false         | null
+        "agp340-beta04" | "5.1.1"       | false         | null
     }
 }
