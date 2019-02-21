@@ -41,7 +41,7 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
         project.extensions.add("deploygate", new DeployGateExtension(project, targets))
         project.evaluate()
 
@@ -78,7 +78,7 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
         project.extensions.add("deploygate", new DeployGateExtension(project, targets))
         project.evaluate()
 
@@ -135,7 +135,7 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
         project.extensions.add("deploygate", new DeployGateExtension(project, targets))
         project.evaluate()
 
@@ -143,11 +143,11 @@ class DeployGateExtensionSpec extends Specification {
         def result = project.deploygate as DeployGateExtension
 
         then:
-        result.findDeployTarget("dep1") == result.deployments.findByName("dep1")
-        result.findDeployTarget("dep2") == result.deployments.findByName("dep2")
+        result.findDeploymentByName("dep1") == result.deployments.findByName("dep1")
+        result.findDeploymentByName("dep2") == result.deployments.findByName("dep2")
 
         when:
-        def dep3 = result.findDeployTarget("dep3")
+        def dep3 = result.findDeploymentByName("dep3")
 
         then:
         dep3
@@ -183,7 +183,7 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
         project.extensions.add("deploygate", new DeployGateExtension(project, targets))
         project.evaluate()
 
@@ -191,14 +191,14 @@ class DeployGateExtensionSpec extends Specification {
         def result = project.deploygate as DeployGateExtension
 
         then:
-        result.hasDeployTarget("dep1")
-        result.hasDeployTarget("dep2")
-        !result.hasDeployTarget("dep3")
+        result.hasDeployment("dep1")
+        result.hasDeployment("dep2")
+        !result.hasDeployment("dep3")
     }
 
     def "mergeDeployTarget should work"() {
         given:
-        def base = new VariantBasedDeployTarget("base")
+        def base = new NamedDeployment("base")
         base.sourceFile = new File("base")
         base.uploadMessage = "base"
         base.distributionKey = "base"
@@ -207,10 +207,10 @@ class DeployGateExtensionSpec extends Specification {
         base.skipAssemble = false
 
         and:
-        def other = new VariantBasedDeployTarget("other")
+        def other = new NamedDeployment("other")
 
         when:
-        DeployGateExtension.mergeDeployTarget(base, other)
+        DeployGateExtension.mergeDeployments(base, other)
 
         then:
         base.sourceFile == new File("base")
@@ -229,7 +229,7 @@ class DeployGateExtensionSpec extends Specification {
         other.skipAssemble = true
 
         and:
-        DeployGateExtension.mergeDeployTarget(base, other)
+        DeployGateExtension.mergeDeployments(base, other)
 
         then:
         base.sourceFile == new File("base")
@@ -248,7 +248,7 @@ class DeployGateExtensionSpec extends Specification {
         base.skipAssemble = false
 
         and:
-        DeployGateExtension.mergeDeployTarget(base, other)
+        DeployGateExtension.mergeDeployments(base, other)
 
         then:
         base.sourceFile == new File("other")
@@ -267,7 +267,7 @@ class DeployGateExtensionSpec extends Specification {
         base.skipAssemble = false
 
         and:
-        DeployGateExtension.mergeDeployTarget(base, other)
+        DeployGateExtension.mergeDeployments(base, other)
 
         then:
         base.sourceFile == new File("other")
@@ -292,7 +292,7 @@ class DeployGateExtensionSpec extends Specification {
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
         and:
-        VariantBasedDeployTarget target = DeployGateExtension.getDefaultDeployTarget(project)
+        NamedDeployment target = DeployGateExtension.getEnvironmentBasedDeployment(project)
 
         expect:
         target.sourceFile == sourceFilePath?.with { project.file(sourceFilePath) }

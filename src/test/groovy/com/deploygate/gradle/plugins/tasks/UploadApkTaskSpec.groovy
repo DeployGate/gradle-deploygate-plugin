@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -25,7 +25,7 @@ class UploadApkTaskSpec extends Specification {
 
     def "getApiToken should get from an extension"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(VariantBasedDeployTarget))
+        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment))
         project.extensions.add("deploygate", deploygate)
 
         and:
@@ -70,7 +70,7 @@ class UploadApkTaskSpec extends Specification {
 
     def "getAppOwnerName should get from an extension"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(VariantBasedDeployTarget))
+        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment))
         project.extensions.add("deploygate", deploygate)
 
         and:
@@ -115,7 +115,7 @@ class UploadApkTaskSpec extends Specification {
 
     def "setVariantName cannot be called with different names"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(VariantBasedDeployTarget))
+        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment))
         project.extensions.add("deploygate", deploygate)
 
         and:
@@ -144,7 +144,7 @@ class UploadApkTaskSpec extends Specification {
 
     def "uploadApkToServer should reject illegal states before processing"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(VariantBasedDeployTarget))
+        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment))
         project.extensions.add("deploygate", deploygate)
 
         and:

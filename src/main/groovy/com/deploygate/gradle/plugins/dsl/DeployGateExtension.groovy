@@ -4,7 +4,7 @@ import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
-import groovy.transform.PackageScope
+import com.google.common.annotations.VisibleForTesting
 import groovyx.net.http.ContentType
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -27,9 +27,9 @@ class DeployGateExtension implements ExtensionSyntax {
     private final Project project
 
     @Nonnull
-    private final NamedDomainObjectContainer<VariantBasedDeployTarget> variantConfigurations
+    private final NamedDomainObjectContainer<NamedDeployment> variantConfigurations
 
-    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<VariantBasedDeployTarget> variantConfigurations) {
+    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> variantConfigurations) {
         this.project = project
         this.variantConfigurations = variantConfigurations
     }
@@ -68,7 +68,7 @@ class DeployGateExtension implements ExtensionSyntax {
 
     @Nonnull
     @Override
-    NamedDomainObjectContainer<VariantBasedDeployTarget> getDeployments() {
+    NamedDomainObjectContainer<NamedDeployment> getDeployments() {
         return variantConfigurations
     }
 
@@ -77,26 +77,26 @@ class DeployGateExtension implements ExtensionSyntax {
         deployments.configure(closure)
     }
 
-    boolean hasDeployTarget(@Nonnull String name) {
+    boolean hasDeployment(@Nonnull String name) {
         return variantConfigurations.findByName(name)
     }
 
     @Nonnull
-    VariantBasedDeployTarget findDeployTarget(@Nonnull String name) {
-        def result = new VariantBasedDeployTarget(name)
-        VariantBasedDeployTarget declaredTarget = variantConfigurations.findByName(name)
+    NamedDeployment findDeploymentByName(@Nonnull String name) {
+        def result = new NamedDeployment(name)
+        NamedDeployment declaredTarget = variantConfigurations.findByName(name)
 
         if (declaredTarget) {
-            mergeDeployTarget(result, declaredTarget)
+            mergeDeployments(result, declaredTarget)
         }
 
-        mergeDeployTarget(result, getDefaultDeployTarget(project))
+        mergeDeployments(result, getEnvironmentBasedDeployment(project))
 
         return result
     }
 
-    @PackageScope
-    static void mergeDeployTarget(@Nonnull VariantBasedDeployTarget base, @Nullable VariantBasedDeployTarget other) {
+    @VisibleForTesting
+    static void mergeDeployments(@Nonnull NamedDeployment base, @Nullable NamedDeployment other) {
         base.sourceFile = base.sourceFile ?: other.sourceFile
         base.uploadMessage = base.uploadMessage ?: other.uploadMessage
         base.distributionKey = base.distributionKey ?: other.distributionKey
@@ -105,15 +105,15 @@ class DeployGateExtension implements ExtensionSyntax {
         base.skipAssemble = base.skipAssemble || other.skipAssemble
     }
 
-    @PackageScope
-    static VariantBasedDeployTarget getDefaultDeployTarget(Project project) {
+    @VisibleForTesting
+    static NamedDeployment getEnvironmentBasedDeployment(Project project) {
         File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { it -> project.file(it) }
         String uploadMessage = System.getenv(DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE)
         String distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
         String releaseNote = System.getenv(DeployGatePlugin.ENV_NAME_RELEASE_NOTE)
         String visibility = System.getenv(DeployGatePlugin.ENV_NAME_VISIBILITY)
 
-        def target = new VariantBasedDeployTarget("")
+        def target = new NamedDeployment("")
 
         target.sourceFile = sourceFile
         target.uploadMessage = uploadMessage

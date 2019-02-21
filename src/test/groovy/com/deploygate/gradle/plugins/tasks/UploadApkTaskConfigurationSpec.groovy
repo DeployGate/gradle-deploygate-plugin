@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -10,7 +10,7 @@ class UploadApkTaskConfigurationSpec extends Specification {
     @Unroll
     def "create a configuration"() {
         setup:
-        def deployTarget = new VariantBasedDeployTarget("dep1")
+        def deployTarget = new NamedDeployment("dep1")
         deployTarget.uploadMessage = uploadMessage
         deployTarget.distributionKey = distributionKey
         deployTarget.releaseNote = releaseNote
@@ -40,7 +40,7 @@ class UploadApkTaskConfigurationSpec extends Specification {
     @Unroll
     def "create a configuration for apk file handling"() {
         setup:
-        def deployTarget = new VariantBasedDeployTarget("dep1")
+        def deployTarget = new NamedDeployment("dep1")
         deployTarget.sourceFile = sourceFile
 
         and:

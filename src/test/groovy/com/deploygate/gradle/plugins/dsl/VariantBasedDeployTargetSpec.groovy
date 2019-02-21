@@ -9,7 +9,7 @@ class VariantBasedDeployTargetSpec extends Specification {
     @Unroll
     def "verify deprecated fields of VariantBasedDeployTarget. Unrolled #name"() {
         setup:
-        def deployTarget = new VariantBasedDeployTarget(name)
+        def deployTarget = new NamedDeployment(name)
         deployTarget.message = uploadMessage
         deployTarget.noAssemble = skipAssemble
 
@@ -27,7 +27,7 @@ class VariantBasedDeployTargetSpec extends Specification {
     @Unroll
     def "verify VariantBasedDeployTarget works. Unrolled #name"() {
         setup:
-        def deployTarget = new VariantBasedDeployTarget(name)
+        def deployTarget = new NamedDeployment(name)
         deployTarget.uploadMessage = uploadMessage
         deployTarget.skipAssemble = skipAssemble
         deployTarget.sourceFile = sourceFile
@@ -53,7 +53,7 @@ class VariantBasedDeployTargetSpec extends Specification {
 
     def "verify empty VariantBasedDeployTarget works"() {
         setup:
-        def deployTarget = new VariantBasedDeployTarget("name")
+        def deployTarget = new NamedDeployment("name")
 
         expect:
         deployTarget.name == "name"

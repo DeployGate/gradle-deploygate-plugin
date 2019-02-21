@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.GradleException
@@ -95,7 +95,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
 
     def "registerUploadApkTask should add a UploadApkTask"() {
         given:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
         targets.create("dep1")
         project.extensions.add("deploygate", new DeployGateExtension(project, targets))
 
@@ -116,7 +116,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
 
     def "registerUploadApkTask should not override itself if already exist"() {
         given:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
         targets.create("dep1")
         project.extensions.add("deploygate", new DeployGateExtension(project, targets))
 
@@ -139,7 +139,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
 
     def "registerUploadApkTask should not allow adding names which do not exist in build.gradle"() {
         given:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
+        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
         targets.create("dep1")
         project.extensions.add("deploygate", new DeployGateExtension(project, targets))
 

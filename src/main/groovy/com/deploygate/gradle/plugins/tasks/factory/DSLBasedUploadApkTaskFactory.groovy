@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -23,14 +23,14 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
             return
         }
 
-        if (!deployGateExtension.hasDeployTarget(variantNameOrCustomName)) {
+        if (!deployGateExtension.hasDeployment(variantNameOrCustomName)) {
             project.logger.error("The associated deploy target to $variantNameOrCustomName has not been detected")
             project.logger.error("Please report this problem from https://github.com/DeployGate/gradle-deploygate-plugin/issues")
 
             throw new GradleException("$variantNameOrCustomName could not be handled by DeployGate plugin")
         }
 
-        final VariantBasedDeployTarget deployTarget = deployGateExtension.findDeployTarget(variantNameOrCustomName)
+        final NamedDeployment deployTarget = deployGateExtension.findDeploymentByName(variantNameOrCustomName)
 
         if (!deployTarget.skipAssemble) {
             project.logger.debug("$variantNameOrCustomName required assmble but ignored")

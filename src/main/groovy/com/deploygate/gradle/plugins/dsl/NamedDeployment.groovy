@@ -1,12 +1,12 @@
 package com.deploygate.gradle.plugins.dsl
 
-import com.deploygate.gradle.plugins.dsl.syntax.DeployTargetSyntax
+import com.deploygate.gradle.plugins.dsl.syntax.DeploymentSyntax
 import org.gradle.api.Named
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
 
-class VariantBasedDeployTarget implements Named, DeployTargetSyntax {
+class NamedDeployment implements Named, DeploymentSyntax {
     @Nonnull
     private String name
 
@@ -27,7 +27,7 @@ class VariantBasedDeployTarget implements Named, DeployTargetSyntax {
 
     boolean skipAssemble
 
-    VariantBasedDeployTarget(@Nonnull String name) {
+    NamedDeployment(@Nonnull String name) {
         this.name = name
     }
 
@@ -54,7 +54,7 @@ class VariantBasedDeployTarget implements Named, DeployTargetSyntax {
         if (this.is(o)) return true
         if (getClass() != o.class) return false
 
-        VariantBasedDeployTarget that = (VariantBasedDeployTarget) o
+        NamedDeployment that = (NamedDeployment) o
 
         if (skipAssemble != that.skipAssemble) return false
         if (distributionKey != that.distributionKey) return false
