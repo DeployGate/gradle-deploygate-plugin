@@ -21,12 +21,12 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
 
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantName), UploadApkTask)
 
-        final NamedDeployment deployTarget = deployGateExtension.findDeploymentByName(variantName)
+        final NamedDeployment deployment = deployGateExtension.findDeploymentByName(variantName)
 
         lazyUploadApkTask.configure { dgTask ->
             dgTask.variantName = variantName
 
-            if (deployTarget?.skipAssemble) {
+            if (deployment?.skipAssemble) {
                 dgTask.dependsOn(dependsOn)
             } else {
                 dgTask.dependsOn([androidAssembleTaskName(variantName), *dependsOn].flatten())
@@ -35,7 +35,7 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
 
         applicationVariant.lazyPackageApplication().configure { packageAppTask ->
             def apkInfo = PackageAppTaskCompat.getApkInfo(packageAppTask)
-            def configuration = UploadApkTask.createConfiguration(deployTarget, apkInfo)
+            def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
             lazyUploadApkTask.configure { dgTask ->
                 dgTask.configuration = configuration

@@ -50,15 +50,15 @@ class UploadApkTask extends DefaultTask {
         }
     }
 
-    static Configuration createConfiguration(@Nonnull NamedDeployment deployTarget, @Nonnull ApkInfo apkInfo) {
+    static Configuration createConfiguration(@Nonnull NamedDeployment deployment, @Nonnull ApkInfo apkInfo) {
         return new Configuration(
                 isSigningReady: apkInfo.isSigningReady(),
                 isUniversalApk: apkInfo.isUniversalApk(),
-                apkFile: deployTarget.sourceFile ?: apkInfo.apkFile,
-                uploadMessage: deployTarget.uploadMessage,
-                distributionKey: deployTarget.distributionKey,
-                releaseNote: deployTarget.releaseNote,
-                visibility: deployTarget.visibility
+                apkFile: deployment.sourceFile ?: apkInfo.apkFile,
+                uploadMessage: deployment.uploadMessage,
+                distributionKey: deployment.distributionKey,
+                releaseNote: deployment.releaseNote,
+                visibility: deployment.visibility
         )
     }
 

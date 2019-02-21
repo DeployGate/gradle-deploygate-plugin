@@ -9,14 +9,14 @@ class NamedDeploymentSpec extends Specification {
     @Unroll
     def "verify deprecated fields of NamedDeployment. Unrolled #name"() {
         setup:
-        def deployTarget = new NamedDeployment(name)
-        deployTarget.message = uploadMessage
-        deployTarget.noAssemble = skipAssemble
+        def deployment = new NamedDeployment(name)
+        deployment.message = uploadMessage
+        deployment.noAssemble = skipAssemble
 
         expect:
-        deployTarget.name == name
-        deployTarget.uploadMessage == uploadMessage
-        deployTarget.skipAssemble == skipAssemble
+        deployment.name == name
+        deployment.uploadMessage == uploadMessage
+        deployment.skipAssemble == skipAssemble
 
         where:
         name  | uploadMessage | skipAssemble
@@ -27,22 +27,22 @@ class NamedDeploymentSpec extends Specification {
     @Unroll
     def "verify NamedDeployment works. Unrolled #name"() {
         setup:
-        def deployTarget = new NamedDeployment(name)
-        deployTarget.uploadMessage = uploadMessage
-        deployTarget.skipAssemble = skipAssemble
-        deployTarget.sourceFile = sourceFile
-        deployTarget.distributionKey = distributionKey
-        deployTarget.releaseNote = releaseNote
-        deployTarget.visibility = visibility
+        def deployment = new NamedDeployment(name)
+        deployment.uploadMessage = uploadMessage
+        deployment.skipAssemble = skipAssemble
+        deployment.sourceFile = sourceFile
+        deployment.distributionKey = distributionKey
+        deployment.releaseNote = releaseNote
+        deployment.visibility = visibility
 
         expect:
-        deployTarget.name == name
-        deployTarget.uploadMessage == uploadMessage
-        deployTarget.skipAssemble == skipAssemble
-        deployTarget.sourceFile == sourceFile
-        deployTarget.distributionKey == distributionKey
-        deployTarget.releaseNote == releaseNote
-        deployTarget.visibility == visibility
+        deployment.name == name
+        deployment.uploadMessage == uploadMessage
+        deployment.skipAssemble == skipAssemble
+        deployment.sourceFile == sourceFile
+        deployment.distributionKey == distributionKey
+        deployment.releaseNote == releaseNote
+        deployment.visibility == visibility
 
         where:
         name  | uploadMessage | skipAssemble | sourceFile      | distributionKey    | releaseNote    | visibility
@@ -53,15 +53,15 @@ class NamedDeploymentSpec extends Specification {
 
     def "verify empty NamedDeployment works"() {
         setup:
-        def deployTarget = new NamedDeployment("name")
+        def deployment = new NamedDeployment("name")
 
         expect:
-        deployTarget.name == "name"
-        deployTarget.uploadMessage == null
-        !deployTarget.skipAssemble
-        deployTarget.sourceFile == null
-        deployTarget.distributionKey == null
-        deployTarget.releaseNote == null
-        deployTarget.visibility == null
+        deployment.name == "name"
+        deployment.uploadMessage == null
+        !deployment.skipAssemble
+        deployment.sourceFile == null
+        deployment.distributionKey == null
+        deployment.releaseNote == null
+        deployment.visibility == null
     }
 }

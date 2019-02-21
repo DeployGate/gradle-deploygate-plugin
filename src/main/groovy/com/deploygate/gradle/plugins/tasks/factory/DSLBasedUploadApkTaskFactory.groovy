@@ -30,9 +30,9 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
             throw new GradleException("$variantNameOrCustomName could not be handled by DeployGate plugin")
         }
 
-        final NamedDeployment deployTarget = deployGateExtension.findDeploymentByName(variantNameOrCustomName)
+        final NamedDeployment deployment = deployGateExtension.findDeploymentByName(variantNameOrCustomName)
 
-        if (!deployTarget.skipAssemble) {
+        if (!deployment.skipAssemble) {
             project.logger.debug("$variantNameOrCustomName required assmble but ignored")
         }
 
@@ -42,7 +42,7 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
         }
 
         def apkInfo = new DefaultPresetApkInfo(variantNameOrCustomName)
-        def configuration = UploadApkTask.createConfiguration(deployTarget, apkInfo)
+        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
         lazyUploadApkTask.configure { dgTask ->
             dgTask.configuration = configuration
