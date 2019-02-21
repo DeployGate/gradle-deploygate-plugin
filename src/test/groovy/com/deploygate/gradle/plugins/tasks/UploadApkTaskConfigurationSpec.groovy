@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
+import com.deploygate.gradle.plugins.dsl.Distribution
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -12,8 +13,10 @@ class UploadApkTaskConfigurationSpec extends Specification {
         setup:
         def deployment = new NamedDeployment("dep1")
         deployment.uploadMessage = uploadMessage
-        deployment.distributionKey = distributionKey
-        deployment.releaseNote = releaseNote
+        deployment.distribution { Distribution distribution ->
+            distribution.key = distributionKey
+            distribution.releaseNote = distributionReleaseNote
+        }
         deployment.visibility = visibility
         deployment.skipAssemble = skipAssemble
 
@@ -26,15 +29,15 @@ class UploadApkTaskConfigurationSpec extends Specification {
         expect:
         configuration.uploadMessage == uploadMessage
         configuration.distributionKey == distributionKey
-        configuration.releaseNote == releaseNote
+        configuration.releaseNote == distributionReleaseNote
         configuration.visibility == visibility
         configuration.isSigningReady == signingReady
         configuration.isUniversalApk == universalApk
 
         where:
-        uploadMessage   | distributionKey   | releaseNote   | visibility | skipAssemble | signingReady | universalApk
-        null            | null              | null          | null       | false        | false        | false
-        "uploadMessage" | "distributionKey" | "releaseNote" | "public"   | true         | true         | true
+        uploadMessage   | distributionKey   | distributionReleaseNote   | visibility | skipAssemble | signingReady | universalApk
+        null            | null              | null                      | null       | false        | false        | false
+        "uploadMessage" | "distributionKey" | "distributionReleaseNote" | "public"   | true         | true         | true
     }
 
     @Unroll

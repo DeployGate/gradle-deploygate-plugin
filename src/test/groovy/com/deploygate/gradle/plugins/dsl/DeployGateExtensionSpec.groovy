@@ -96,8 +96,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         dep1.sourceFile == null
         dep1.uploadMessage == null
-        dep1.releaseNote == null
-        dep1.distributionKey == null
+        dep1.distribution?.key == null
+        dep1.distribution?.releaseNote == null
         !dep1.skipAssemble
 
         when:
@@ -106,8 +106,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         dep2.sourceFile.name == "build.gradle"
         dep2.uploadMessage == "message1"
-        dep2.releaseNote == "note1"
-        dep2.distributionKey == "distKey"
+        dep2.distribution?.key == "distKey"
+        dep2.distribution?.releaseNote == "note1"
         dep2.skipAssemble
     }
 
@@ -154,8 +154,8 @@ class DeployGateExtensionSpec extends Specification {
         dep3.name == "dep3"
         dep3.sourceFile == null
         dep3.uploadMessage == null
-        dep3.releaseNote == null
-        dep3.distributionKey == null
+        dep3.distribution?.key == null
+        dep3.distribution?.releaseNote == null
         !dep3.skipAssemble
     }
 
@@ -201,8 +201,10 @@ class DeployGateExtensionSpec extends Specification {
         def base = new NamedDeployment("base")
         base.sourceFile = new File("base")
         base.uploadMessage = "base"
-        base.distributionKey = "base"
-        base.releaseNote = "base"
+        base.distribution { Distribution distribution ->
+            distribution.key = "base"
+            distribution.releaseNote = "base"
+        }
         base.visibility = "base"
         base.skipAssemble = false
 
@@ -215,16 +217,18 @@ class DeployGateExtensionSpec extends Specification {
         then:
         base.sourceFile == new File("base")
         base.uploadMessage == "base"
-        base.distributionKey == "base"
-        base.releaseNote == "base"
+        base.distribution?.key == "base"
+        base.distribution?.releaseNote == "base"
         base.visibility == "base"
         !base.skipAssemble
 
         when:
         other.sourceFile = new File("other")
         other.uploadMessage = "other uploadMessage"
-        other.distributionKey = "other distributionKey"
-        other.releaseNote = "other releaseNote"
+        other.distribution { Distribution distribution ->
+            distribution.key = "other distributionKey"
+            distribution.releaseNote = "other distributionReleaseNote"
+        }
         other.visibility = "other visibility"
         other.skipAssemble = true
 
@@ -234,16 +238,18 @@ class DeployGateExtensionSpec extends Specification {
         then:
         base.sourceFile == new File("base")
         base.uploadMessage == "base"
-        base.distributionKey == "base"
-        base.releaseNote == "base"
+        base.distribution?.key == "base"
+        base.distribution?.releaseNote == "base"
         base.visibility == "base"
         base.skipAssemble // only skip assemble was changed
 
         when:
         base.sourceFile = null
         base.uploadMessage = null
-        base.distributionKey = null
-        base.releaseNote = null
+        base.distribution { Distribution distribution ->
+            distribution.key = null
+            distribution.releaseNote = null
+        }
         base.visibility = null
         base.skipAssemble = false
 
@@ -253,16 +259,18 @@ class DeployGateExtensionSpec extends Specification {
         then:
         base.sourceFile == new File("other")
         base.uploadMessage == "other uploadMessage"
-        base.distributionKey == "other distributionKey"
-        base.releaseNote == "other releaseNote"
+        base.distribution?.key == "other distributionKey"
+        base.distribution?.releaseNote == "other distributionReleaseNote"
         base.visibility == "other visibility"
         base.skipAssemble
 
         when:
         base.sourceFile = null
         base.uploadMessage = ""
-        base.distributionKey = ""
-        base.releaseNote = ""
+        base.distribution { Distribution distribution ->
+            distribution.key = ""
+            distribution.releaseNote = ""
+        }
         base.visibility = ""
         base.skipAssemble = false
 
@@ -272,8 +280,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         base.sourceFile == new File("other")
         base.uploadMessage == "other uploadMessage"
-        base.distributionKey == "other distributionKey"
-        base.releaseNote == "other releaseNote"
+        base.distribution?.key == "other distributionKey"
+        base.distribution?.releaseNote == "other distributionReleaseNote"
         base.visibility == "other visibility"
         base.skipAssemble
     }
@@ -285,7 +293,7 @@ class DeployGateExtensionSpec extends Specification {
         env[DeployGatePlugin.ENV_NAME_SOURCE_FILE] = sourceFilePath
         env[DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE] = uploadMessage
         env[DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY] = distributionKey
-        env[DeployGatePlugin.ENV_NAME_RELEASE_NOTE] = releaseNote
+        env[DeployGatePlugin.ENV_NAME_RELEASE_NOTE] = distributionReleaseNote
         env[DeployGatePlugin.ENV_NAME_VISIBILITY] = visibility
         testSystemEnv.setEnv(env)
 
@@ -297,14 +305,14 @@ class DeployGateExtensionSpec extends Specification {
         expect:
         deployment.sourceFile == sourceFilePath?.with { project.file(sourceFilePath) }
         deployment.uploadMessage == uploadMessage
-        deployment.distributionKey == distributionKey
-        deployment.releaseNote == releaseNote
+        deployment.distribution?.key == distributionKey
+        deployment.distribution?.releaseNote == distributionReleaseNote
         deployment.visibility == visibility
         !deployment.skipAssemble // this var cannot be injected from env vars for now
 
         where:
-        sourceFilePath   | uploadMessage   | distributionKey   | releaseNote   | visibility   | skipAssemble
-        null             | null            | null              | null          | null         | null
-        "sourceFilePath" | "uploadMessage" | "distributionKey" | "releaseNote" | "visibility" | true
+        sourceFilePath   | uploadMessage   | distributionKey   | distributionReleaseNote   | visibility   | skipAssemble
+        null             | null            | null              | null                      | null         | null
+        "sourceFilePath" | "uploadMessage" | "distributionKey" | "distributionReleaseNote" | "visibility" | true
     }
 }

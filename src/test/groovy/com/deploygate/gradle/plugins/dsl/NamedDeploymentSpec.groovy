@@ -31,8 +31,10 @@ class NamedDeploymentSpec extends Specification {
         deployment.uploadMessage = uploadMessage
         deployment.skipAssemble = skipAssemble
         deployment.sourceFile = sourceFile
-        deployment.distributionKey = distributionKey
-        deployment.releaseNote = releaseNote
+        deployment.distribution { Distribution distribution ->
+            distribution.key = distributionKey
+            distribution.releaseNote = distributionReleaseNote
+        }
         deployment.visibility = visibility
 
         expect:
@@ -40,15 +42,14 @@ class NamedDeploymentSpec extends Specification {
         deployment.uploadMessage == uploadMessage
         deployment.skipAssemble == skipAssemble
         deployment.sourceFile == sourceFile
-        deployment.distributionKey == distributionKey
-        deployment.releaseNote == releaseNote
+        deployment.distribution?.key == distributionKey
+        deployment.distribution?.releaseNote == distributionReleaseNote
         deployment.visibility == visibility
 
         where:
-        name  | uploadMessage | skipAssemble | sourceFile      | distributionKey    | releaseNote    | visibility
-        "foo" | null          | true         | null            | null               | null           | null
-        "bar" | "message"     | false        | new File("apk") | "distribution_key" | "release_note" | "private"
-        "bar" | "message"     | false        | new File("apk") | "distribution_key" | "release_note" | "public"
+        name  | uploadMessage | skipAssemble | sourceFile      | distributionKey    | distributionReleaseNote     | visibility
+        "foo" | null          | true         | null            | null               | null                        | null
+        "bar" | "message"     | false        | new File("apk") | "distribution_key" | "distribution_release_note" | "private"
     }
 
     def "verify empty NamedDeployment works"() {
@@ -60,8 +61,8 @@ class NamedDeploymentSpec extends Specification {
         deployment.uploadMessage == null
         !deployment.skipAssemble
         deployment.sourceFile == null
-        deployment.distributionKey == null
-        deployment.releaseNote == null
+        deployment.distribution?.key == null
+        deployment.distribution?.releaseNote == null
         deployment.visibility == null
     }
 }

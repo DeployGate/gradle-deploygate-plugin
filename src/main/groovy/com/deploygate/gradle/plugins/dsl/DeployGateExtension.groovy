@@ -99,10 +99,12 @@ class DeployGateExtension implements ExtensionSyntax {
     static void mergeDeployments(@Nonnull NamedDeployment base, @Nullable NamedDeployment other) {
         base.sourceFile = base.sourceFile ?: other.sourceFile
         base.uploadMessage = base.uploadMessage ?: other.uploadMessage
-        base.distributionKey = base.distributionKey ?: other.distributionKey
-        base.releaseNote = base.releaseNote ?: other.releaseNote
         base.visibility = base.visibility ?: other.visibility
         base.skipAssemble = base.skipAssemble || other.skipAssemble
+        base.distribution { Distribution distribution ->
+            distribution.key = base.distribution?.key ?: other.distribution?.key
+            distribution.releaseNote = base.distribution?.releaseNote ?: other.distribution?.releaseNote
+        }
     }
 
     @VisibleForTesting
@@ -110,15 +112,17 @@ class DeployGateExtension implements ExtensionSyntax {
         File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { it -> project.file(it) }
         String uploadMessage = System.getenv(DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE)
         String distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
-        String releaseNote = System.getenv(DeployGatePlugin.ENV_NAME_RELEASE_NOTE)
+        String distributionReleaseNote = System.getenv(DeployGatePlugin.ENV_NAME_RELEASE_NOTE)
         String visibility = System.getenv(DeployGatePlugin.ENV_NAME_VISIBILITY)
 
         def deployment = new NamedDeployment("environment-based")
 
         deployment.sourceFile = sourceFile
         deployment.uploadMessage = uploadMessage
-        deployment.distributionKey = distributionKey
-        deployment.releaseNote = releaseNote
+        deployment.distribution { Distribution distribution ->
+            distribution.key = distributionKey
+            distribution.releaseNote = distributionReleaseNote
+        }
         deployment.visibility = visibility
 
         return deployment
