@@ -5,6 +5,8 @@
 
 This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
 
+*We are currently upgrading to `v2`. Please check [v2 branch](https://github.com/DeployGate/gradle-deploygate-plugin/tree/v2) for more detail.*
+
 ## Getting started
 
 ### `dg deploy` way (for OS X)
