@@ -87,10 +87,13 @@ class DeployGateExtensionSpec extends Specification {
             }
             dep2 {
               sourceFile = "build.gradle" as File
-              distributionKey = "distKey"
-              releaseNote = "note1"
               uploadMessage = "message1"
               skipAssemble = true
+              
+              distribution {
+                key = "distKey"
+                releaseNote = "note1"
+              }
             }
           }
         }
@@ -144,10 +147,13 @@ class DeployGateExtensionSpec extends Specification {
             }
             dep2 {
               sourceFile = "build.gradle" as File
-              distributionKey = "distKey"
-              releaseNote = "note1"
               uploadMessage = "message1"
               skipAssemble = true
+              
+              distribution {
+                key = "distKey"
+                releaseNote = "note1"
+              }
             }
           }
         }
@@ -192,10 +198,13 @@ class DeployGateExtensionSpec extends Specification {
             }
             dep2 {
               sourceFile = "build.gradle" as File
-              distributionKey = "distKey"
-              releaseNote = "note1"
               uploadMessage = "message1"
               skipAssemble = true
+              
+              distribution {
+                key = "distKey"
+                releaseNote = "note1"
+              }
             }
           }
         }
