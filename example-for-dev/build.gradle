@@ -12,8 +12,8 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0'
-//        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.android.tools.build:gradle:3.4.0-beta04'
+        classpath 'io.fabric.tools:gradle:1.+'
 
         // cd /path/to/repo
         // Edit version info in build.gradle
@@ -24,13 +24,13 @@ buildscript {
         // ./gradlew uploadDeployGateDebug
 
         // Use the current local
-        // def version = new File(rootProject.projectDir, '../src/main/resources/VERSION').text.trim()
-        // println("VERSION $version")
-        // classpath "com.deploygate:gradle:$version"
+         def version = new File(rootProject.projectDir, '../src/main/resources/VERSION').text.trim()
+         println("VERSION $version")
+         classpath "com.deploygate:gradle:$version"
 
         // Use the snapshot
-        println("Snapshot")
-        classpath "com.github.deploygate:gradle-deploygate-plugin:fc7d50490e"
+//        println("Snapshot")
+//        classpath "com.github.deploygate:gradle-deploygate-plugin:8ea1ad4"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

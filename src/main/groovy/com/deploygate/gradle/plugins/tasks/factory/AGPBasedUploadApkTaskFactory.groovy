@@ -19,28 +19,25 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
     void registerUploadApkTask(@Nonnull IApplicationVariant applicationVariant, Object... dependsOn) {
         String variantName = applicationVariant.name
 
-        def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantName), UploadApkTask)
+        // depends on other task provider, so we need to get a task right now.
+        def dgTask = taskFactory.register(uploadApkTaskName(variantName), UploadApkTask).get()
 
         final NamedDeployment deployment = deployGateExtension.findDeploymentByName(variantName)
 
-        lazyUploadApkTask.configure { dgTask ->
-            dgTask.variantName = variantName
+        dgTask.variantName = variantName
 
-            if (deployment?.skipAssemble) {
-                dgTask.dependsOn(dependsOn)
-            } else {
-                dgTask.dependsOn([androidAssembleTaskName(variantName), *dependsOn].flatten())
-            }
+        if (deployment?.skipAssemble) {
+            dgTask.dependsOn(dependsOn)
+        } else {
+            dgTask.dependsOn([androidAssembleTaskName(variantName), *dependsOn].flatten())
         }
 
         applicationVariant.lazyPackageApplication().configure { packageAppTask ->
             def apkInfo = PackageAppTaskCompat.getApkInfo(packageAppTask)
             def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
-            lazyUploadApkTask.configure { dgTask ->
-                dgTask.configuration = configuration
-                dgTask.applyTaskProfile()
-            }
+            dgTask.configuration = configuration
+            dgTask.applyTaskProfile()
         }
     }
 
