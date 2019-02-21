@@ -39,10 +39,10 @@ class GradleCompatAcceptanceSpec extends Specification {
                 .withArguments("tasks" /*, "--stacktrace" */)
 
         and:
-        def result = runner.build()
+        def buildResult = runner.build()
 
         expect:
-        result.task("tasks").outcome == TaskOutcome.SUCCESS
+        buildResult.task(":tasks").outcome == TaskOutcome.SUCCESS
 
         where:
         gradleVersion << [

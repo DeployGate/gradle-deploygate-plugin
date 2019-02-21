@@ -45,7 +45,8 @@ class TaskFactorySpec extends Specification {
         "agp310" | "4.4"         | SingleTask
         "agp320" | "4.6"         | SingleTask
         "border" | "4.7"         | SingleTask
-        "border" | "4.8"         | TaskProvider
+        "border" | "4.8"         | SingleTask
+        "border" | "4.9"         | TaskProvider
         "agp330" | "4.10.1"      | TaskProvider
     }
 

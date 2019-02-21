@@ -6,12 +6,12 @@ plugins {
 
 GradleCompat.newLazyConfigurableTask(project, "task1", DefaultTask)
 
-def task1 = tasks.findByName("task1")
+def task1 = project.tasks.findByName("task1")
 
 if (!task1) {
     throw new IllegalStateException("task1 must exist")
 }
 
-GradleCompat.configureEach(task1) {
+GradleCompat.configureEach(project.tasks.withType(DefaultTask)) {
     println("no crash is expteced")
 }
