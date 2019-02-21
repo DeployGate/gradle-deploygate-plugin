@@ -5,7 +5,8 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
-class ApplyPluginSpec extends Specification {
+class DeployGatePluginSpec extends Specification {
+
     def "can apply this plugin to a project which does not have AGP"() {
         given:
         Project project = ProjectBuilder.builder().build()

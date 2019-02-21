@@ -8,6 +8,12 @@ import javax.annotation.Nonnull
 
 abstract class DeployGateTaskFactory {
     public static final String GROUP_NAME = 'DeployGate'
+    public static String AGGREGATION_TASK_NAME = "uploadDeployGate"
+
+    @Nonnull
+    static String uploadApkTaskName(@Nonnull String variantName) {
+        return "$AGGREGATION_TASK_NAME${variantName.capitalize()}"
+    }
 
     @Nonnull
     final Project project

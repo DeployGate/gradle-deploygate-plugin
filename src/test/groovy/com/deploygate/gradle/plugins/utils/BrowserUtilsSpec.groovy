@@ -1,24 +1,16 @@
 package com.deploygate.gradle.plugins.utils
 
-import spock.lang.Shared
+import com.deploygate.gradle.plugins.TestSystemEnv
+import org.junit.Rule
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
 class BrowserUtilsSpec extends Specification {
-    @Shared
-    Map<String, Object> envStub = new HashMap<String, Object>()
+    @Rule
+    TestSystemEnv envStub = new TestSystemEnv()
 
-    def setup() {
-        System.metaClass.static.getenv = { ->
-            envStub
-        }
-        System.metaClass.static.getenv = { String name ->
-            envStub[name] as String
-        }
-    }
-
-    @ConfineMetaClassChanges([System, BrowserUtils])
+    @ConfineMetaClassChanges([BrowserUtils])
     @Unroll
     def "openBrowser. Unrolled #name"() {
         given:
@@ -53,8 +45,7 @@ class BrowserUtilsSpec extends Specification {
     @Unroll
     def "isCiEnvironment. Unrolled #name"() {
         given:
-        envStub.clear()
-        envStub.putAll([
+        envStub.setEnv([
                 "CI"         : isCI,
                 "JENKINS_URL": jenkinsUrl
         ])
@@ -71,12 +62,11 @@ class BrowserUtilsSpec extends Specification {
     }
 
 
-    @ConfineMetaClassChanges([System, BrowserUtils])
+    @ConfineMetaClassChanges([BrowserUtils])
     @Unroll
     def "isExecutableXXX. Unrolled osName is #osName"() {
         given:
-        envStub.clear()
-        envStub.putAll([
+        envStub.setEnv([
                 "DISPLAY": display,
         ])
         BrowserUtils.metaClass.static.getOS_NAME = { ->
@@ -102,7 +92,7 @@ class BrowserUtilsSpec extends Specification {
     }
 
 
-    @ConfineMetaClassChanges([System, BrowserUtils])
+    @ConfineMetaClassChanges([BrowserUtils])
     @Unroll
     def "hasBrowser. Unrolled #name"() {
         given:

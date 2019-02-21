@@ -2,19 +2,21 @@ package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
 import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
-import com.deploygate.gradle.plugins.internal.agp.ApplicationVariantProxy
+import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
-class AGPBasedUploadApkTaskFactory extends UploadApkTaskFactory<ApplicationVariantProxy> {
+import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
+
+class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements UploadApkTaskFactory<IApplicationVariant> {
     AGPBasedUploadApkTaskFactory(@Nonnull Project project) {
         super(project)
     }
 
     @Override
-    void registerUploadApkTask(@Nonnull ApplicationVariantProxy applicationVariant, Object... dependsOn) {
+    void registerUploadApkTask(@Nonnull IApplicationVariant applicationVariant, Object... dependsOn) {
         String variantName = applicationVariant.name
 
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantName), UploadApkTask)
@@ -40,5 +42,10 @@ class AGPBasedUploadApkTaskFactory extends UploadApkTaskFactory<ApplicationVaria
                 dgTask.applyTaskProfile()
             }
         }
+    }
+
+    @Override
+    void registerAggregatedUploadApkTask(Object... dependsOn) {
+        throw new IllegalAccessException("this method is not allowed to be called")
     }
 }

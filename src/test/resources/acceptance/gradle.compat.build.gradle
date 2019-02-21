@@ -1,0 +1,17 @@
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
+
+plugins {
+    id "deploygate"
+}
+
+GradleCompat.newLazyConfigurableTask(project, "task1", DefaultTask)
+
+def task1 = project.tasks.findByName("task1")
+
+if (!task1) {
+    throw new IllegalStateException("task1 must exist")
+}
+
+GradleCompat.configureEach(project.tasks.withType(DefaultTask)) {
+    println("no crash is expteced")
+}

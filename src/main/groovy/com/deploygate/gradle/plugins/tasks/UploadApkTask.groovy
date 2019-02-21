@@ -6,6 +6,7 @@ import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
 import com.deploygate.gradle.plugins.tasks.factory.DeployGateTaskFactory
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
+import com.google.common.annotations.VisibleForTesting
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.Method
@@ -74,6 +75,12 @@ class UploadApkTask extends DefaultTask {
         this.variantName = variantName
     }
 
+    @VisibleForTesting
+    @Nullable
+    String getVariantName() {
+        return variantName
+    }
+
     void setConfiguration(@Nonnull Configuration configuration) {
         if (!this.variantName) {
             throw new IllegalStateException("variant name must be set first")
@@ -102,7 +109,7 @@ class UploadApkTask extends DefaultTask {
     @TaskAction
     def uploadApkToServer() {
         if (!configuration.isSigningReady) {
-            throw new GradleException('Cannot upload a build without code signature to DeployGate')
+            throw new IllegalStateException('Cannot upload a build without code signature to DeployGate')
         }
 
         if (!configuration.apkFile) {
@@ -113,19 +120,21 @@ class UploadApkTask extends DefaultTask {
             throw new IllegalStateException("APK file ${configuration.apkFile} was not found. If you are using Android Build Tools >= 3.0.0, you need to set `sourceFile` in your build.gradle. See https://docs.deploygate.com/docs/gradle-plugin")
         }
 
+        def appOwnerName = getAppOwnerName()
+        def apiToken = getApiToken()
+
         onBeforeUpload()
 
-        // FIXME token and user name verification should be done before onBeforeUpload
-        def response = postRequestToUpload(getAppOwnerName(), getApiToken(), configuration.apkFile, configuration.toUploadParams())
+        def response = postRequestToUpload(appOwnerName, apiToken, configuration.apkFile, configuration.toUploadParams())
 
         handleResponse(response, response.data)
     }
 
-    def onBeforeUpload() {
+    void onBeforeUpload() {
         project.deploygate.notifyServer 'start_upload', ['length': Long.toString(configuration.apkFile.length())]
     }
 
-    def handleResponse(response, data) {
+    def handleResponse(HttpResponseDecorator response, data) {
         if (!(200 <= response.status && response.status < 300) || data.error) {
             throw new GradleException("${variantName} failed due to ${data.message}")
         }
@@ -141,20 +150,24 @@ class UploadApkTask extends DefaultTask {
         }
     }
 
-    private String getApiToken() {
+    @VisibleForTesting
+    @Nonnull
+    String getApiToken() {
         def apiToken = project.deploygate.apiToken
 
-        if (!apiToken.trim()) {
+        if (!apiToken?.trim()) {
             throw new GradleException('apiToken is missing. Please enter the token.')
         }
 
         apiToken.trim()
     }
 
-    private String getAppOwnerName() {
+    @VisibleForTesting
+    @Nonnull
+    String getAppOwnerName() {
         def appOwnerName = project.deploygate.appOwnerName
 
-        if (!appOwnerName.trim()) {
+        if (!appOwnerName?.trim()) {
             throw new GradleException('appOwnerName is missing. Please enter the token.')
         }
 

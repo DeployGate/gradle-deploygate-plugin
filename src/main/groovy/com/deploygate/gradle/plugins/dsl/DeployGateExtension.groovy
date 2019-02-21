@@ -107,7 +107,7 @@ class DeployGateExtension implements ExtensionSyntax {
 
     @PackageScope
     static VariantBasedDeployTarget getDefaultDeployTarget(Project project) {
-        File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { project.file(this) }
+        File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { it -> project.file(it) }
         String uploadMessage = System.getenv(DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE)
         String distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
         String releaseNote = System.getenv(DeployGatePlugin.ENV_NAME_RELEASE_NOTE)
@@ -115,14 +115,11 @@ class DeployGateExtension implements ExtensionSyntax {
 
         def target = new VariantBasedDeployTarget("")
 
-        target.with {
-            sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { project.file(this) }
-            uploadMessage = System.getenv(DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE)
-            distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
-            releaseNote = System.getenv(DeployGatePlugin.ENV_NAME_RELEASE_NOTE)
-            visibility = System.getenv(DeployGatePlugin.ENV_NAME_VISIBILITY)
-            skipAssemble = false
-        }
+        target.sourceFile = sourceFile
+        target.uploadMessage = uploadMessage
+        target.distributionKey = distributionKey
+        target.releaseNote = releaseNote
+        target.visibility = visibility
 
         return target
     }

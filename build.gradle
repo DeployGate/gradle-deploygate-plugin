@@ -67,10 +67,11 @@ dependencies {
 
     testImplementation gradleTestKit()
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.spockframework.spock:spock-core:spock-1.2'
 
     // 2.21.0 will break behaviors of multipart requests :thinking_face:
     testImplementation "com.github.tomakehurst:wiremock:2.20.0"
+
+    testImplementation 'org.spockframework.spock:spock-core:spock-1.2'
 
     // for ApplyPluginSpec
     testRuntimeOnly "com.android.tools.build:gradle:$agpVersion"
@@ -83,11 +84,15 @@ tasks.create("acceptanceTest", Test) {
     dependsOn("createClasspathManifest")
 }
 
-test {
+project.tasks.withType(Test).configureEach {
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
+
+    environment([
+            "ANDROID_HOME": System.getenv("ANDROID_HOME")
+    ])
 }
 
 task javadocJar(type: Jar, dependsOn: groovydoc) {

@@ -32,6 +32,14 @@ ndk.dir=${androidSdk}/ndk-bundle
         copyDir("acceptance")
     }
 
+    void useGradleCompatResource() {
+        def classLoader = getClass().getClassLoader()
+        def dir = classLoader.getResource("acceptance").file as File
+
+        buildGradle.exists() && buildGradle.delete() && buildGradle.createNewFile()
+        buildGradle << new File(dir, "gradle.compat.build.gradle").newInputStream()
+    }
+
     @Nonnull
     private File copyDir(String dirName) {
         def classLoader = getClass().getClassLoader()
