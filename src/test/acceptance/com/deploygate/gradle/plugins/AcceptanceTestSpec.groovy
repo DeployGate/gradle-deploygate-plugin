@@ -82,6 +82,7 @@ class AcceptanceTestSpec extends Specification {
         "3.1.0"    | "4.4"
         "3.2.0"    | "4.6"
         "3.3.0"    | "4.10.1"
+        "3.4.0-beta04" | "5.1.1"
     }
 
     @Unroll
@@ -121,6 +122,7 @@ class AcceptanceTestSpec extends Specification {
         "3.1.0"    | "4.4"
         "3.2.0"    | "4.6"
         "3.3.0"    | "4.10.1"
+        "3.4.0-beta04" | "5.1.1"
     }
 
     @Unroll
@@ -157,6 +159,7 @@ class AcceptanceTestSpec extends Specification {
         "3.1.0"    | "4.4"
         "3.2.0"    | "4.6"
         "3.3.0"    | "4.10.1"
+        "3.4.0-beta04" | "5.1.1"
     }
 
     @Unroll
@@ -188,11 +191,12 @@ class AcceptanceTestSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpVersion | minGradleVersion
-        "3.0.0"    | "4.1"
-        "3.1.0"    | "4.4"
-        "3.2.0"    | "4.6"
-        "3.3.0"    | "4.10.1"
+        agpVersion     | minGradleVersion
+        "3.0.0"        | "4.1"
+        "3.1.0"        | "4.4"
+        "3.2.0"        | "4.6"
+        "3.3.0"        | "4.10.1"
+        "3.4.0-beta04" | "5.1.1"
     }
 
     @Unroll
@@ -229,6 +233,7 @@ class AcceptanceTestSpec extends Specification {
         "3.1.0"    | "4.4"
         "3.2.0"    | "4.6"
         "3.3.0"    | "4.10.1"
+        "3.4.0-beta04" | "5.1.1"
     }
 
     @Unroll
@@ -256,6 +261,7 @@ class AcceptanceTestSpec extends Specification {
         "3.1.0"    | "4.4"
         "3.2.0"    | "4.6"
         "3.3.0"    | "4.10.1"
+        "3.4.0-beta04" | "5.1.1"
     }
 
     @Unroll
@@ -293,6 +299,7 @@ class AcceptanceTestSpec extends Specification {
         "3.1.0"    | "4.4"
         "3.2.0"    | "4.6"
         "3.3.0"    | "4.10.1"
+        "3.4.0-beta04" | "5.1.1"
     }
 
     @Unroll
@@ -329,6 +336,7 @@ class AcceptanceTestSpec extends Specification {
         "3.1.0"    | "4.4"
         "3.2.0"    | "4.6"
         "3.3.0"    | "4.10.1"
+        "3.4.0-beta04" | "5.1.1"
     }
 
     private static boolean missingPart(LoggedRequest request, String name) {
