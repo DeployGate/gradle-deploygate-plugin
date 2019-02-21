@@ -321,8 +321,8 @@ class DeployGateExtensionSpec extends Specification {
         env[DeployGatePlugin.ENV_NAME_SOURCE_FILE] = sourceFilePath
         env[DeployGatePlugin.ENV_NAME_UPLOAD_MESSAGE] = uploadMessage
         env[DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY] = distributionKey
-        env[DeployGatePlugin.ENV_NAME_RELEASE_NOTE] = distributionReleaseNote
-        env[DeployGatePlugin.ENV_NAME_VISIBILITY] = visibility
+        env[DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE] = distributionReleaseNote
+        env[DeployGatePlugin.ENV_NAME_APP_VISIBILITY] = visibility
         testSystemEnv.setEnv(env)
 
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
