@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -10,18 +10,18 @@ class UploadApkTaskConfigurationSpec extends Specification {
     @Unroll
     def "create a configuration"() {
         setup:
-        def deployTarget = new VariantBasedDeployTarget("dep1")
-        deployTarget.uploadMessage = uploadMessage
-        deployTarget.distributionKey = distributionKey
-        deployTarget.releaseNote = releaseNote
-        deployTarget.visibility = visibility
-        deployTarget.skipAssemble = skipAssemble
+        def deployment = new NamedDeployment("dep1")
+        deployment.uploadMessage = uploadMessage
+        deployment.distributionKey = distributionKey
+        deployment.releaseNote = releaseNote
+        deployment.visibility = visibility
+        deployment.skipAssemble = skipAssemble
 
         and:
         def apkInfo = new DirectApkInfo("dep1", null, signingReady, universalApk)
 
         and:
-        def configuration = UploadApkTask.createConfiguration(deployTarget, apkInfo)
+        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
         expect:
         configuration.uploadMessage == uploadMessage
@@ -40,14 +40,14 @@ class UploadApkTaskConfigurationSpec extends Specification {
     @Unroll
     def "create a configuration for apk file handling"() {
         setup:
-        def deployTarget = new VariantBasedDeployTarget("dep1")
-        deployTarget.sourceFile = sourceFile
+        def deployment = new NamedDeployment("dep1")
+        deployment.sourceFile = sourceFile
 
         and:
         def apkInfo = new DirectApkInfo("dep1", apkFile, false, false)
 
         and:
-        def configuration = UploadApkTask.createConfiguration(deployTarget, apkInfo)
+        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
         expect:
         configuration.apkFile == sourceFile ?: apkFile

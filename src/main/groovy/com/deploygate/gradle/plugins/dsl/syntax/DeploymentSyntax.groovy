@@ -2,7 +2,7 @@ package com.deploygate.gradle.plugins.dsl.syntax
 
 import javax.annotation.Nullable
 
-interface DeployTargetSyntax {
+interface DeploymentSyntax {
     void setSourceFile(@Nullable File file)
 
     void setUploadMessage(@Nullable String message)

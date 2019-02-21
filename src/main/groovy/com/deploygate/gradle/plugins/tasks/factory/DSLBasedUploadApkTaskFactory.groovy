@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -19,20 +19,20 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantNameOrCustomName), UploadApkTask, false)
 
         if (!lazyUploadApkTask) {
-            project.logger.debug("It sounds $variantNameOrCustomName's upload apk task has been already registered by AGP based factory")
+            project.logger.debug("It sounds $variantNameOrCustomName's upload apk task has been already registered by me or other factories")
             return
         }
 
-        if (!deployGateExtension.hasDeployTarget(variantNameOrCustomName)) {
-            project.logger.error("The associated deploy target to $variantNameOrCustomName has not been detected")
+        if (!deployGateExtension.hasDeployment(variantNameOrCustomName)) {
+            project.logger.error("No associated deployment to $variantNameOrCustomName has been detected")
             project.logger.error("Please report this problem from https://github.com/DeployGate/gradle-deploygate-plugin/issues")
 
             throw new GradleException("$variantNameOrCustomName could not be handled by DeployGate plugin")
         }
 
-        final VariantBasedDeployTarget deployTarget = deployGateExtension.findDeployTarget(variantNameOrCustomName)
+        final NamedDeployment deployment = deployGateExtension.findDeploymentByName(variantNameOrCustomName)
 
-        if (!deployTarget.skipAssemble) {
+        if (!deployment.skipAssemble) {
             project.logger.debug("$variantNameOrCustomName required assmble but ignored")
         }
 
@@ -42,7 +42,7 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
         }
 
         def apkInfo = new DefaultPresetApkInfo(variantNameOrCustomName)
-        def configuration = UploadApkTask.createConfiguration(deployTarget, apkInfo)
+        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
         lazyUploadApkTask.configure { dgTask ->
             dgTask.configuration = configuration

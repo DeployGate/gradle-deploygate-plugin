@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
-import com.deploygate.gradle.plugins.dsl.VariantBasedDeployTarget
+import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.Project
@@ -21,12 +21,12 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
 
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantName), UploadApkTask)
 
-        final VariantBasedDeployTarget deployTarget = deployGateExtension.findDeployTarget(variantName)
+        final NamedDeployment deployment = deployGateExtension.findDeploymentByName(variantName)
 
         lazyUploadApkTask.configure { dgTask ->
             dgTask.variantName = variantName
 
-            if (deployTarget?.skipAssemble) {
+            if (deployment?.skipAssemble) {
                 dgTask.dependsOn(dependsOn)
             } else {
                 dgTask.dependsOn([androidAssembleTaskName(variantName), *dependsOn].flatten())
@@ -35,7 +35,7 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
 
         applicationVariant.lazyPackageApplication().configure { packageAppTask ->
             def apkInfo = PackageAppTaskCompat.getApkInfo(packageAppTask)
-            def configuration = UploadApkTask.createConfiguration(deployTarget, apkInfo)
+            def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
             lazyUploadApkTask.configure { dgTask ->
                 dgTask.configuration = configuration

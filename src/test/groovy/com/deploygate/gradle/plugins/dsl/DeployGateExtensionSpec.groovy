@@ -41,8 +41,8 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
         project.evaluate()
 
         when:
@@ -78,8 +78,8 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
         project.evaluate()
 
         when:
@@ -111,7 +111,7 @@ class DeployGateExtensionSpec extends Specification {
         dep2.skipAssemble
     }
 
-    def "findDeployTarget"() {
+    def "findDeploymentByName"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
@@ -135,19 +135,19 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
         project.evaluate()
 
         when:
         def result = project.deploygate as DeployGateExtension
 
         then:
-        result.findDeployTarget("dep1") == result.deployments.findByName("dep1")
-        result.findDeployTarget("dep2") == result.deployments.findByName("dep2")
+        result.findDeploymentByName("dep1") == result.deployments.findByName("dep1")
+        result.findDeploymentByName("dep2") == result.deployments.findByName("dep2")
 
         when:
-        def dep3 = result.findDeployTarget("dep3")
+        def dep3 = result.findDeploymentByName("dep3")
 
         then:
         dep3
@@ -159,7 +159,7 @@ class DeployGateExtensionSpec extends Specification {
         !dep3.skipAssemble
     }
 
-    def "hasDeployTarget"() {
+    def "hasDeployment"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
@@ -183,22 +183,22 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<VariantBasedDeployTarget> targets = project.container(VariantBasedDeployTarget)
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
         project.evaluate()
 
         when:
         def result = project.deploygate as DeployGateExtension
 
         then:
-        result.hasDeployTarget("dep1")
-        result.hasDeployTarget("dep2")
-        !result.hasDeployTarget("dep3")
+        result.hasDeployment("dep1")
+        result.hasDeployment("dep2")
+        !result.hasDeployment("dep3")
     }
 
-    def "mergeDeployTarget should work"() {
+    def "mergeDeployments should work"() {
         given:
-        def base = new VariantBasedDeployTarget("base")
+        def base = new NamedDeployment("base")
         base.sourceFile = new File("base")
         base.uploadMessage = "base"
         base.distributionKey = "base"
@@ -207,10 +207,10 @@ class DeployGateExtensionSpec extends Specification {
         base.skipAssemble = false
 
         and:
-        def other = new VariantBasedDeployTarget("other")
+        def other = new NamedDeployment("other")
 
         when:
-        DeployGateExtension.mergeDeployTarget(base, other)
+        DeployGateExtension.mergeDeployments(base, other)
 
         then:
         base.sourceFile == new File("base")
@@ -229,7 +229,7 @@ class DeployGateExtensionSpec extends Specification {
         other.skipAssemble = true
 
         and:
-        DeployGateExtension.mergeDeployTarget(base, other)
+        DeployGateExtension.mergeDeployments(base, other)
 
         then:
         base.sourceFile == new File("base")
@@ -248,7 +248,7 @@ class DeployGateExtensionSpec extends Specification {
         base.skipAssemble = false
 
         and:
-        DeployGateExtension.mergeDeployTarget(base, other)
+        DeployGateExtension.mergeDeployments(base, other)
 
         then:
         base.sourceFile == new File("other")
@@ -267,7 +267,7 @@ class DeployGateExtensionSpec extends Specification {
         base.skipAssemble = false
 
         and:
-        DeployGateExtension.mergeDeployTarget(base, other)
+        DeployGateExtension.mergeDeployments(base, other)
 
         then:
         base.sourceFile == new File("other")
@@ -279,7 +279,7 @@ class DeployGateExtensionSpec extends Specification {
     }
 
     @Unroll
-    def "getDefaultDeployTarget should return based on env. Unrolled #sourceFilePath"() {
+    def "getEnvironmentBasedDeployments should return based on env. Unrolled #sourceFilePath"() {
         given:
         def env = [:]
         env[DeployGatePlugin.ENV_NAME_SOURCE_FILE] = sourceFilePath
@@ -292,15 +292,15 @@ class DeployGateExtensionSpec extends Specification {
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
         and:
-        VariantBasedDeployTarget target = DeployGateExtension.getDefaultDeployTarget(project)
+        NamedDeployment deployment = DeployGateExtension.getEnvironmentBasedDeployment(project)
 
         expect:
-        target.sourceFile == sourceFilePath?.with { project.file(sourceFilePath) }
-        target.uploadMessage == uploadMessage
-        target.distributionKey == distributionKey
-        target.releaseNote == releaseNote
-        target.visibility == visibility
-        !target.skipAssemble // this var cannot be injected from env vars for now
+        deployment.sourceFile == sourceFilePath?.with { project.file(sourceFilePath) }
+        deployment.uploadMessage == uploadMessage
+        deployment.distributionKey == distributionKey
+        deployment.releaseNote == releaseNote
+        deployment.visibility == visibility
+        !deployment.skipAssemble // this var cannot be injected from env vars for now
 
         where:
         sourceFilePath   | uploadMessage   | distributionKey   | releaseNote   | visibility   | skipAssemble
