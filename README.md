@@ -7,6 +7,8 @@ This is the DeployGate plugin for the Gradle. You can build and deploy your apps
 
 ## Getting started
 
+Snapshot? See [how to use snapshot](#snapshot)
+
 1 ) Add jcenter to and the dependency of this plugin to your *build.gradle*.
 
 ```groovy
@@ -185,6 +187,28 @@ Configuration priority is based on the following.
 - To create a new distribution is not supported
 - Split apks are not supported
 - Android App Bundle is not supported. See [a tracking issue and a workaround](https://github.com/DeployGate/gradle-deploygate-plugin/issues/60#issuecomment-464448962).
+
+## <a name="snapshot">Snapshot</a>
+
+You can use `jitpack.io` for snapshots.
+
+```groovy
+buildscript {
+  repositories {
+    maven { url "https://jitpack.io" }
+  }
+
+  dependencies {
+    // if you want to use the specified commit
+    classpath "com.github.deploygate:gradle-deploygate-plugin:${commit_hash}"
+    // if you want to use the branch HEAD
+    classpath "com.github.deploygate:gradle-deploygate-plugin:${branch_name}-SNAPSHOT"
+  }
+}
+```
+
+jitpack.io will store artifacts once required, so the request may cause time-out for the first time.
+If you get a time-out error from jitpack, then please run your task again.
 
 ## <a name="migrate-v2">Migrate from v1 to v2</a>
 
