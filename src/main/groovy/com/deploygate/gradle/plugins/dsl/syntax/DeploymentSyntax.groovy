@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.dsl.syntax
 
+import javax.annotation.Nonnull
 import javax.annotation.Nullable
 
 interface DeploymentSyntax {
@@ -7,11 +8,9 @@ interface DeploymentSyntax {
 
     void setUploadMessage(@Nullable String message)
 
-    void setDistributionKey(@Nullable String distributionKey)
-
-    void setReleaseNote(@Nullable String releaseNote)
-
     void setVisibility(@Nullable String visibility)
 
     void setSkipAssemble(boolean skipAssemble)
+
+    void distribution(@Nonnull Closure closure)
 }

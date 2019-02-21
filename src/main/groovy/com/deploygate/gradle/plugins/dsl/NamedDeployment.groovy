@@ -17,18 +17,16 @@ class NamedDeployment implements Named, DeploymentSyntax {
     String uploadMessage
 
     @Nullable
-    String distributionKey
-
-    @Nullable
-    String releaseNote
-
-    @Nullable
     String visibility
 
     boolean skipAssemble
 
+    @Nonnull
+    private Distribution[] optionalDistribution
+
     NamedDeployment(@Nonnull String name) {
         this.name = name
+        this.optionalDistribution = Collections.singletonList(new Distribution())
     }
 
     @Override
@@ -36,11 +34,39 @@ class NamedDeployment implements Named, DeploymentSyntax {
         return name
     }
 
+    @Override
+    void distribution(@Nonnull Closure closure) {
+        def distribution = optionalDistribution[0]
+
+        closure.delegate = distribution
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
+        closure.call(distribution)
+    }
+
+    @Nullable
+    Distribution getDistribution() {
+        return optionalDistribution.find { it.isPresent() }
+    }
+
     // backward compatibility
 
     @Deprecated
     void setMessage(@Nullable String message) {
         setUploadMessage(message)
+    }
+
+    @Deprecated
+    void setDistributionKey(@Nullable String distributionKey) {
+        distribution {
+            delegate.key = distributionKey
+        }
+    }
+
+    @Deprecated
+    void setReleaseNote(@Nullable String releaseNote) {
+        distribution {
+            delegate.releaseNote = releaseNote
+        }
     }
 
     @Deprecated
@@ -57,9 +83,8 @@ class NamedDeployment implements Named, DeploymentSyntax {
         NamedDeployment that = (NamedDeployment) o
 
         if (skipAssemble != that.skipAssemble) return false
-        if (distributionKey != that.distributionKey) return false
+        if (distribution != that.distribution) return false
         if (name != that.name) return false
-        if (releaseNote != that.releaseNote) return false
         if (sourceFile != that.sourceFile) return false
         if (uploadMessage != that.uploadMessage) return false
         if (visibility != that.visibility) return false
@@ -72,10 +97,9 @@ class NamedDeployment implements Named, DeploymentSyntax {
         result = name.hashCode()
         result = 31 * result + (sourceFile != null ? sourceFile.hashCode() : 0)
         result = 31 * result + (uploadMessage != null ? uploadMessage.hashCode() : 0)
-        result = 31 * result + (distributionKey != null ? distributionKey.hashCode() : 0)
-        result = 31 * result + (releaseNote != null ? releaseNote.hashCode() : 0)
         result = 31 * result + (visibility != null ? visibility.hashCode() : 0)
         result = 31 * result + (skipAssemble ? 1 : 0)
+        result = 31 * result + (distribution != null ? distribution.hashCode() : 0)
         return result
     }
 }
