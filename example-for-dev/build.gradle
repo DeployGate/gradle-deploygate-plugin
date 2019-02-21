@@ -4,6 +4,8 @@ buildscript {
     repositories {
         google()
         jcenter()
+        // snapshot repo.
+        maven { url 'https://jitpack.io' }
         repositories {
             maven { url 'https://maven.fabric.io/public' }
         }
@@ -21,12 +23,14 @@ buildscript {
         // export DEPLOYGATE_API_TOKEN=...
         // ./gradlew uploadDeployGateDebug
 
-        def version = new File(rootProject.projectDir, '../src/main/resources/VERSION').text.trim()
+        // Use the current local
+        // def version = new File(rootProject.projectDir, '../src/main/resources/VERSION').text.trim()
+        // println("VERSION $version")
+        // classpath "com.deploygate:gradle:$version"
 
-        println(version)
-
-        classpath "com.deploygate:gradle:$version"
-
+        // Use the snapshot
+        println("Snapshot")
+        classpath "com.github.deploygate:gradle-deploygate-plugin:fc7d50490e"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
