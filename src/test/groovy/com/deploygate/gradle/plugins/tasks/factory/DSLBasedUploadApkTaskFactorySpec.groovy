@@ -95,9 +95,9 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
 
     def "registerUploadApkTask should add a UploadApkTask"() {
         given:
-        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
-        targets.create("dep1")
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        deployments.create("dep1")
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
 
         and:
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
@@ -116,9 +116,9 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
 
     def "registerUploadApkTask should not override itself if already exist"() {
         given:
-        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
-        targets.create("dep1")
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        deployments.create("dep1")
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
 
         and:
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
@@ -139,9 +139,9 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
 
     def "registerUploadApkTask should not allow adding names which do not exist in build.gradle"() {
         given:
-        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
-        targets.create("dep1")
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        deployments.create("dep1")
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
 
         and:
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)

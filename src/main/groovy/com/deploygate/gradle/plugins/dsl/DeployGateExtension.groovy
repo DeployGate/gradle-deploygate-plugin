@@ -27,11 +27,11 @@ class DeployGateExtension implements ExtensionSyntax {
     private final Project project
 
     @Nonnull
-    private final NamedDomainObjectContainer<NamedDeployment> variantConfigurations
+    private final NamedDomainObjectContainer<NamedDeployment> deployments
 
-    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> variantConfigurations) {
+    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments) {
         this.project = project
-        this.variantConfigurations = variantConfigurations
+        this.deployments = deployments
     }
 
     // backward compatibility
@@ -69,7 +69,7 @@ class DeployGateExtension implements ExtensionSyntax {
     @Nonnull
     @Override
     NamedDomainObjectContainer<NamedDeployment> getDeployments() {
-        return variantConfigurations
+        return deployments
     }
 
     @Override
@@ -78,13 +78,13 @@ class DeployGateExtension implements ExtensionSyntax {
     }
 
     boolean hasDeployment(@Nonnull String name) {
-        return variantConfigurations.findByName(name)
+        return deployments.findByName(name)
     }
 
     @Nonnull
     NamedDeployment findDeploymentByName(@Nonnull String name) {
         def result = new NamedDeployment(name)
-        NamedDeployment declaredTarget = variantConfigurations.findByName(name)
+        NamedDeployment declaredTarget = deployments.findByName(name)
 
         if (declaredTarget) {
             mergeDeployments(result, declaredTarget)
@@ -113,15 +113,15 @@ class DeployGateExtension implements ExtensionSyntax {
         String releaseNote = System.getenv(DeployGatePlugin.ENV_NAME_RELEASE_NOTE)
         String visibility = System.getenv(DeployGatePlugin.ENV_NAME_VISIBILITY)
 
-        def target = new NamedDeployment("")
+        def deployment = new NamedDeployment("environment-based")
 
-        target.sourceFile = sourceFile
-        target.uploadMessage = uploadMessage
-        target.distributionKey = distributionKey
-        target.releaseNote = releaseNote
-        target.visibility = visibility
+        deployment.sourceFile = sourceFile
+        deployment.uploadMessage = uploadMessage
+        deployment.distributionKey = distributionKey
+        deployment.releaseNote = releaseNote
+        deployment.visibility = visibility
 
-        return target
+        return deployment
     }
 
     def notifyServer(String action, HashMap<String, String> data = null) {

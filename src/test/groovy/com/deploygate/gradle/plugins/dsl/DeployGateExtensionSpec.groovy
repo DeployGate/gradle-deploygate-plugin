@@ -41,8 +41,8 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
         project.evaluate()
 
         when:
@@ -78,8 +78,8 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
         project.evaluate()
 
         when:
@@ -135,8 +135,8 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
         project.evaluate()
 
         when:
@@ -183,8 +183,8 @@ class DeployGateExtensionSpec extends Specification {
         """
 
         and:
-        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
         project.evaluate()
 
         when:
@@ -292,15 +292,15 @@ class DeployGateExtensionSpec extends Specification {
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
         and:
-        NamedDeployment target = DeployGateExtension.getEnvironmentBasedDeployment(project)
+        NamedDeployment deployment = DeployGateExtension.getEnvironmentBasedDeployment(project)
 
         expect:
-        target.sourceFile == sourceFilePath?.with { project.file(sourceFilePath) }
-        target.uploadMessage == uploadMessage
-        target.distributionKey == distributionKey
-        target.releaseNote == releaseNote
-        target.visibility == visibility
-        !target.skipAssemble // this var cannot be injected from env vars for now
+        deployment.sourceFile == sourceFilePath?.with { project.file(sourceFilePath) }
+        deployment.uploadMessage == uploadMessage
+        deployment.distributionKey == distributionKey
+        deployment.releaseNote == releaseNote
+        deployment.visibility == visibility
+        !deployment.skipAssemble // this var cannot be injected from env vars for now
 
         where:
         sourceFilePath   | uploadMessage   | distributionKey   | releaseNote   | visibility   | skipAssemble

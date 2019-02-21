@@ -38,15 +38,15 @@ class DeployGatePlugin implements Plugin<Project> {
     }
 
     private static void setupExtension(Project project) {
-        NamedDomainObjectContainer<NamedDeployment> targets = project.container(NamedDeployment)
-        project.extensions.add(EXTENSION_NAME, new DeployGateExtension(project, targets))
+        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
+        project.extensions.add(EXTENSION_NAME, new DeployGateExtension(project, deployments))
     }
 
     private void initProcessor(@Nonnull Project project) {
         processor = new Processor(project)
 
-        project.deploygate.apks.all { NamedDeployment target ->
-            processor.addVariantOrCustomName(target.name)
+        project.deploygate.apks.all { NamedDeployment deployment ->
+            processor.addVariantOrCustomName(deployment.name)
         }
     }
 
