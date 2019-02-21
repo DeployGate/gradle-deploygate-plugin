@@ -111,7 +111,7 @@ class DeployGateExtensionSpec extends Specification {
         dep2.skipAssemble
     }
 
-    def "findDeployTarget"() {
+    def "findDeploymentByName"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
@@ -159,7 +159,7 @@ class DeployGateExtensionSpec extends Specification {
         !dep3.skipAssemble
     }
 
-    def "hasDeployTarget"() {
+    def "hasDeployment"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
@@ -196,7 +196,7 @@ class DeployGateExtensionSpec extends Specification {
         !result.hasDeployment("dep3")
     }
 
-    def "mergeDeployTarget should work"() {
+    def "mergeDeployments should work"() {
         given:
         def base = new NamedDeployment("base")
         base.sourceFile = new File("base")
@@ -279,7 +279,7 @@ class DeployGateExtensionSpec extends Specification {
     }
 
     @Unroll
-    def "getDefaultDeployTarget should return based on env. Unrolled #sourceFilePath"() {
+    def "getEnvironmentBasedDeployments should return based on env. Unrolled #sourceFilePath"() {
         given:
         def env = [:]
         env[DeployGatePlugin.ENV_NAME_SOURCE_FILE] = sourceFilePath

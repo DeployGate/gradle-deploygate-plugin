@@ -4,10 +4,10 @@ package com.deploygate.gradle.plugins.dsl
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class VariantBasedDeployTargetSpec extends Specification {
+class NamedDeploymentSpec extends Specification {
 
     @Unroll
-    def "verify deprecated fields of VariantBasedDeployTarget. Unrolled #name"() {
+    def "verify deprecated fields of NamedDeployment. Unrolled #name"() {
         setup:
         def deployTarget = new NamedDeployment(name)
         deployTarget.message = uploadMessage
@@ -25,7 +25,7 @@ class VariantBasedDeployTargetSpec extends Specification {
     }
 
     @Unroll
-    def "verify VariantBasedDeployTarget works. Unrolled #name"() {
+    def "verify NamedDeployment works. Unrolled #name"() {
         setup:
         def deployTarget = new NamedDeployment(name)
         deployTarget.uploadMessage = uploadMessage
@@ -51,7 +51,7 @@ class VariantBasedDeployTargetSpec extends Specification {
         "bar" | "message"     | false        | new File("apk") | "distribution_key" | "release_note" | "public"
     }
 
-    def "verify empty VariantBasedDeployTarget works"() {
+    def "verify empty NamedDeployment works"() {
         setup:
         def deployTarget = new NamedDeployment("name")
 

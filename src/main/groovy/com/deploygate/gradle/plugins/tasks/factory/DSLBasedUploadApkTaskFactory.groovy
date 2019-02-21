@@ -19,12 +19,12 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
         def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantNameOrCustomName), UploadApkTask, false)
 
         if (!lazyUploadApkTask) {
-            project.logger.debug("It sounds $variantNameOrCustomName's upload apk task has been already registered by AGP based factory")
+            project.logger.debug("It sounds $variantNameOrCustomName's upload apk task has been already registered by me or other factories")
             return
         }
 
         if (!deployGateExtension.hasDeployment(variantNameOrCustomName)) {
-            project.logger.error("The associated deploy target to $variantNameOrCustomName has not been detected")
+            project.logger.error("No associated deployment to $variantNameOrCustomName has been detected")
             project.logger.error("Please report this problem from https://github.com/DeployGate/gradle-deploygate-plugin/issues")
 
             throw new GradleException("$variantNameOrCustomName could not be handled by DeployGate plugin")
