@@ -318,7 +318,7 @@ class AcceptanceTestSpec extends Specification {
         result.requests.size() == 1
         request.getPart("token").body.asString() == "api token"
         request.getPart("file").body.present
-        request.getPart("message").body.asString() == "custom uploadMessage"
+        request.getPart("message").body.asString() == "custom message"
         request.getPart("distribution_key").body.asString() == "custom distributionKey"
         request.getPart("release_note").body.asString() == "custom releaseNote"
         request.getPart("visibility").body.asString() == "custom visibility"

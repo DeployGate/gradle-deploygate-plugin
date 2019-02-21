@@ -16,7 +16,7 @@ class DeployGatePlugin implements Plugin<Project> {
 
     // env names must start with 'DEPLOYGATE_'
     static final String ENV_NAME_SOURCE_FILE = "DEPLOYGATE_SOURCE_FILE"
-    static final String ENV_NAME_UPLOAD_MESSAGE = "DEPLOYGATE_MESSAGE"
+    static final String ENV_NAME_MESSAGE = "DEPLOYGATE_MESSAGE"
     static final String ENV_NAME_DISTRIBUTION_KEY = "DEPLOYGATE_DISTRIBUTION_KEY"
     static final String ENV_NAME_DISTRIBUTION_RELEASE_NOTE = "DEPLOYGATE_RELEASE_NOTE"
     static final String ENV_NAME_APP_VISIBILITY = "DEPLOYGATE_VISIBILITY"

@@ -27,15 +27,15 @@ class UploadApkTask extends DefaultTask {
         boolean isUniversalApk
 
         File apkFile
-        String uploadMessage
+        String message
         String distributionKey
         String releaseNote
         String visibility
 
         HashMap<String, String> toUploadParams() {
             HashMap<String, String> params = new HashMap<String, String>()
-            if (uploadMessage != null) {
-                params.put("message", uploadMessage)
+            if (message != null) {
+                params.put("message", message)
             }
             if (distributionKey != null) {
                 params.put("distribution_key", distributionKey)
@@ -55,7 +55,7 @@ class UploadApkTask extends DefaultTask {
                 isSigningReady: apkInfo.isSigningReady(),
                 isUniversalApk: apkInfo.isUniversalApk(),
                 apkFile: deployment.sourceFile ?: apkInfo.apkFile,
-                uploadMessage: deployment.uploadMessage,
+                message: deployment.message,
                 distributionKey: deployment.distribution?.key,
                 releaseNote: deployment.distribution?.releaseNote,
                 visibility: deployment.visibility

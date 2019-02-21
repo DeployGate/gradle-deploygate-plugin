@@ -64,18 +64,18 @@ deploygate {
         flavor1Flavor3Debug {
         }
         flavor2Flavor3Debug {
-            uploadMessage = "flavor2Flavor3Debug"
+            message = "flavor2Flavor3Debug"
         }
         flavor1Flavor4Debug {
-            uploadMessage = "flavor1Flavor4Debug"
+            message = "flavor1Flavor4Debug"
         }
         flavor2Flavor4Debug {
-            uploadMessage = "flavor2Flavor4Debug"
+            message = "flavor2Flavor4Debug"
             skipAssemble = true
         }
         customApk {
             sourceFile = file("${project.projectDir}/texture/sample.apk")
-            uploadMessage = "custom uploadMessage"
+            message = "custom message"
             visibility = "custom visibility"
 
             distribution {
