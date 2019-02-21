@@ -53,21 +53,8 @@ apply plugin: 'deploygate'
 
 This plugin does not work with non-app modules and/or library modules correctly.
 
-3 ) You can see DeployGate tasks
-
-```
-# Tasks, which relate with variants which generate split apks, are not visible because they do not belong to any group.
-./gradlew tasks | grep "DeployGate"
-```
-
-If you are an android app development beginner.
-
-- Do `Sync Gradle` if you are using AndroidStudio and/or IDEA.
-
-By running `uploadDeployGate<VariantName>` task, it will build your application,
-set up your DeployGate credentials (for the first time) and upload your application.
-You can deploy an update of your application by running the same task.
-
+3 ) Ready for deployments. Run tasks which you need. Please check the *Usage#Tasks* section for the detail of added tasks.
+ 
 ### If you are using `dg` command (for MacOSX)
 
 [dg](https://github.com/deploygate/deploygate-cli) is a command line tool to help your deployments to DeployGate.
@@ -77,14 +64,37 @@ The command will make diffs to apply this plugin if you run `dg deploy` on the p
 
 ### Tasks
 
-Run `./gradlew tasks` on your project root to see all available tasks. 
+```
+./gradlew tasks | grep "DeployGate"
+```
 
-* `uploadDeployGate[capitalized VariantName]` - Build and upload an apk artifact of *\<VariantName\>*
-* `loginDeployGate` - Log in to DeployGate and save credentials locally
+* `uploadDeployGate<capitalized VariantName>` - Build and upload an apk artifact of *\<VariantName\>*
+* `loginDeployGate` - Log in to DeployGate and save credentials to your local
 * `logoutDeployGate` - Delete current credentials
 
-[VariantName] is built by appending capitalized names of productFlavor and buildType.
-For example, `fooBar` is a variant name if you have `foo` product flavor and `bar` build type.
+*NOTE: Tasks, which relate with variants which generate split apks, are not visible because they do not belong to any group.*
+
+> [VariantName] is built by appending capitalized names of productFlavor and buildType.
+> For example, `fooBar` is a variant name if you have `foo` product flavor and `bar` build type.
+
+#### loginDeployGate
+
+This task reads stored and/or specified credentials. 
+If no credentials are found, this requests you to log in to DeployGate and save credentials to your local.
+
+#### logoutDeployGate
+
+This task deletes stored credentials on your local.
+
+#### uploadDeployGate<VariantName>
+
+This task will do:
+
+- Assemble your app
+- Start set-up your DeployGate credentials only for the first time
+- Upload your app to DeployGate
+
+You can continue to deploy updates by running the same task once credential prepared.
 
 If you define deployment names in `deployments` section, there will also be `uploadDeployGate` task which can upload all the associated deployments at once.
 
@@ -92,7 +102,7 @@ If you define deployment names in `deployments` section, there will also be `upl
 
 ### build.gradle
 
-*v2* has changed the DSL. See [Migrate to v2](#migrate-v2) for more detail.
+*v2* has changed the DSL. See [Migrate from v1 to v2](#migrate-v2) for more detail.
 
 ```groovy
 apply plugin: 'deploygate'                    // add this *after* 'android' plugin 
@@ -176,7 +186,7 @@ Configuration priority is based on the following.
 - Split apks are not supported
 - Android App Bundle is not supported. See [a tracking issue and a workaround](https://github.com/DeployGate/gradle-deploygate-plugin/issues/60#issuecomment-464448962).
 
-## <a name="migrate-v2">Migrate v1 to v2</a>
+## <a name="migrate-v2">Migrate from v1 to v2</a>
 
 We have deprecated some syntax and introduced the new syntax based on the table below.
 
