@@ -14,7 +14,7 @@ class NamedDeployment implements Named, DeploymentSyntax {
     File sourceFile
 
     @Nullable
-    String uploadMessage
+    String message
 
     @Nullable
     String visibility
@@ -51,11 +51,6 @@ class NamedDeployment implements Named, DeploymentSyntax {
     // backward compatibility
 
     @Deprecated
-    void setMessage(@Nullable String message) {
-        setUploadMessage(message)
-    }
-
-    @Deprecated
     void setDistributionKey(@Nullable String distributionKey) {
         distribution {
             delegate.key = distributionKey
@@ -86,7 +81,7 @@ class NamedDeployment implements Named, DeploymentSyntax {
         if (distribution != that.distribution) return false
         if (name != that.name) return false
         if (sourceFile != that.sourceFile) return false
-        if (uploadMessage != that.uploadMessage) return false
+        if (message != that.message) return false
         if (visibility != that.visibility) return false
 
         return true
@@ -96,7 +91,7 @@ class NamedDeployment implements Named, DeploymentSyntax {
         int result
         result = name.hashCode()
         result = 31 * result + (sourceFile != null ? sourceFile.hashCode() : 0)
-        result = 31 * result + (uploadMessage != null ? uploadMessage.hashCode() : 0)
+        result = 31 * result + (message != null ? message.hashCode() : 0)
         result = 31 * result + (visibility != null ? visibility.hashCode() : 0)
         result = 31 * result + (skipAssemble ? 1 : 0)
         result = 31 * result + (distribution != null ? distribution.hashCode() : 0)

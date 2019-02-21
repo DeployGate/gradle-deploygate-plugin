@@ -98,7 +98,7 @@ deploygate {
       // ProTip: get git hash for current commit for easier troubleshooting
       def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
       // set as build message
-      uploadMessage = "debug build ${hash}"
+      message = "debug build ${hash}"
 
       // If this property is `true` , Skip dependency of `assemble` task from `uploadDeployGate` task
       // The default value is `false`

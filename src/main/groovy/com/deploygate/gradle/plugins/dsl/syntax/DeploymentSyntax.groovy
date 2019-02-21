@@ -6,7 +6,7 @@ import javax.annotation.Nullable
 interface DeploymentSyntax {
     void setSourceFile(@Nullable File file)
 
-    void setUploadMessage(@Nullable String message)
+    void setMessage(@Nullable String message)
 
     void setVisibility(@Nullable String visibility)
 
