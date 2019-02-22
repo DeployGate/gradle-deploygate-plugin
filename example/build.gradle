@@ -13,7 +13,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.3.0'
 
         def useReleaseVersion = {
-            def version = "1.1.5"
+            def version = "2.0.0"
             println("VERSION $version")
             classpath "com.deploygate:gradle:$version"
         }
@@ -37,9 +37,9 @@ buildscript {
         }
 
         // Use one of the following calls which what you would to use.
-//        useReleaseVersion.call()
+        useReleaseVersion.call()
 //        useCurrentHEAD.call()
-        useBranchSnapshot.call()
+//        useBranchSnapshot.call()
 //        useCommitSnapshot.call()
 
         // NOTE: Do not place your application dependencies here; they belong
