@@ -2,36 +2,41 @@ language: android
 sudo: false
 jdk: oraclejdk8
 before_cache:
-- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-- rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-  - "$HOME/.gradle"
-  - "$HOME/.android"
-  - ".gradle"
+    - "$HOME/.gradle"
+    - "$HOME/.android"
+    - ".gradle"
 android:
   components:
-  - platform-tools
-  - android-27
-  - build-tools-28.0.3
-  - extra-google-m2repository
-  - extra-android-m2repository
-  - tools
+    - platform-tools
+    - android-27
+    - build-tools-28.0.3
+    - extra-google-m2repository
+    - extra-android-m2repository
+    - tools
   licenses:
-  - android-sdk-preview-license-.+
-  - android-sdk-license-.+
-  - google-gdk-license-.+
-env:
-  matrix:
-    - GRADLE_TASK_NAME="install test"
-    - GRADLE_TASK_NAME=acceptanceTest
-script:
-- "./gradlew $GRADLE_TASK_NAME"
-deploy:
-  provider: script
-  script: ./release.sh
-  on:
-    tags: true
-    repo: DeployGate/gradle-deploygate-plugin
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+jobs:
+  include:
+    - stage: required_test
+      script: ./gradlew install test
+    - script: ./gradlew acceptanceTest
+    - stage: deploy
+      script: skip
+      deploy:
+        provider: script
+        script: ./release.sh
+        condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
+        on:
+          tags: true
+          repo: DeployGate/gradle-deploygate-plugin
+stages: # job order
+  - required_test
+  - deploy
 after_deploy:
-- 'curl -X POST --data-urlencode "payload={\"text\": \"Released a gradle-deploygate-plugin in Bintray! Please check <https://bintray.com/deploygate/maven|Bintray>\"}" $SLACK_URL'
+  - 'curl -X POST --data-urlencode "payload={\"text\": \"Released a gradle-deploygate-plugin in Bintray! Please check <https://bintray.com/deploygate/maven|Bintray>\"}" $SLACK_URL'
