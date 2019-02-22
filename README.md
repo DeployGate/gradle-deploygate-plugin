@@ -27,7 +27,7 @@ buildscript {
 }
 ```
 
-If you are using the new plugin DSL, then the following is required in your *setting.gradle*.
+If you are using the new plugin block DSL, then the following is required in your *setting.gradle*.
 
 ```groovy
 pluginManagement {
@@ -53,14 +53,21 @@ apply plugin: 'com.android.application' // It's better to apply Android Plugin f
 apply plugin: 'deploygate'
 ```
 
+*The new plugin block DSL*
+
+```groovy
+plugins {
+    id "com.deploygate" version "the latest version"
+}
+```
+
 This plugin does not work with non-app modules and/or library modules correctly.
 
 3 ) Ready for deployments. Run tasks which you need. Please check the *Usage#Tasks* section for the detail of added tasks.
  
 ### If you are using `dg` command (for MacOSX)
 
-[dg](https://github.com/deploygate/deploygate-cli) is a command line tool to help your deployments to DeployGate.
-The command will make diffs to apply this plugin if you run `dg deploy` on the project root. 
+[dg](https://github.com/deploygate/deploygate-cli) will make diffs to apply this plugin if you run `dg deploy` on the project root. 
 
 ## Usage
 
@@ -159,13 +166,15 @@ deploygate {
 
 ### Environment Variables
 
+*v2* has renamed some environment variables. See [Migrate from v1 to v2](#migrate-v2) for more detail.
+
 You can configure this plugin as well by providing environment variables. This would be useful for CI/CD.
 
- * `DEPLOYGATE_USER_NAME`
+ * `DEPLOYGATE_APP_OWNER_NAME`
  * `DEPLOYGATE_API_TOKEN`
  * `DEPLOYGATE_MESSAGE`
  * `DEPLOYGATE_DISTRIBUTION_KEY`
- * `DEPLOYGATE_RELEASE_NOTE`
+ * `DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE`
  * `DEPLOYGATE_SOURCE_FILE`
  * `DEPLOYGATE_OPEN_BROWSER` (Env only; open the app page after the uploading finished) 
 
@@ -174,7 +183,7 @@ Environment variable configurations allow you to avoid writing your credentials 
 Tip: You do not need to export these values to the current shell. You can use DEPLOYGATE_USER_NAME like the following:
 
 ```
-DEPLOYGATE_USER_NAME=YourOrganizationName ./gradlew :app:uploadDeployGateFlavor1Debug
+DEPLOYGATE_USER_NAME=YourOrganizationName ./gradlew uploadDeployGateFlavor1Debug
 ```
 
 Note that this plugin will read environment values first, and overwrite them by specified configurations later.
@@ -182,11 +191,19 @@ Configuration priority is based on the following.
 
 *Specified configurations* \> *Environment variables* \> *Auto detection*
 
+## Proxy setting
+
+You can configure proxy settings via system properties. Please follow the official document of Gradle.
+
+- https://docs.gradle.org/current/userguide/build_environment.html#sec:accessing_the_web_via_a_proxy
+- https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_system_properties
+
 ## Known limitations
 
 - To create a new distribution is not supported
 - Split apks are not supported
-- Android App Bundle is not supported. See [a tracking issue and a workaround](https://github.com/DeployGate/gradle-deploygate-plugin/issues/60#issuecomment-464448962).
+- Android App Bundle is not supported. See [a tracking issue](https://github.com/DeployGate/gradle-deploygate-plugin/issues/60) and [a workaround](./example/app/build.gradle#L61).
+- Tasks will be added after project-evaluated
 
 ## <a name="snapshot">Snapshot</a>
 
@@ -210,6 +227,22 @@ buildscript {
 jitpack.io will store artifacts once required, so the request may cause time-out for the first time.
 If you get a time-out error from jitpack, then please run your task again.
 
+## Development
+
+You can try this plugin locally by following the steps below.
+
+0. Clone this repository
+1. Edit `/VERSION` file to an unused version (e.g. 2.0.0-beta01)
+2. Run `./gradlew install` to make it available on your local
+3. Add mavenLocal to buildscript repository of a test project
+4. Specify the version which you specify at step 2
+
+And also, please make sure your changes pass unit tests and acceptance tests.  
+
+```bash
+./gradlew test acceptanceTest
+```
+
 ## <a name="migrate-v2">Migrate from v1 to v2</a>
 
 We have deprecated some syntax and introduced the new syntax based on the table below.
@@ -222,8 +255,12 @@ Deprecated | New
 *noAssemble* | Use **skipAssemble**
 *distributionKey* | Use **key** in **distribution** closure
 *releaseNote* | Use **releaseNote** in **distribution** closure
+*DEPLOYGATE_USER_NAME* env | Use **DEPLOYGATE_APP_OWNER_NAME** instead
+*DEPLOYGATE_RELEASE_NOTE* env | Use **DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE** instead
 
-*v2.0.x can use the v1 syntax as it is, but we will make it obsolete on v2.1.0*  
+*If both of v1 and v2 variables are specified, v2 variables will be used.*
+
+**v2.0.x can use the v1 syntax as it is, but we will start to make it obsolete from v2.1.0**  
 
 Let's say we have a v1 configuration like below. 
 

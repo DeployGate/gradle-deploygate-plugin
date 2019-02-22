@@ -315,6 +315,30 @@ class DeployGateExtensionSpec extends Specification {
     }
 
     @Unroll
+    def "getEnvironmentBasedDeployments backward compatibility"() {
+        given:
+        def env = [:]
+        env[DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE] = distributionReleaseNote
+        env[DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1] = v1DistributionReleaseNote
+        testSystemEnv.setEnv(env)
+
+        Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+
+        and:
+        NamedDeployment deployment = DeployGateExtension.getEnvironmentBasedDeployment(project)
+
+        expect:
+        deployment.distribution?.releaseNote == expectedDistributionReleaseNote
+
+        where:
+        v1DistributionReleaseNote   | distributionReleaseNote   | expectedDistributionReleaseNote
+        null                        | null                      | null
+        null                        | "distributionReleaseNote" | "distributionReleaseNote"
+        "v1DistributionReleaseNote" | null                      | "v1DistributionReleaseNote"
+        "v1DistributionReleaseNote" | "distributionReleaseNote" | "distributionReleaseNote"
+    }
+
+    @Unroll
     def "getEnvironmentBasedDeployments should return based on env. Unrolled #sourceFilePath"() {
         given:
         def env = [:]
@@ -340,7 +364,7 @@ class DeployGateExtensionSpec extends Specification {
 
         where:
         sourceFilePath   | message   | distributionKey   | distributionReleaseNote   | visibility   | skipAssemble
-        null             | null            | null              | null                      | null         | null
+        null             | null      | null              | null                      | null         | null
         "sourceFilePath" | "message" | "distributionKey" | "distributionReleaseNote" | "visibility" | true
     }
 }

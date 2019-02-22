@@ -112,7 +112,10 @@ class DeployGateExtension implements ExtensionSyntax {
         File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { it -> project.file(it) }
         String message = System.getenv(DeployGatePlugin.ENV_NAME_MESSAGE)
         String distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
-        String distributionReleaseNote = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE)
+        String distributionReleaseNote = [
+                System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE),
+                System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1)
+        ].find { it }
         String visibility = System.getenv(DeployGatePlugin.ENV_NAME_APP_VISIBILITY)
 
         def deployment = new NamedDeployment("environment-based")

@@ -1,0 +1,82 @@
+apply plugin: 'com.android.application'
+apply plugin: 'deploygate'
+
+ android {
+     compileSdkVersion 28
+     defaultConfig {
+         applicationId "com.deploygate.gradlesample"
+         minSdkVersion 14
+         targetSdkVersion 28
+         versionCode 1
+         versionName "1.0"
+         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+     }
+     buildTypes {
+         release {
+             minifyEnabled false
+             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+         }
+     }
+     flavorDimensions "dimension1"
+     productFlavors {
+         flavor1 {
+             dimension "dimension1"
+             applicationIdSuffix ".flavor1"
+         }
+         flavor2 {
+             dimension "dimension1"
+             applicationIdSuffix ".flavor2"
+         }
+     }
+ }
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+}
+
+def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
+
+// see README.md for more detail
+deploygate {
+    deployments {
+        flavor1Debug {
+            message = "flavor1Debug ${hash}"
+        }
+
+        flavor2Debug {
+            message = "flavor2Debug ${hash}"
+            skipAssemble = true
+        }
+
+        alpha {
+            sourceFile = file("${project.projectDir}/build/outputs/apk/flavor1/debug/app-flavor1-debug.apk")
+            distribution {
+                // Need to set DEPLOYGATE_DISTRIBUTION_KEY
+                releaseNote = "release alpha flavor1Debug"
+            }
+        }
+
+        universalApkOfAab {
+            message = "universalApkOfAab flavor1Debug ${hash}"
+            sourceFile = file("${project.rootDir}/app/build/from-aab/universal.apk")
+        }
+    }
+}
+
+def buildUniversalApk = project.tasks.create("buildUniversalApk", DefaultTask.class) {
+    dependsOn("bundleFlavor1Debug")
+    doLast {
+        def proc = "${rootProject.projectDir}/bundle_universal_apk.bash app/build/outputs/bundle/flavor1Debug/app.aab app/build/from-aab/universal.apk".execute([], rootProject.projectDir)
+        if (proc.waitFor() != 0) {
+            throw new IllegalStateException(proc.err.text)
+        }
+    }
+}
+project.afterEvaluate {
+    // Gradle 4.10.0 is required
+    project.tasks.named("uploadDeployGateUniversalApkOfAab").configure { dgTask ->
+        dgTask.dependsOn(buildUniversalApk)
+    }
+}

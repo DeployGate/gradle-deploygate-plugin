@@ -15,10 +15,16 @@ class DeployGatePlugin implements Plugin<Project> {
     private static final String EXTENSION_NAME = 'deploygate'
 
     // env names must start with 'DEPLOYGATE_'
+    static final String ENV_NAME_APP_OWNER_NAME = "DEPLOYGATE_APP_OWNER_NAME"
+    @Deprecated
+    static final String ENV_NAME_APP_OWNER_NAME_V1 = "DEPLOYGATE_USER_NAME"
+    static final String ENV_NAME_API_TOKEN = "DEPLOYGATE_API_TOKEN"
     static final String ENV_NAME_SOURCE_FILE = "DEPLOYGATE_SOURCE_FILE"
     static final String ENV_NAME_MESSAGE = "DEPLOYGATE_MESSAGE"
     static final String ENV_NAME_DISTRIBUTION_KEY = "DEPLOYGATE_DISTRIBUTION_KEY"
-    static final String ENV_NAME_DISTRIBUTION_RELEASE_NOTE = "DEPLOYGATE_RELEASE_NOTE"
+    static final String ENV_NAME_DISTRIBUTION_RELEASE_NOTE = "DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE"
+    @Deprecated
+    static final String ENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1 = "DEPLOYGATE_RELEASE_NOTE"
     static final String ENV_NAME_APP_VISIBILITY = "DEPLOYGATE_VISIBILITY"
 
     static final String ENV_NAME_OPEN_APP_DETAIL_AFTER_UPLOAD = "DEPLOYGATE_OPEN_BROWSER"
@@ -45,7 +51,7 @@ class DeployGatePlugin implements Plugin<Project> {
     private void initProcessor(@Nonnull Project project) {
         processor = new Processor(project)
 
-        project.deploygate.apks.all { NamedDeployment deployment ->
+        GradleCompat.configureEach(project.deploygate.apks) { NamedDeployment deployment ->
             processor.addVariantOrCustomName(deployment.name)
         }
     }
