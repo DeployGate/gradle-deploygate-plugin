@@ -51,7 +51,7 @@ class DeployGatePlugin implements Plugin<Project> {
     private void initProcessor(@Nonnull Project project) {
         processor = new Processor(project)
 
-        GradleCompat.configureEach(project.deploygate.apks) { NamedDeployment deployment ->
+        GradleCompat.configureEach(project.deploygate.deployments) { NamedDeployment deployment ->
             processor.addVariantOrCustomName(deployment.name)
         }
     }
