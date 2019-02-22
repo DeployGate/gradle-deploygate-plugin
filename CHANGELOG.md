@@ -1,8 +1,36 @@
 # ChangeLog
 
-## ver 2
+## ver 2.0.0
 
-TBW
+- Change the DSL syntax
+- Change environment variable names
+- Support Android Studio 3.3.0 and higher
+- Avoid using obsoleted apis of Android Plugin for Gradle whose version is lower than 3.4.0-beta04 
+
+*Breaking changes*
+
+- Drop Android Studio 2 supports
+- Drop Android Studio 3.0.0-preview supports
+
+*Deprecation*
+
+Deprecated | New
+:---|:----
+*userName* | Use **appOwnerName**
+*token* | Use **apiToken**
+*apks* closure | Use **deployments** closure
+*noAssemble* | Use **skipAssemble**
+*distributionKey* | Use **key** in **distribution** closure
+*releaseNote* | Use **releaseNote** in **distribution** closure
+*DEPLOYGATE_USER_NAME* env | Use **DEPLOYGATE_APP_OWNER_NAME** instead
+*DEPLOYGATE_RELEASE_NOTE* env | Use **DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE** instead
+
+*Other*
+
+- Revised README.md
+- Separated README.md and CHANGELOG
+- Supported snapshot versions
+- Added an example to build a universal apk from Android App Bundle
 
 ## ver 1.1.5
 

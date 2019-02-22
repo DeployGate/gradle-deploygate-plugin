@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.tasks
 
+import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
@@ -29,11 +30,11 @@ class LoginTask extends DefaultTask {
                 throw new RuntimeException('Failed to retrieve DeployGate credentials. Please try again or specify it in your build.gradle script.')
 
         project.deploygate.appOwnerName =
-                [project.deploygate.appOwnerName, System.getenv('DEPLOYGATE_USER_NAME'), localCredential.name].find {
+                [project.deploygate.appOwnerName, System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1), localCredential.name].find {
                     it != null
                 }
         project.deploygate.apiToken =
-                [project.deploygate.apiToken, System.getenv('DEPLOYGATE_API_TOKEN'), localCredential.token].find {
+                [project.deploygate.apiToken, System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN), localCredential.token].find {
                     it != null
                 }
     }
@@ -43,7 +44,8 @@ class LoginTask extends DefaultTask {
     }
 
     boolean hasCredentialInEnv() {
-        System.getenv('DEPLOYGATE_USER_NAME') && System.getenv('DEPLOYGATE_API_TOKEN')
+        [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1)].any() &&
+                [System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN)].any()
     }
 
     private boolean hasSavedCredential() {
