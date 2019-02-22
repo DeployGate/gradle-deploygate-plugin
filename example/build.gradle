@@ -1,44 +1,59 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
 buildscript {
     repositories {
+        google()
+        mavenLocal()
         jcenter()
+        // snapshot repo.
+        maven { url 'https://jitpack.io' }
     }
+
     dependencies {
-        classpath 'com.deploygate:gradle:1.0.4'
+        classpath 'com.android.tools.build:gradle:3.3.0'
+
+        def useReleaseVersion = {
+            def version = "1.1.5"
+            println("VERSION $version")
+            classpath "com.deploygate:gradle:$version"
+        }
+
+        def useCurrentHEAD = {
+            def version = new File(rootProject.projectDir, '../src/main/resources/VERSION').text.trim()
+            println("VERSION $version")
+            classpath "com.deploygate:gradle:$version"
+        }
+
+        def useBranchSnapshot = {
+            def branchName = "v2"
+            println("Branch-snapshot $branchName")
+            classpath "com.github.deploygate:gradle-deploygate-plugin:${branchName}-SNAPSHOT"
+        }
+
+        def useCommitSnapshot = {
+            def commitHash = "6061031"
+            println("Commit-snapshot $commitHash")
+            classpath "com.github.deploygate:gradle-deploygate-plugin:$commitHash"
+        }
+
+        // Use one of the following calls which what you would to use.
+//        useReleaseVersion.call()
+//        useCurrentHEAD.call()
+        useBranchSnapshot.call()
+//        useCommitSnapshot.call()
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
-apply plugin: 'deploygate'                    // add this *after* 'android' plugin
-
-// Optional configurations
-deploygate {
-
-    // If you are using automated build, you can specify your account credentials like this
-    userName = "[username of app owner]"
-    token = "[your API token]"
-
-    // You can also specify additional options for each flavor.
-    apks {
-
-        // this correspond to `debug` flavor and used for `uploadDeployGateDebug` task
-        debug {
-            // ProTip: get git hash for current commit for easier troubleshooting
-            def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
-            // set as build message
-            message = "debug build ${hash}"
-
-            // If this property is `true` , Skip dependency of `assemble` task from `uploadDeployGate` task
-            // The default value is `false`
-            noAssemble = true
-
-            // if you are using a distribution page, you can update it simultaneously
-            distributionKey = "1234567890abcdef1234567890abcdef"
-            releaseNote = "release note sample"
-        }
-
-        // this creates `uploadDeployGateCustom` task to upload arbitrary APK file
-        custom {
-            // set target file
-            sourceFile = file("${project.rootDir}/app/build/some-custom-build.apk")
-        }
+allprojects {
+    repositories {
+        google()
+        jcenter()
     }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

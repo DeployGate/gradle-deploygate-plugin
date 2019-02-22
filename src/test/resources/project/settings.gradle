@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        // to support older AGP
+        maven {
+            url 'https://maven.google.com'
+        }
+        maven {
+            url "https://jcenter.bintray.com"
+        }
+    }
+
+    resolutionStrategy {
+        eachPlugin {
+            switch (requested.id.id) {
+                case "com.android.application":
+                    useModule("com.android.tools.build:gradle:${agpVersion}")
+                    break
+            }
+        }
+    }
+}
+
+rootProject.name = 'app'

@@ -1,17 +1,22 @@
 package com.deploygate.gradle.plugins.utils
 
+import javax.annotation.Nonnull
+
 class BrowserUtils {
 
-    private static final String OS_NAME = System.getProperty("os.name").toLowerCase()
+    @Nonnull
+    private static String getOS_NAME() {
+        return (System.getProperty("os.name") ?: "unknown").toLowerCase(Locale.US)
+    }
 
-    static boolean openBrowser(String url) {
+    static boolean openBrowser(@Nonnull String url) {
         if (hasBrowser()) {
             try {
-                if(isMac()) {
+                if (isExecutableOnMacOS()) {
                     return openBrowserForMac(url)
-                } else if(isWindows()) {
+                } else if (isExecutableOnWindows()) {
                     return openBrowserForWindows(url)
-                } else if(isLinux()) {
+                } else if (isExecutableOnLinux()) {
                     return openBrowserForLinux(url)
                 } else {
                     return false
@@ -22,18 +27,18 @@ class BrowserUtils {
         false
     }
 
-    static boolean openBrowserForMac(String url) {
+    static boolean openBrowserForMac(@Nonnull String url) {
         return ['open', url].execute().waitFor() == 0
     }
 
-    static boolean openBrowserForWindows(String url) {
+    static boolean openBrowserForWindows(@Nonnull String url) {
         return ['cmd', '/c', 'start', url].execute().waitFor() == 0
     }
 
-    static boolean openBrowserForLinux(String url) {
+    static boolean openBrowserForLinux(@Nonnull String url) {
         try {
             int result = ['xdg-open', url].execute().waitFor()
-            if(result == 0) {
+            if (result == 0) {
                 return true
             } else {
                 throw new RuntimeException()
@@ -44,18 +49,18 @@ class BrowserUtils {
     }
 
     static boolean hasBrowser() {
-        !isCiEnvironment() && (isMac() || isWindows() || (isLinux() && isDisplayAvailable()))
+        !isCiEnvironment() && (isExecutableOnMacOS() || isExecutableOnWindows() || isExecutableOnLinux())
     }
 
-    static boolean isLinux() {
-        return OS_NAME.startsWith("linux")
+    static boolean isExecutableOnLinux() {
+        return OS_NAME.startsWith("linux") && isDisplayAvailable()
     }
 
-    static boolean isMac() {
+    static boolean isExecutableOnMacOS() {
         return OS_NAME.startsWith("mac")
     }
 
-    static boolean isWindows() {
+    static boolean isExecutableOnWindows() {
         return OS_NAME.startsWith("windows")
     }
 
@@ -65,6 +70,6 @@ class BrowserUtils {
     }
 
     static boolean isCiEnvironment() {
-        System.getenv('CI') || System.getenv('JENKINS_URL')
+        System.getenv('CI') == "true" || System.getenv('JENKINS_URL')
     }
 }
