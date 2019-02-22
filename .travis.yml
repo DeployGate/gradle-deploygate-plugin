@@ -30,7 +30,7 @@ script:
 deploy:
   provider: script
   script: ./release.sh
-  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
+  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ && $TRAVIS_JOB_NUMBER =~ ^[0-9]+\.1$
   on:
     tags: true
     repo: DeployGate/gradle-deploygate-plugin
