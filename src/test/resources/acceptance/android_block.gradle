@@ -1,0 +1,49 @@
+android {
+    compileSdkVersion 27
+    buildToolsVersion '28.0.3'
+    defaultConfig {
+        applicationId "com.deploygate.example"
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+        }
+    }
+
+    flavorDimensions "dim1", "dim2"
+    productFlavors {
+        flavor1 {
+            dimension "dim1"
+            applicationIdSuffix ".p1"
+        }
+        flavor2 {
+            dimension "dim1"
+            applicationIdSuffix ".p2"
+        }
+        flavor3 {
+            dimension "dim2"
+            applicationIdSuffix ".p3"
+        }
+        flavor4 {
+            dimension "dim2"
+            applicationIdSuffix ".p4"
+        }
+    }
+}
+
+repositories {
+    maven {
+        url "https://jcenter.bintray.com"
+    }
+    maven {
+        url "https://maven.google.com"
+    }
+}
