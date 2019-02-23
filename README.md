@@ -98,7 +98,7 @@ If no credentials are found, this requests you to log in to DeployGate and save 
 
 This task deletes stored credentials on your local.
 
-#### uploadDeployGate\<VariantName\>
+#### uploadDeployGate\<capitalized VariantName\>
 
 This task will do:
 
@@ -108,7 +108,7 @@ This task will do:
 
 You can continue to deploy updates by running the same task once credential prepared.
 
-*uploadDeployGate*
+**uploadDeployGate**
 
 If you define deployment names in `deployments` section, there will also be `uploadDeployGate` task which can upload all the associated deployments at once.
 For example, `uploadDeployGate` will run `uploadDeployGateFoo` and `uploadDeployGateBar` based on a configuration below.
