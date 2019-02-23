@@ -1,41 +1,43 @@
+import com.deploygate.gradle.plugins.dsl.Distribution
+
 plugins {
-    id "com.android.application"
-    id "deploygate"
+    id("com.android.application")
+    id("deploygate")
 }
 
-apply from: "android_block.gradle"
+apply(from = "android_block.gradle")
 
 deploygate {
     // for testing
     endpoint = "http://localhost:8888"
-    
+
     appOwnerName = "appOwner"
     apiToken = "api token"
-    
+
     deployments {
-        flavor1Flavor3Debug {
+        create("flavor1Flavor3Debug") {
         }
-        flavor2Flavor3Debug {
+        create("flavor2Flavor3Debug") {
             message = "flavor2Flavor3Debug"
         }
-        flavor1Flavor4Debug {
+        create("flavor1Flavor4Debug") {
             message = "flavor1Flavor4Debug"
         }
-        flavor2Flavor4Debug {
+        create("flavor2Flavor4Debug") {
             message = "flavor2Flavor4Debug"
             skipAssemble = true
         }
-        customApk {
+        create("customApk") {
             sourceFile = file("${project.projectDir}/texture/sample.apk")
             message = "custom message"
             visibility = "custom visibility"
 
-            distribution {
+            distribution(closureOf<Distribution> {
                 key = "custom distributionKey"
                 releaseNote = "custom releaseNote"
-            }
+            })
         }
     }
 }
 
-apply from: "assertion_tasks.gradle"
+apply(from = "assertion_tasks.gradle")

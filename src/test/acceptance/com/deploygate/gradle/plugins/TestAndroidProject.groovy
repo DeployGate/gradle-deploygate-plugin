@@ -29,7 +29,13 @@ ndk.dir=${androidSdk}/ndk-bundle
 
     void useAcceptanceResourceDir() {
         useProjectResourceDir()
+        buildGradle.exists() && buildGradle.delete()
         copyDir("acceptance")
+    }
+
+    void useAcceptanceKtsResourceDir() {
+        useAcceptanceResourceDir()
+        useGradleKtsResource()
     }
 
     void useGradleCompatResource() {
@@ -38,6 +44,24 @@ ndk.dir=${androidSdk}/ndk-bundle
 
         buildGradle.exists() && buildGradle.delete() && buildGradle.createNewFile()
         buildGradle << new File(dir, "gradle.compat.build.gradle").newInputStream()
+    }
+
+    void useGradleKtsForBackwardCompatibilityResource() {
+        def classLoader = getClass().getClassLoader()
+        def dir = classLoader.getResource("acceptance-kts").file as File
+
+        buildGradle.exists() && buildGradle.delete()
+        buildGradleKts.exists() && buildGradleKts.delete() && buildGradleKts.createNewFile()
+        buildGradleKts << new File(dir, "old-dsl.build.gradle.kts").newInputStream()
+    }
+
+    private void useGradleKtsResource() {
+        def classLoader = getClass().getClassLoader()
+        def dir = classLoader.getResource("acceptance-kts").file as File
+
+        buildGradle.exists() && buildGradle.delete()
+        buildGradleKts.exists() && buildGradleKts.delete() && buildGradleKts.createNewFile()
+        buildGradleKts << new File(dir, "build.gradle.kts").newInputStream()
     }
 
     @Nonnull
@@ -54,9 +78,12 @@ ndk.dir=${androidSdk}/ndk-bundle
 
     private void copy(File copyFrom, File copyTo) {
         def nextCopyTo = new File(copyTo, copyFrom.name)
+        nextCopyTo.exists() && nextCopyTo.delete()
 
         if (copyFrom.isFile()) {
-            nextCopyTo.exists() && nextCopyTo.delete() && nextCopyTo.createNewFile()
+            if (!nextCopyTo.createNewFile()) {
+                throw new RuntimeException("cannot make a file")
+            }
             nextCopyTo << copyFrom.newInputStream()
         } else if (copyFrom.isDirectory()) {
             if (!nextCopyTo.mkdirs()) {
@@ -71,6 +98,10 @@ ndk.dir=${androidSdk}/ndk-bundle
 
     File getBuildGradle() {
         return new File(temporaryFolder.root, "build.gradle")
+    }
+
+    File getBuildGradleKts() {
+        return new File(temporaryFolder.root, "build.gradle.kts")
     }
 
     void gradleProperties(Map<String, Object> vars) {
