@@ -103,7 +103,7 @@ This task deletes stored credentials on your local.
 This task will do:
 
 - Assemble your app
-- Start set-up your DeployGate credentials only for the first time
+- Start set-up your DeployGate credentials if no credential is found
 - Upload your app to DeployGate
 
 You can continue to deploy updates by running the same task once credential prepared.
@@ -172,7 +172,6 @@ deploygate {
     
     // You can define any names which you would like to use.
     // In this case, this plugin creates `uploadDeployGateUniversalApkOfAab` task to upload the specified apk file.
-    // Custom
     universalApkOfAab {
       sourceFile = file("${project.rootDir}/app/build/from-aab/universal.apk")
 
@@ -201,7 +200,7 @@ Environment variable configurations allow you to avoid writing your credentials 
 Tip: You do not need to export these values to the current shell. You can use DEPLOYGATE_USER_NAME like the following:
 
 ```
-DEPLOYGATE_USER_NAME=YourOrganizationName ./gradlew uploadDeployGateFlavor1Debug
+DEPLOYGATE_APP_OWNER_NAME=YourOrganizationName ./gradlew uploadDeployGateFlavor1Debug
 ```
 
 Note that this plugin will read environment values first, and overwrite them by specified configurations later.
@@ -250,7 +249,7 @@ If you get a time-out error from jitpack, then please run your task again.
 You can try this plugin locally by following the steps below.
 
 0. Clone this repository
-1. Edit `/VERSION` file to an unused version (e.g. 2.0.0-beta01)
+1. Edit `/VERSION` file to a non-released version (e.g. 2.0.0-beta01)
 2. Run `./gradlew install` to make it available on your local
 3. Add mavenLocal to buildscript repository of a test project
 4. Specify the version which you specify at step 1
@@ -322,7 +321,7 @@ NOTE: 2.0.1 fixed the broken DSL. Please upgrade to 2.0.1 if you are using 2.0.0
 
 then, new v2 configuration which is the same to the above will be like below:
 
-```groovy
+```kotlin
 import com.deploygate.gradle.plugins.dsl.Distribution
 
 deploygate {
