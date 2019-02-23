@@ -81,8 +81,8 @@ This plugin does not work with non-app modules and/or library modules correctly.
 
 * `loginDeployGate` - Log in to DeployGate and save credentials to your local
 * `logoutDeployGate` - Delete current credentials
-* `uploadDeployGate` - Run uploadDeployGateXXX tasks which are defined in a gradle file
 * `uploadDeployGate<capitalized VariantName>` - Build and upload an apk artifact of *\<VariantName\>*
+* `uploadDeployGate` - Run uploadDeployGateXXX tasks which are defined in a gradle file
 
 *NOTE: Tasks, which relate with variants which generate split apks, are not visible because they do not belong to any group.*
 
@@ -98,20 +98,6 @@ If no credentials are found, this requests you to log in to DeployGate and save 
 
 This task deletes stored credentials on your local.
 
-#### uploadDeployGate
-
-This task runs *uploadDeployGateXXX* tasks whose variants are defined expressly.
-For example, this task will run `uploadDeployGateFoo` and `uploadDeployGateBar` based on a configuration below.
-
-```
-deploygate {
-  deployments {
-    foo { ... }
-    bar { ... }
-  }
-}
-```
-
 #### uploadDeployGate\<VariantName\>
 
 This task will do:
@@ -122,7 +108,19 @@ This task will do:
 
 You can continue to deploy updates by running the same task once credential prepared.
 
+*uploadDeployGate*
+
 If you define deployment names in `deployments` section, there will also be `uploadDeployGate` task which can upload all the associated deployments at once.
+For example, `uploadDeployGate` will run `uploadDeployGateFoo` and `uploadDeployGateBar` based on a configuration below.
+
+```
+deploygate {
+  deployments {
+    foo { ... }
+    bar { ... }
+  }
+}
+```
 
 ## How configure your deployments
 
