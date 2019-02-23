@@ -48,6 +48,12 @@ class NamedDeployment implements Named, DeploymentSyntax {
     // backward compatibility
 
     @Deprecated
+    @Nullable
+    String getDistributionKey() {
+        return distribution?.key
+    }
+
+    @Deprecated
     void setDistributionKey(@Nullable String distributionKey) {
         distribution {
             delegate.key = distributionKey
@@ -55,10 +61,21 @@ class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     @Deprecated
+    @Nullable
+    String getReleaseNote() {
+        return distribution?.releaseNote
+    }
+
+    @Deprecated
     void setReleaseNote(@Nullable String releaseNote) {
         distribution {
             delegate.releaseNote = releaseNote
         }
+    }
+
+    @Deprecated
+    boolean getNoAssemble() {
+        return isSkipAssemble()
     }
 
     @Deprecated

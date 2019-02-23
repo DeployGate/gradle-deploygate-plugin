@@ -36,13 +36,23 @@ class DeployGateExtension implements ExtensionSyntax {
 
     // backward compatibility
 
-    @Deprecated
-    void setToken(String token) {
-        setApiToken(token)
+    @Nullable
+    String getToken() {
+        return getApiToken()
     }
 
     @Deprecated
-    void setUserName(String userName) {
+    void setToken(@Nullable String token) {
+        setApiToken(token)
+    }
+
+    @Nullable
+    String getUserName() {
+        return getAppOwnerName()
+    }
+
+    @Deprecated
+    void setUserName(@Nullable String userName) {
         setAppOwnerName(userName)
     }
 
