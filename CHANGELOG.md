@@ -1,5 +1,9 @@
 # ChangeLog
 
+## ver 2.0.1
+
+- Fixed unexpected broken v1 configuration on Kotlin DSL
+
 ## ver 2.0.0
 
 - Change the DSL syntax
