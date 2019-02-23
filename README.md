@@ -5,7 +5,7 @@
 
 This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
 
-*We are migrated to `v2`. See [Migrate from v1 to v2](#migrate-v2) for the migration for more detail*
+*We have migrated to `v2`. See [Migrate from v1 to v2](#migrate-v2) for the migration for more detail*
 
 ## Getting started
 
@@ -124,9 +124,7 @@ deploygate {
 
 ## How configure your deployments
 
-### build.gradle
-
-*v2* has changed the DSL. See [Migrate from v1 to v2](#migrate-v2) for more detail.
+*v2* has changed the DSL. See [Migrate from v1 to v2](#migrate-v2) for more detail. 
 
 ```groovy
 apply plugin: 'deploygate'                    // add this *after* 'android' plugin 
@@ -145,7 +143,7 @@ deploygate {
     // This configuration will be used for `uploadDeployGateFlavor1Debug` task 
     flavor1Debug {
       // ProTip: Use Git hash of the current commit for easier troubleshooting
-      def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
+      def hash = "git rev-parse --short HEAD".execute([], project.rootDir).in.text.trim()
 
       // Set a text which is associated with an application file on DeployGate
       message = "debug build ${hash}" // null by default
@@ -165,6 +163,11 @@ deploygate {
           // A release note of a distribution which is associated with this build
           releaseNote = "release note sample"
       }
+      
+      // If you are using KotlinDSL
+      distribution(closureOf<com.deploygate.gradle.plugins.dsl.Distribution> {
+          ...
+      })
     }
     
     // You can define any names which you would like to use.
@@ -250,7 +253,7 @@ You can try this plugin locally by following the steps below.
 1. Edit `/VERSION` file to an unused version (e.g. 2.0.0-beta01)
 2. Run `./gradlew install` to make it available on your local
 3. Add mavenLocal to buildscript repository of a test project
-4. Specify the version which you specify at step 2
+4. Specify the version which you specify at step 1
 
 And also, please make sure your changes pass unit tests and acceptance tests.  
 
@@ -277,7 +280,7 @@ Deprecated | New
 
 **v2.0.x can use the v1 syntax as it is, but we will start to make it obsolete from v2.1.0**  
 
-Let's say we have a v1 configuration like below. 
+Let's say we have a v1 configuration like below. (Groovy configuration and Kotlin DSL are the same in v1)
 
 ```groovy
 deploygate {
@@ -293,6 +296,8 @@ deploygate {
 }
 ```
 
+### v2 Groovy configuration
+
 then, new v2 configuration which is the same to the above will be like below:
 
 ```groovy
@@ -306,6 +311,30 @@ deploygate {
         key = "xyz..."
         releaseNote = "foobar"
       }
+    }
+  }
+}
+```
+
+### v2 Kotlin DSL
+
+NOTE: 2.0.1 fixed the broken DSL. Please upgrade to 2.0.1 if you are using 2.0.0 and have troubles with it.
+
+then, new v2 configuration which is the same to the above will be like below:
+
+```groovy
+import com.deploygate.gradle.plugins.dsl.Distribution
+
+deploygate {
+  appOwnerName = "deploygate-user"
+  apiToken = "abcdef..."
+  deployments {
+    flavor1Debug {
+      skipAssemble = true
+      distribution(closureOf<Distribution> {
+        key = "xyz..."
+        releaseNote = "foobar"
+      })
     }
   }
 }
