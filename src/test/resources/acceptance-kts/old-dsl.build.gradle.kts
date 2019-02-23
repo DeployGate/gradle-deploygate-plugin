@@ -1,6 +1,3 @@
-import com.deploygate.gradle.plugins.dsl.NamedDeployment
-import com.deploygate.gradle.plugins.dsl.Distribution
-
 plugins {
     id("com.android.application")
     id("deploygate")
@@ -15,7 +12,7 @@ deploygate {
     setUserName("appOwner")
     setToken("api token")
 
-    apks(closureOf<NamedDomainObjectContainer<NamedDeployment>> {
+    apks {
         create("flavor1Flavor3Debug").apply {
         }
         create("flavor2Flavor3Debug").apply {
@@ -35,7 +32,7 @@ deploygate {
             setDistributionKey("custom distributionKey")
             setReleaseNote("custom releaseNote")
         }
-    })
+    }
 }
 
 apply(from = "assertion_tasks.gradle")

@@ -51,7 +51,7 @@ class DeployGateExtension implements ExtensionSyntax {
      * @see DeployGateExtension#getDeployments()
      */
     @Deprecated
-    def getApks() {
+    NamedDomainObjectContainer<NamedDeployment> getApks() {
         return getDeployments()
     }
 
