@@ -25,7 +25,7 @@ deploygate {
             message = "flavor2Flavor4Debug"
             noAssemble = true
         }
-        create("customApk").apply {
+        create("customApk") {
             sourceFile = file("${project.projectDir}/texture/sample.apk")
             message = "custom message"
             visibility = "custom visibility"
