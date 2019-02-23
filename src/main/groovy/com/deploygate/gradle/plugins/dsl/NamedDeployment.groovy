@@ -21,6 +21,7 @@ class NamedDeployment implements Named, DeploymentSyntax {
 
     boolean skipAssemble
 
+    // Avoid using Optional like Guava for now because we want to reduce external dependencies as much as possible.
     @Nonnull
     private Distribution[] optionalDistribution
 
@@ -36,11 +37,7 @@ class NamedDeployment implements Named, DeploymentSyntax {
 
     @Override
     void distribution(@Nonnull Closure closure) {
-        def distribution = optionalDistribution[0]
-
-        closure.delegate = distribution
-        closure.resolveStrategy = Closure.DELEGATE_ONLY
-        closure.call(distribution)
+        optionalDistribution[0].configure(closure)
     }
 
     @Nullable
@@ -51,6 +48,12 @@ class NamedDeployment implements Named, DeploymentSyntax {
     // backward compatibility
 
     @Deprecated
+    @Nullable
+    String getDistributionKey() {
+        return distribution?.key
+    }
+
+    @Deprecated
     void setDistributionKey(@Nullable String distributionKey) {
         distribution {
             delegate.key = distributionKey
@@ -58,10 +61,21 @@ class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     @Deprecated
+    @Nullable
+    String getReleaseNote() {
+        return distribution?.releaseNote
+    }
+
+    @Deprecated
     void setReleaseNote(@Nullable String releaseNote) {
         distribution {
             delegate.releaseNote = releaseNote
         }
+    }
+
+    @Deprecated
+    boolean getNoAssemble() {
+        return isSkipAssemble()
     }
 
     @Deprecated

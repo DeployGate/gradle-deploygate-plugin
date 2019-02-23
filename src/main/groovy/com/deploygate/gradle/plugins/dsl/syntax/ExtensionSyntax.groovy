@@ -10,8 +10,16 @@ interface ExtensionSyntax {
 
     void setAppOwnerName(@Nonnull String appOwnerName)
 
+    /**
+     * this is for Groovy configuration
+     * @param closure
+     */
     void deployments(Closure closure)
 
+    /**
+     * this is for Kotlin-DSL
+     * @param closure
+     */
     @Nonnull
     NamedDomainObjectContainer<NamedDeployment> getDeployments()
 }

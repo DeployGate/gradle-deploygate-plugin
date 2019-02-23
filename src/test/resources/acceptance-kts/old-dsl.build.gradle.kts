@@ -1,6 +1,3 @@
-import com.deploygate.gradle.plugins.dsl.NamedDeployment
-import com.deploygate.gradle.plugins.dsl.Distribution
-
 plugins {
     id("com.android.application")
     id("deploygate")
@@ -12,30 +9,30 @@ deploygate {
     // for testing
     endpoint = "http://localhost:8888"
 
-    setUserName("appOwner")
-    setToken("api token")
+    userName = "appOwner"
+    token = "api token"
 
-    apks(closureOf<NamedDomainObjectContainer<NamedDeployment>> {
-        create("flavor1Flavor3Debug").apply {
+    apks {
+        create("flavor1Flavor3Debug") {
         }
-        create("flavor2Flavor3Debug").apply {
+        create("flavor2Flavor3Debug") {
             message = "flavor2Flavor3Debug"
         }
-        create("flavor1Flavor4Debug").apply {
+        create("flavor1Flavor4Debug") {
             message = "flavor1Flavor4Debug"
         }
-        create("flavor2Flavor4Debug").apply {
+        create("flavor2Flavor4Debug") {
             message = "flavor2Flavor4Debug"
-            setNoAssemble(true)
+            noAssemble = true
         }
         create("customApk").apply {
             sourceFile = file("${project.projectDir}/texture/sample.apk")
             message = "custom message"
             visibility = "custom visibility"
-            setDistributionKey("custom distributionKey")
-            setReleaseNote("custom releaseNote")
+            distributionKey = "custom distributionKey"
+            releaseNote = "custom releaseNote"
         }
-    })
+    }
 }
 
 apply(from = "assertion_tasks.gradle")
