@@ -79,9 +79,10 @@ This plugin does not work with non-app modules and/or library modules correctly.
 ./gradlew tasks | grep "DeployGate"
 ```
 
-* `uploadDeployGate<capitalized VariantName>` - Build and upload an apk artifact of *\<VariantName\>*
 * `loginDeployGate` - Log in to DeployGate and save credentials to your local
 * `logoutDeployGate` - Delete current credentials
+* `uploadDeployGate` - Run uploadDeployGateXXX tasks which are defined in a gradle file
+* `uploadDeployGate<capitalized VariantName>` - Build and upload an apk artifact of *\<VariantName\>*
 
 *NOTE: Tasks, which relate with variants which generate split apks, are not visible because they do not belong to any group.*
 
@@ -97,7 +98,21 @@ If no credentials are found, this requests you to log in to DeployGate and save 
 
 This task deletes stored credentials on your local.
 
-#### uploadDeployGate<VariantName>
+#### uploadDeployGate
+
+This task runs *uploadDeployGateXXX* tasks whose variants are defined expressly.
+For example, this task will run `uploadDeployGateFoo` and `uploadDeployGateBar` based on a configuration below.
+
+```
+deploygate {
+  deployments {
+    foo { ... }
+    bar { ... }
+  }
+}
+```
+
+#### uploadDeployGate\<VariantName\>
 
 This task will do:
 
