@@ -273,7 +273,7 @@ jitpack.io は初回のリクエストを受けてからスナップショット
 
 **バージョン 2.0.x は v1 の記法をそのまま利用できます。バージョン2.1.0 より、非推奨となった記法を削除していきます。**  
 
-以下の v1 の設定に対して、v2 への移行を行います。※ Groovy による設定と Kotlin DSL での設定は v1 だと同じ記述です。
+以下の v1 の設定に対して、v2 への移行を行います。
 
 ```groovy
 deploygate {
@@ -281,6 +281,7 @@ deploygate {
   token = "abcdef..."
   apks {
     flavor1Debug {
+    // Kotlin DSL では create("flavor1Debug")
       noAssmble = true
       distributionKey = "xyz..."
       releaseNote = "foobar"
@@ -322,7 +323,7 @@ deploygate {
   appOwnerName = "deploygate-user"
   apiToken = "abcdef..."
   deployments {
-    flavor1Debug {
+    create("flavor1Debug") {
       skipAssemble = true
       distribution(closureOf<Distribution> {
         key = "xyz..."
