@@ -279,14 +279,14 @@ Deprecated | New
 
 **v2.0.x can use the v1 syntax as it is, but we will start to make it obsolete from v2.1.0**  
 
-Let's say we have a v1 configuration like below. (Groovy configuration and Kotlin DSL are the same in v1)
+Let's say we have a v1 configuration like below. 
 
 ```groovy
 deploygate {
   userName = "deploygate-user"
   token = "abcdef..."
   apks {
-    flavor1Debug {
+    flavor1Debug { // create("flavor1Debug") if Kotlin DSL
       noAssmble = true
       distributionKey = "xyz..."
       releaseNote = "foobar"
@@ -328,7 +328,7 @@ deploygate {
   appOwnerName = "deploygate-user"
   apiToken = "abcdef..."
   deployments {
-    flavor1Debug {
+    create("flavor1Debug") {
       skipAssemble = true
       distribution(closureOf<Distribution> {
         key = "xyz..."
