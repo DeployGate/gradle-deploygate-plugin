@@ -58,11 +58,11 @@ class AndroidGradlePluginAcceptanceSpec extends Specification {
         result.output.trim().contains(agpVersion)
 
         where:
-        agpVersion     | minGradleVersion
-        "3.0.0"        | "4.1"
-        "3.1.0"        | "4.4"
-        "3.2.0"        | "4.6"
-        "3.3.0"        | "4.10.1"
-        "3.4.0-beta04" | "5.1.1"
+        agpVersion       | minGradleVersion
+        "3.0.0"          | "4.1"
+        "3.1.0"          | "4.4"
+        "3.2.0"          | "4.6"
+        "3.3.2"          | "4.10.1"
+        "3.4.0-beta05"   | "5.1.1"
     }
 }
