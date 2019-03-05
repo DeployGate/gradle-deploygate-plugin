@@ -52,6 +52,7 @@ class AndroidGradlePluginSpec extends Specification {
         "3.2.0"                    | true                 | false                              | false
         "3.2.1"                    | true                 | false                              | false
         "3.3.0"                    | true                 | true                               | true
+        "3.3.0-canary01"           | true                 | true                               | true
         "3.4.0"                    | true                 | true                               | true
         "4.0.0"                    | true                 | true                               | true // for now
         "${Integer.MAX_VALUE}.0.0" | true                 | true                               | true // fallback

@@ -25,7 +25,7 @@ repositories {
 }
 
 ext {
-    agpVersion = '3.3.0'
+    agpVersion = '3.3.2'
 }
 
 sourceSets {
