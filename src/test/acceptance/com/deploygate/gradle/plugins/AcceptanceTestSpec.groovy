@@ -15,7 +15,6 @@ class AcceptanceTestSpec extends AcceptanceTestBaseSpec {
                 new AGPEnv("3.2.0", "4.6"),
                 new AGPEnv("3.3.2", "4.10.1"),
                 new AGPEnv("3.4.0-beta05", "5.1.1"),
-                new AGPEnv("3.5.0-canary06", "5.1.1"),
         ]
     }
 }
