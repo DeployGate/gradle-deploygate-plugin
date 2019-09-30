@@ -261,26 +261,35 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     }
 
     @Unroll
-    def "flavor2Flavor4Debug needs assembling #agpVersion"() {
+    def "flavor2Flavor4Debug require assembling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
                 "agpVersion": agpVersion
         ])
 
-        def runner = GradleRunner.create()
+        def assembleRunner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
                 .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
                 .withGradleVersion(gradleVersion)
-                .withArguments("assembleFlavor2Flavor4Debug", "uploadDeployGateFlavor2Flavor4Debug" /*, "--stacktrace" */)
+                .withArguments("assembleFlavor2Flavor4Debug" /*, "--stacktrace" */)
+
+        def uploadRunner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(gradleVersion)
+                .withArguments("uploadDeployGateFlavor2Flavor4Debug" /*, "--stacktrace" */)
 
         and:
-        def buildResult = runner.build()
+        def assembleBuildResult = assembleRunner.build()
+
+        and:
+        def uploadBuildResult = uploadRunner.build()
         def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
         def request = result.requests.first()
 
         expect:
-        buildResult.task(":assembleFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
-        buildResult.task(":uploadDeployGateFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
+        assembleBuildResult.task(":assembleFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
+        uploadBuildResult.task(":uploadDeployGateFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
         request.getPart("token").body.asString() == "api token"
         request.getPart("file").body.present
