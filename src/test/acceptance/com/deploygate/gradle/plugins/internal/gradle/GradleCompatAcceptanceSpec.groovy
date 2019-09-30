@@ -52,7 +52,8 @@ class GradleCompatAcceptanceSpec extends Specification {
                 "4.8",
                 "4.9",
                 "4.10.1",
-                "5.1.1"
+                "5.1.1",
+                "5.4.1"
         ]
     }
 }
