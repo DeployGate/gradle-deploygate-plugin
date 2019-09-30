@@ -1,0 +1,136 @@
+version: 2.1
+
+executors: &executors
+  acceptance_test:
+    machine: true
+    working_directory: ~/gradle-deploygate-plugin
+    environment:
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false'
+      ANDROID_HOME: /home/circleci/android
+  android_java:
+    docker:
+      - image: circleci/android:api-28
+    working_directory: ~/gradle-deploygate-plugin
+    environment:
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false'
+
+commands: &commands
+  download_sdk:
+    parameters:
+      version:
+        type: string
+      zip_hash:
+        type: string
+    steps:
+      - restore_cache:
+          keys:
+            - android-sdk-cache-<< parameters.zip_hash >>-<< parameters.version >>
+      - run:
+          name:
+          command: |
+            mkdir -p $ANDROID_HOME
+            cp -f .circleci/android/licenses $ANDROID_HOME/licenses
+
+            if ! [[ -d $ANDROID_HOME/tools ]]; then
+              wget -q -O sdk-tools.zip "https://dl.google.com/android/repository/sdk-tools-linux-<< parameters.zip_hash >>.zip"
+              unzip -qq sdk-tools.zip -d $ANDROID_HOME
+              rm sdk-tools.zip
+            fi
+
+            yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;28.0.3" "platforms;android-28" "platform-tools" >/dev/null 2>&1 || if [ $? -ne '141' ]; then exit $?; fi;
+      - save_cache:
+          paths:
+            - ~/android
+          key: android-sdk-cache-<< parameters.zip_hash >>-<< parameters.version >>
+  use_gradle_cache:
+    parameters:
+      cache_version:
+        type: string
+        default: v2
+      steps:
+        type: steps
+    steps:
+      - restore_cache:
+          keys:
+          - gradle-<< parameters.cache_version >>-{{ checksum "build.gradle" }}
+          - gradle-<< parameters.cache_version >>-
+          - gradle-
+      - << parameters.steps >>
+      - save_cache:
+          paths:
+          - ~/.android
+          - ~/.gradle
+          - .gradle
+          - ~/.m2
+          key: gradle-<< parameters.cache_version >>-{{ checksum "build.gradle" }}
+
+orbs:
+  gradle:
+    commands: *commands
+    executors: *executors
+    jobs:
+      unit_tests:
+        executor: android_java
+        steps:
+        - checkout
+        - use_gradle_cache:
+            steps:
+            - run: ./gradlew install test
+        - store_artifacts:
+            path: build/reports/tests/test
+            when: always
+        - store_test_results:
+            path: build/test-results/tests/test
+            when: always
+      acceptance_tests:
+        executor: acceptance_test
+        steps:
+        - checkout
+        - download_sdk:
+            zip_hash: "4333796"
+            version: v2
+        - use_gradle_cache:
+            steps:
+            - run: ./gradlew acceptanceTest
+        - store_artifacts:
+            path: build/reports/tests/acceptanceTest
+            when: always
+        - store_test_results:
+            path: build/test-results/tests/acceptanceTest
+            when: always
+      release:
+        executor: android_java
+        steps:
+        - checkout
+        - use_gradle_cache:
+            steps:
+              - deploy:
+                  command: |
+                    ./release.sh
+                    curl -X POST -d "payload=$(cat .circleci/bintray.json)" $OUTGOING_WEBHOOK_URL
+
+workflows_filter:
+  release: &release
+    filters:
+      branches:
+        ignore: /.*/
+      tags:
+        only: /^[0-9]+\.[0-9]+\.[0-9]+$/
+
+workflows:
+  version: 2
+  on_commit:
+    jobs:
+    - gradle/unit_tests
+    - gradle/acceptance_tests
+  deploy:
+    jobs:
+    - gradle/unit_tests:
+        <<: *release
+    - gradle/acceptance_tests:
+        <<: *release
+    - gradle/release:
+        requires: 
+          - gradle/unit_tests
+          - gradle/acceptance_tests
+        <<: *release
