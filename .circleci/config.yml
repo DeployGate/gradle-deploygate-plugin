@@ -46,7 +46,7 @@ commands: &commands
     parameters:
       cache_version:
         type: string
-        default: v2
+        default: v3
       steps:
         type: steps
     steps:
