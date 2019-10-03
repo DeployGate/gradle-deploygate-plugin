@@ -2,9 +2,9 @@
 
 set -eu
 
-if [[ "$(cat VERSION)" != "${TRAVIS_TAG:-}" ]]; then
+if [[ "$(cat VERSION)" != "${CIRCLE_TAG:-}" ]]; then
   echo "tag and version verification failed" 1>&2
-  echo "Required tag was $(cat VERSION) but ${TRAVIS_TAG:-not found} had come." 1>&2
+  echo "Required tag was $(cat VERSION) but ${CIRCLE_TAG:-not found} had come." 1>&2
   exit 1
 fi
 
