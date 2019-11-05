@@ -15,8 +15,8 @@ class AcceptanceKtsTestSpec extends AcceptanceTestBaseSpec {
         return [
                 new AGPEnv("3.3.2", "4.10.1"),
                 new AGPEnv("3.4.0", "5.1.1"),
-                new AGPEnv("3.5.1", "5.4.1"),
-                new AGPEnv("3.6.0-beta01", "5.6.1"),
+                new AGPEnv("3.5.2", "5.4.1"),
+                new AGPEnv("3.6.0-beta03", "5.6.1"),
         ]
     }
 
