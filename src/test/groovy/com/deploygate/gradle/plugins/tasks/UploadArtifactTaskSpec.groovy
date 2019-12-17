@@ -162,6 +162,7 @@ class UploadArtifactTaskSpec extends Specification {
         and:
         def task = project.tasks.create("UploadArtifactTaskStub", UploadArtifactTaskStub)
         task.variantName = "dep1"
+        task.lazyPackageApplication = Optional.of("DUMMY")
 
         when: "apkFile is required"
         task.configuration = new UploadArtifactTask.Configuration(artifactFile: null, isSigningReady: true)

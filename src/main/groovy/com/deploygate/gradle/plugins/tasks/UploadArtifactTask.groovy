@@ -67,6 +67,8 @@ abstract class UploadArtifactTask extends DefaultTask {
 
     Configuration configuration
 
+    private def lazyPackageApplication
+
     void setVariantName(@Nonnull String variantName) {
         if (this.variantName && this.variantName != variantName) {
             throw new IllegalStateException("different variant name cannot be assigned")
@@ -92,8 +94,17 @@ abstract class UploadArtifactTask extends DefaultTask {
         this.configuration = configuration
     }
 
+    void setLazyPackageApplication(lazyPackageApplication) {
+        this.lazyPackageApplication = lazyPackageApplication
+    }
+
     // Add TaskAction annotation in overrider classes
     void doUpload() {
+        assert lazyPackageApplication != null
+        // evaluate surely
+        // ref: https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
+        lazyPackageApplication.get()
+
         runArtifactSpecificVerification()
         uploadArtifactToServer()
     }

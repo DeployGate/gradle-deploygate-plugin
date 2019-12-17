@@ -17,18 +17,8 @@ class UploadAabTask extends UploadArtifactTask {
         )
     }
 
-    private def lazyPackageApplication
-
-    void setLazyPackageApplication(lazyPackageApplication) {
-        this.lazyPackageApplication = lazyPackageApplication
-    }
-
     @TaskAction
     void doUpload() {
-        // evaluate immediately
-        assert lazyPackageApplication != null
-        lazyPackageApplication.get()
-
         super.doUpload()
     }
 

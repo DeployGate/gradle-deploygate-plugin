@@ -32,18 +32,14 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
             dgTask.dependsOn([androidAssembleTaskName(variantName), *dependsOn].flatten())
         }
 
+        dgTask.lazyPackageApplication = applicationVariant.lazyPackageApplication()
+
         applicationVariant.lazyPackageApplication().configure { packageAppTask ->
             def apkInfo = PackageAppTaskCompat.getApkInfo(packageAppTask)
             def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
             dgTask.configuration = configuration
             dgTask.applyTaskProfile()
-        }
-
-        if (deployment?.skipAssemble) {
-            // a package application provider may not be evaluated in some cases.
-            // ref: https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
-            applicationVariant.lazyPackageApplication().get()
         }
     }
 

@@ -31,6 +31,7 @@ class UploadApkTaskSpec extends Specification {
         and:
         def task = project.tasks.create("UploadApkTask", UploadApkTask)
         task.variantName = "dep1"
+        task.lazyPackageApplication = Optional.of("DUMMY")
 
         when: "signing is required"
         task.configuration = new UploadArtifactTask.Configuration(isSigningReady: false)
