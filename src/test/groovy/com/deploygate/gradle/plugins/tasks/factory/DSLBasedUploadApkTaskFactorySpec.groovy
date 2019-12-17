@@ -36,13 +36,13 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         def taskNames = project.tasks.toList().collect { it.name }
 
         when:
-        dslBasedUploadApkTaskFactory.registerAggregatedUploadApkTask()
+        dslBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask()
 
         then:
         taskNames == project.tasks.toList().collect { it.name }
 
         when:
-        dslBasedUploadApkTaskFactory.registerAggregatedUploadApkTask([])
+        dslBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask([])
 
         then:
         taskNames == project.tasks.toList().collect { it.name }
@@ -53,7 +53,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
 
         when:
-        dslBasedUploadApkTaskFactory.registerAggregatedUploadApkTask("task1", "task2")
+        dslBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask("task1", "task2")
 
         and:
         def task = project.tasks.findByName("uploadDeployGate")
@@ -75,8 +75,8 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
 
         when:
-        dslBasedUploadApkTaskFactory.registerAggregatedUploadApkTask("task1", "task2")
-        dslBasedUploadApkTaskFactory.registerAggregatedUploadApkTask("task3", "task4")
+        dslBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask("task1", "task2")
+        dslBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask("task3", "task4")
 
         and:
         def task = project.tasks.findByName("uploadDeployGate")
@@ -103,7 +103,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
 
         when:
-        dslBasedUploadApkTaskFactory.registerUploadApkTask("dep1")
+        dslBasedUploadApkTaskFactory.registerUploadArtifactTask("dep1")
 
         and:
         def task = project.tasks.findByName("uploadDeployGateDep1")
@@ -127,7 +127,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         project.tasks.create("uploadDeployGateDep1")
 
         when:
-        dslBasedUploadApkTaskFactory.registerUploadApkTask("dep1")
+        dslBasedUploadApkTaskFactory.registerUploadArtifactTask("dep1")
 
         and:
         def task = project.tasks.findByName("uploadDeployGateDep1")
@@ -147,7 +147,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
 
         when:
-        dslBasedUploadApkTaskFactory.registerUploadApkTask("dep2")
+        dslBasedUploadApkTaskFactory.registerUploadArtifactTask("dep2")
 
         then:
         thrown(GradleException)

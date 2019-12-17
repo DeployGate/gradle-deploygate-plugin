@@ -61,6 +61,11 @@ class AndroidGradlePlugin {
         return "assemble${variantName.capitalize()}"
     }
 
+    @Nonnull
+    static String androidBundleTaskName(@Nonnull String variantName) {
+        return "bundle${variantName.capitalize()}"
+    }
+
     /**
      * Get the AGP version from a classloader because `plugins` block will separate class loaders
      *

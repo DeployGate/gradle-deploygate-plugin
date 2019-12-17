@@ -39,7 +39,7 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
 
         when:
-        agpBasedUploadApkTaskFactory.registerAggregatedUploadApkTask()
+        agpBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask()
 
         then:
         thrown(IllegalAccessException)
@@ -62,7 +62,7 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         }
 
         when:
-        agpBasedUploadApkTaskFactory.registerUploadApkTask(variant)
+        agpBasedUploadApkTaskFactory.registerUploadArtifactTask(variant)
 
         and:
         def task = project.tasks.findByName("uploadDeployGateDep1")
@@ -89,7 +89,7 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         }
 
         when:
-        agpBasedUploadApkTaskFactory.registerUploadApkTask(variant)
+        agpBasedUploadApkTaskFactory.registerUploadArtifactTask(variant)
 
         and:
         def firstTask = project.tasks.findByName("uploadDeployGateDep1")
@@ -98,7 +98,7 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         firstTask
 
         when:
-        agpBasedUploadApkTaskFactory.registerUploadApkTask(variant)
+        agpBasedUploadApkTaskFactory.registerUploadArtifactTask(variant)
 
         and:
         def secondTask = project.tasks.findByName("uploadDeployGateDep1")

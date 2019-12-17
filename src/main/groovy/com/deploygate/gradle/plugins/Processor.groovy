@@ -25,10 +25,10 @@ class Processor {
     private final LogoutTaskFactory logoutTaskFactory
 
     @Nonnull
-    private final UploadApkTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory
+    private final UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory
 
     @Nonnull
-    private final UploadApkTaskFactory<String> stringBasedUploadApkTaskFactory
+    private final UploadArtifactTaskFactory<String> stringBasedUploadApkTaskFactory
 
     def declaredNames = new HashSet<String>()
 
@@ -47,8 +47,8 @@ class Processor {
             @Nonnull Project project,
             @Nonnull LoginTaskFactory loginTaskFactory,
             @Nonnull LogoutTaskFactory logoutTaskFactory,
-            @Nonnull UploadApkTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory,
-            @Nonnull UploadApkTaskFactory<String> stringBasedUploadApkTaskFactory
+            @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory,
+            @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadApkTaskFactory
     ) {
         this.project = project
         this.loginTaskFactory = loginTaskFactory
@@ -79,11 +79,11 @@ class Processor {
     }
 
     def registerDeclarationAwareUploadApkTask(String variantOrCustomName) {
-        stringBasedUploadApkTaskFactory.registerUploadApkTask(variantOrCustomName, *dependencyAncestorOfUploadTaskNames)
+        stringBasedUploadApkTaskFactory.registerUploadArtifactTask(variantOrCustomName, *dependencyAncestorOfUploadTaskNames)
     }
 
     def registerAggregatedDeclarationAwareUploadApkTask(Collection<String> variantOrCustomNames) {
-        stringBasedUploadApkTaskFactory.registerAggregatedUploadApkTask(variantOrCustomNames.collect {
+        stringBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask(variantOrCustomNames.collect {
             DeployGateTaskFactory.uploadApkTaskName(it)
         })
     }
@@ -94,7 +94,7 @@ class Processor {
             return
         }
 
-        applicationVariantBasedUploadApkTaskFactory.registerUploadApkTask(variant, *dependencyAncestorOfUploadTaskNames)
+        applicationVariantBasedUploadApkTaskFactory.registerUploadArtifactTask(variant, *dependencyAncestorOfUploadTaskNames)
     }
 
     @VisibleForTesting

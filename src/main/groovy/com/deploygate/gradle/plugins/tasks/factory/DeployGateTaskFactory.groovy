@@ -16,6 +16,11 @@ abstract class DeployGateTaskFactory {
     }
 
     @Nonnull
+    static String uploadAabTaskName(@Nonnull String variantName) {
+        return "$AGGREGATION_TASK_NAME${variantName.capitalize()}Aab"
+    }
+
+    @Nonnull
     final Project project
     @Nonnull
     final TaskFactory taskFactory

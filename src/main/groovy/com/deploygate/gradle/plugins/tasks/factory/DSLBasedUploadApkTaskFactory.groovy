@@ -9,14 +9,14 @@ import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
-class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements UploadApkTaskFactory<String> {
+class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements UploadArtifactTaskFactory<String> {
     DSLBasedUploadApkTaskFactory(@Nonnull Project project) {
         super(project)
     }
 
     @Override
-    void registerUploadApkTask(@Nonnull String variantNameOrCustomName, Object... dependsOn) {
-        def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantNameOrCustomName), UploadApkTask, false)
+    void registerUploadArtifactTask(@Nonnull String variantNameOrCustomName, Object... dependsOn) {
+        def lazyUploadApkTask = taskFactory.registerOrFindBy(uploadApkTaskName(variantNameOrCustomName), UploadApkTask)
 
         if (!lazyUploadApkTask) {
             project.logger.debug("It sounds $variantNameOrCustomName's upload apk task has been already registered by me or other factories")
@@ -51,7 +51,7 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
     }
 
     @Override
-    void registerAggregatedUploadApkTask(Object... dependsOn) {
+    void registerAggregatedUploadArtifactTask(Object... dependsOn) {
         if (!dependsOn?.flatten()) {
             project.logger.debug("skipped register aggregation tasks")
             return

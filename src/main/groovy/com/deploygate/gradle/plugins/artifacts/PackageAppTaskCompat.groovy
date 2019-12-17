@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.artifacts
 
+
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import groovy.transform.PackageScope
 

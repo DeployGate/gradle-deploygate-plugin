@@ -10,13 +10,13 @@ import javax.annotation.Nonnull
 
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
 
-class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements UploadApkTaskFactory<IApplicationVariant> {
+class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements UploadArtifactTaskFactory<IApplicationVariant> {
     AGPBasedUploadApkTaskFactory(@Nonnull Project project) {
         super(project)
     }
 
     @Override
-    void registerUploadApkTask(@Nonnull IApplicationVariant applicationVariant, Object... dependsOn) {
+    void registerUploadArtifactTask(@Nonnull IApplicationVariant applicationVariant, Object... dependsOn) {
         String variantName = applicationVariant.name
 
         // depends on other task provider, so we need to get a task right now.
@@ -48,7 +48,7 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
     }
 
     @Override
-    void registerAggregatedUploadApkTask(Object... dependsOn) {
+    void registerAggregatedUploadArtifactTask(Object... dependsOn) {
         throw new IllegalAccessException("this method is not allowed to be called")
     }
 }
