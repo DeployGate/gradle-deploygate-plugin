@@ -7,6 +7,7 @@ import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.google.common.annotations.VisibleForTesting
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
+import groovyx.net.http.HttpResponseException
 import groovyx.net.http.Method
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.FileBody
@@ -177,9 +178,13 @@ abstract class UploadArtifactTask extends DefaultTask {
             entity.addPart(key, new StringBody(params.get(key), charset))
         }
 
-        HTTPBuilderFactory.restClient(project.deploygate.endpoint).request(Method.POST, ContentType.JSON) { req ->
-            uri.path = "/api/users/${appOwnerName}/apps"
-            req.entity = entity
-        } as HttpResponseDecorator
+        try {
+            HTTPBuilderFactory.restClient(project.deploygate.endpoint).request(Method.POST, ContentType.JSON) { req ->
+                uri.path = "/api/users/${appOwnerName}/apps"
+                req.entity = entity
+            } as HttpResponseDecorator
+        } catch (HttpResponseException e) {
+            e.response
+        }
     }
 }

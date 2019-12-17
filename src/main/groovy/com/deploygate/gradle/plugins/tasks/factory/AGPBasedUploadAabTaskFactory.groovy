@@ -3,15 +3,15 @@ package com.deploygate.gradle.plugins.tasks.factory
 import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
-import com.deploygate.gradle.plugins.tasks.UploadApkTask
+import com.deploygate.gradle.plugins.tasks.UploadAabTask
 import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
-import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
+import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidBundleTaskName
 
-class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements UploadArtifactTaskFactory<IApplicationVariant> {
-    AGPBasedUploadApkTaskFactory(@Nonnull Project project) {
+class AGPBasedUploadAabTaskFactory extends DeployGateTaskFactory implements UploadArtifactTaskFactory<IApplicationVariant> {
+    AGPBasedUploadAabTaskFactory(@Nonnull Project project) {
         super(project)
     }
 
@@ -20,7 +20,7 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
         String variantName = applicationVariant.name
 
         // depends on other task provider, so we need to get a task right now.
-        def dgTask = taskFactory.registerOrFindBy(uploadApkTaskName(variantName), UploadApkTask).get()
+        def dgTask = taskFactory.registerOrFindBy(uploadAabTaskName(variantName), UploadAabTask).get()
 
         final NamedDeployment deployment = deployGateExtension.findDeploymentByName(variantName)
 
@@ -29,21 +29,17 @@ class AGPBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
         if (deployment?.skipAssemble) {
             dgTask.dependsOn(dependsOn)
         } else {
-            dgTask.dependsOn([androidAssembleTaskName(variantName), *dependsOn].flatten())
+            dgTask.dependsOn([androidBundleTaskName(variantName), *dependsOn].flatten())
         }
 
+        dgTask.lazyPackageApplication = applicationVariant.lazyPackageApplication()
+
         applicationVariant.lazyPackageApplication().configure { packageAppTask ->
-            def apkInfo = PackageAppTaskCompat.getApkInfo(packageAppTask)
-            def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
+            def aabInfo = PackageAppTaskCompat.getAabInfo(packageAppTask)
+            def configuration = UploadAabTask.createConfiguration(deployment, aabInfo)
 
             dgTask.configuration = configuration
             dgTask.applyTaskProfile()
-        }
-
-        if (deployment?.skipAssemble) {
-            // a package application provider may not be evaluated in some cases.
-            // ref: https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
-            applicationVariant.lazyPackageApplication().get()
         }
     }
 

@@ -68,11 +68,12 @@ class DeployGatePlugin implements Plugin<Project> {
             processor.registerDeclarationAwareUploadApkTask(variantOrCustomName)
 
             if (AndroidGradlePlugin.isAppBundleSupported()) {
-                // TODO create tasks for app bundle
+                processor.registerDeclarationAwareUploadAabTask(variantOrCustomName)
             }
         }
 
         processor.registerAggregatedDeclarationAwareUploadApkTask(processor.declaredNames)
+        processor.registerAggregatedDeclarationAwareUploadAabTask(processor.declaredNames)
 
         if (!processor.canProcessVariantAware()) {
             project.logger.warn("DeployGate Gradle Plugin is stopped because Android Gradle Plugin must be applied before.")
@@ -85,7 +86,7 @@ class DeployGatePlugin implements Plugin<Project> {
             processor.registerVariantAwareUploadApkTask(variantProxy)
 
             if (AndroidGradlePlugin.isAppBundleSupported()) {
-                // TODO create tasks for app bundle
+                processor.registerVariantAwareUploadAabTask(variantProxy)
             }
         }
     }

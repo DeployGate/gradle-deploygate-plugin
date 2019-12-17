@@ -1,7 +1,6 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.AabInfo
-import com.deploygate.gradle.plugins.artifacts.ApkInfo
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.tasks.factory.DeployGateTaskFactory
 import org.gradle.api.tasks.TaskAction
@@ -18,29 +17,28 @@ class UploadAabTask extends UploadArtifactTask {
         )
     }
 
+    private def lazyPackageApplication
+
+    void setLazyPackageApplication(lazyPackageApplication) {
+        this.lazyPackageApplication = lazyPackageApplication
+    }
+
     @TaskAction
     void doUpload() {
+        // evaluate immediately
+        lazyPackageApplication.get()
+
         super.doUpload()
     }
 
     @Override
     void applyTaskProfile() {
-        setDescription("Deploy assembled $variantName to DeployGate")
+        setDescription("Deploy bundled $variantName to DeployGate")
 
-        if (!configuration.isSigningReady) {
-            // require signing config to build a signed APKs
-            setDescription(description + " (requires valid signingConfig setting)")
-        }
-
-        if (configuration.isUniversalApk) {
-            group = DeployGateTaskFactory.GROUP_NAME
-        }
+        group = DeployGateTaskFactory.GROUP_NAME
     }
 
     @Override
     void runArtifactSpecificVerification() {
-        if (!configuration.isSigningReady) {
-            throw new IllegalStateException('Cannot upload a build without code signature to DeployGate')
-        }
     }
 }

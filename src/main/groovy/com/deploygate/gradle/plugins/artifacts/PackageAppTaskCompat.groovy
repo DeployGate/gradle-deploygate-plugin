@@ -27,6 +27,23 @@ class PackageAppTaskCompat {
         )
     }
 
+    @Nonnull
+    static AabInfo getAabInfo(@Nonnull /* PackageApplication */ packageAppTask) {
+        String variantName = packageAppTask.name
+        // outputScope is retrieved by the reflection
+        Collection<String> apkNames = packageAppTask.outputScope.apkDatas*.outputFileName
+        File outputDir = packageAppTask.outputDirectory
+        File apkFile = new File(outputDir, (String) apkNames[0])
+
+        // FIXME toooooooooooo dirty hack!
+        def aabFile = new File(apkFile.getPath().replaceAll("\\.apk\$", ".aab").reverse().replaceAll("/apk/".reverse(), "/bundle/".reverse()).reverse())
+
+        return new DirectAabInfo(
+                variantName,
+                aabFile,
+        )
+    }
+
     @PackageScope
     static boolean hasSigningConfig(packageAppTask) {
         if (!AndroidGradlePlugin.isSigningConfigCollectionSupported()) {
