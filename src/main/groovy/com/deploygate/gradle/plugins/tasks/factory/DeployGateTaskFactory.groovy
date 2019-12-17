@@ -8,18 +8,18 @@ import javax.annotation.Nonnull
 
 abstract class DeployGateTaskFactory {
     public static final String GROUP_NAME = 'DeployGate'
-    public static String PREFIX_TASK_NAME = "uploadDeployGate"
     public static String AGGREGATION_APK_TASK_NAME = "uploadDeployGate"
     public static String AGGREGATION_AAB_TASK_NAME = "uploadDeployGateAab"
+    // if product flavor is `aab`, then this does not work ;(
 
     @Nonnull
     static String uploadApkTaskName(@Nonnull String variantName) {
-        return "$PREFIX_TASK_NAME${variantName.capitalize()}"
+        return "$AGGREGATION_APK_TASK_NAME${variantName.capitalize()}"
     }
 
     @Nonnull
     static String uploadAabTaskName(@Nonnull String variantName) {
-        return "$PREFIX_TASK_NAME${variantName.capitalize()}Aab"
+        return "$AGGREGATION_AAB_TASK_NAME${variantName.capitalize()}"
     }
 
     @Nonnull

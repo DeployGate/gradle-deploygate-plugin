@@ -106,7 +106,7 @@ class DSLBasedUploadAabTaskFactorySpec extends Specification {
         dslBasedUploadAabTaskFactory.registerUploadArtifactTask("dep1")
 
         and:
-        def task = project.tasks.findByName("uploadDeployGateDep1Aab")
+        def task = project.tasks.findByName("uploadDeployGateAabDep1")
 
         then:
         task
@@ -124,13 +124,13 @@ class DSLBasedUploadAabTaskFactorySpec extends Specification {
         dslBasedUploadAabTaskFactory = new DSLBasedUploadAabTaskFactory(project)
 
         and:
-        project.tasks.create("uploadDeployGateDep1Aab")
+        project.tasks.create("uploadDeployGateAabDep1")
 
         when:
         dslBasedUploadAabTaskFactory.registerUploadArtifactTask("dep1")
 
         and:
-        def task = project.tasks.findByName("uploadDeployGateDep1Aab")
+        def task = project.tasks.findByName("uploadDeployGateAabDep1")
 
         then:
         task

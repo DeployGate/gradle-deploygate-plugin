@@ -48,7 +48,7 @@ class AGPBasedUploadAabTaskFactorySpec extends Specification {
     }
 
     @ConfineMetaClassChanges([PackageAppTaskCompat])
-    def "registerUploadArtifactTask should add a UploadApkTask"() {
+    def "registerUploadArtifactTask should add a UploadAabTask"() {
         setup:
         def variantName = "dep1"
         def variant = Mock(IApplicationVariant)
@@ -67,7 +67,7 @@ class AGPBasedUploadAabTaskFactorySpec extends Specification {
         agpBasedUploadAabTaskFactory.registerUploadArtifactTask(variant)
 
         and:
-        def task = project.tasks.findByName("uploadDeployGateDep1Aab")
+        def task = project.tasks.findByName("uploadDeployGateAabDep1")
 
         then:
         task
@@ -94,7 +94,7 @@ class AGPBasedUploadAabTaskFactorySpec extends Specification {
         agpBasedUploadAabTaskFactory.registerUploadArtifactTask(variant)
 
         and:
-        def firstTask = project.tasks.findByName("uploadDeployGateDep1Aab")
+        def firstTask = project.tasks.findByName("uploadDeployGateAabDep1")
 
         then:
         firstTask
@@ -103,7 +103,7 @@ class AGPBasedUploadAabTaskFactorySpec extends Specification {
         agpBasedUploadAabTaskFactory.registerUploadArtifactTask(variant)
 
         and:
-        def secondTask = project.tasks.findByName("uploadDeployGateDep1Aab")
+        def secondTask = project.tasks.findByName("uploadDeployGateAabDep1")
 
         then:
         firstTask == secondTask
