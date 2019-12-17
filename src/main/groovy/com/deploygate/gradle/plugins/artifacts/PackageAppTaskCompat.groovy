@@ -33,10 +33,8 @@ class PackageAppTaskCompat {
         // outputScope is retrieved by the reflection
         Collection<String> apkNames = packageAppTask.outputScope.apkDatas*.outputFileName
         File outputDir = packageAppTask.outputDirectory
-        File apkFile = new File(outputDir, (String) apkNames[0])
-
         // FIXME toooooooooooo dirty hack!
-        def aabFile = new File(apkFile.getPath().replaceAll("\\.apk\$", ".aab").reverse().replaceAll("/apk/".reverse(), "/bundle/".reverse()).reverse())
+        File aabFile = new File(outputDir.getPath().replaceFirst("/apk/", "/bundle/"), ((String) apkNames[0]).replaceFirst("\\.apk\$", ".aab"))
 
         return new DirectAabInfo(
                 variantName,
