@@ -18,7 +18,7 @@ class DSLBasedUploadAabTaskFactory extends DeployGateTaskFactory implements Uplo
 
     @Override
     void registerUploadArtifactTask(@Nonnull String variantNameOrCustomName, Object... dependsOn) {
-        def lazyUploadAabTask = taskFactory.registerOrFindBy(uploadAabTaskName(variantNameOrCustomName), UploadAabTask)
+        def lazyUploadAabTask = taskFactory.register(uploadAabTaskName(variantNameOrCustomName), UploadAabTask)
 
         if (!lazyUploadAabTask) {
             project.logger.debug("It sounds $variantNameOrCustomName's upload aab task has been already registered by me or other factories")
@@ -59,7 +59,7 @@ class DSLBasedUploadAabTaskFactory extends DeployGateTaskFactory implements Uplo
             return
         }
 
-        taskFactory.register(AGGREGATION_AAB_TASK_NAME, DefaultTask).configure { dgTask ->
+        taskFactory.registerOrFindBy(AGGREGATION_AAB_TASK_NAME, DefaultTask).configure { dgTask ->
             dgTask.group = GROUP_NAME
             dgTask.dependsOn(dependsOn.flatten())
         }

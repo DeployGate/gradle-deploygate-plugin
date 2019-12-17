@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
+import com.deploygate.gradle.plugins.artifacts.DirectAabInfo
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
 import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
@@ -7,6 +8,7 @@ import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.internal.gradle.LazyConfigurableTask
+import com.deploygate.gradle.plugins.tasks.UploadAabTask
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -16,7 +18,7 @@ import spock.util.mop.ConfineMetaClassChanges
 
 import javax.annotation.Nonnull
 
-class AGPBasedUploadApkTaskFactorySpec extends Specification {
+class AGPBasedUploadAabTaskFactorySpec extends Specification {
     @Nonnull
     private Project project
 
@@ -24,7 +26,7 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
     private NamedDomainObjectContainer<NamedDeployment> deployments
 
     @Nonnull
-    private AGPBasedUploadApkTaskFactory agpBasedUploadApkTaskFactory
+    private AGPBasedUploadAabTaskFactory agpBasedUploadAabTaskFactory
 
     def setup() {
         project = ProjectBuilder.builder().build()
@@ -36,10 +38,10 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
 
     def "registerAggregatedUploadApkTask should not be supported"() {
         given:
-        agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
+        agpBasedUploadAabTaskFactory = new AGPBasedUploadAabTaskFactory(project)
 
         when:
-        agpBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask()
+        agpBasedUploadAabTaskFactory.registerAggregatedUploadArtifactTask()
 
         then:
         thrown(IllegalAccessException)
@@ -54,22 +56,22 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         variant.lazyPackageApplication() >> Stub(LazyConfigurableTask, name: variantName)
 
         and:
-        agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
+        agpBasedUploadAabTaskFactory = new AGPBasedUploadAabTaskFactory(project)
 
         and:
-        PackageAppTaskCompat.metaClass.static.getApkInfo = { LazyConfigurableTask _ ->
-            new DirectApkInfo(variantName, null, true, true)
+        PackageAppTaskCompat.metaClass.static.getAabInfo = { LazyConfigurableTask _ ->
+            new DirectAabInfo(variantName, null)
         }
 
         when:
-        agpBasedUploadApkTaskFactory.registerUploadArtifactTask(variant)
+        agpBasedUploadAabTaskFactory.registerUploadArtifactTask(variant)
 
         and:
-        def task = project.tasks.findByName("uploadDeployGateDep1")
+        def task = project.tasks.findByName("uploadDeployGateDep1Aab")
 
         then:
         task
-        task instanceof UploadApkTask
+        task instanceof UploadAabTask
     }
 
     @ConfineMetaClassChanges([PackageAppTaskCompat])
@@ -81,27 +83,27 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         variant.lazyPackageApplication() >> Stub(LazyConfigurableTask, name: variantName)
 
         and:
-        agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
+        agpBasedUploadAabTaskFactory = new AGPBasedUploadAabTaskFactory(project)
 
         and:
-        PackageAppTaskCompat.metaClass.static.getApkInfo = { LazyConfigurableTask _ ->
-            new DirectApkInfo(variantName, null, true, true)
+        PackageAppTaskCompat.metaClass.static.getAabInfo = { LazyConfigurableTask _ ->
+            new DirectAabInfo(variantName, null)
         }
 
         when:
-        agpBasedUploadApkTaskFactory.registerUploadArtifactTask(variant)
+        agpBasedUploadAabTaskFactory.registerUploadArtifactTask(variant)
 
         and:
-        def firstTask = project.tasks.findByName("uploadDeployGateDep1")
+        def firstTask = project.tasks.findByName("uploadDeployGateDep1Aab")
 
         then:
         firstTask
 
         when:
-        agpBasedUploadApkTaskFactory.registerUploadArtifactTask(variant)
+        agpBasedUploadAabTaskFactory.registerUploadArtifactTask(variant)
 
         and:
-        def secondTask = project.tasks.findByName("uploadDeployGateDep1")
+        def secondTask = project.tasks.findByName("uploadDeployGateDep1Aab")
 
         then:
         firstTask == secondTask

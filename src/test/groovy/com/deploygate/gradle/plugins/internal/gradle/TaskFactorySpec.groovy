@@ -34,7 +34,7 @@ class TaskFactorySpec extends Specification {
         TaskFactory taskFactory = new TaskFactory(project)
 
         and:
-        def result = taskFactory.register(taskName, DefaultTask)
+        def result = taskFactory.registerOrFindBy(taskName, DefaultTask)
 
         expect:
         expectedTaskClass.isInstance(result)
@@ -53,7 +53,7 @@ class TaskFactorySpec extends Specification {
 
     @ConfineMetaClassChanges([GradleCompat])
     @Unroll
-    def "TaskFactory can handle duplicated tasks regardless of #gradleVersion"() {
+    def "TaskFactory#register does nothing if a task is duplicated regardless of #gradleVersion"() {
         given:
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
 
@@ -66,10 +66,41 @@ class TaskFactorySpec extends Specification {
         taskFactory.register(taskName, DefaultTask)
 
         and:
-        def result = taskFactory.register(taskName, DefaultTask, allowExisting)
+        def result = taskFactory.register(taskName, DefaultTask)
 
         expect:
-        !allowExisting && result == null || expectedTaskClass.isInstance(result)
+        result == null
+
+        where:
+        taskName        | gradleVersion | allowExisting
+        "agp300"        | "4.1"         | false
+        "agp310"        | "4.4"         | false
+        "agp320"        | "4.6"         | false
+        "border"        | "4.7"         | false
+        "border"        | "4.8"         | false
+        "agp330"        | "4.10.1"      | false
+        "agp340-beta04" | "5.1.1"       | false
+    }
+
+    @ConfineMetaClassChanges([GradleCompat])
+    @Unroll
+    def "TaskFactory#registerOrFindBy return an existing task if duplicated regardless of #gradleVersion"() {
+        given:
+        Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+
+        GradleCompat.metaClass.static.getVersion = { ->
+            VersionString.tryParse(gradleVersion)
+        }
+
+        and:
+        TaskFactory taskFactory = new TaskFactory(project)
+        taskFactory.register(taskName, DefaultTask)
+
+        and:
+        def result = taskFactory.registerOrFindBy(taskName, DefaultTask)
+
+        expect:
+        expectedTaskClass.isInstance(result)
 
         where:
         taskName        | gradleVersion | allowExisting | expectedTaskClass
@@ -80,12 +111,5 @@ class TaskFactorySpec extends Specification {
         "border"        | "4.8"         | true          | SingleTask
         "agp330"        | "4.10.1"      | true          | SingleTask
         "agp340-beta04" | "5.1.1"       | true          | SingleTask
-        "agp300"        | "4.1"         | false         | null
-        "agp310"        | "4.4"         | false         | null
-        "agp320"        | "4.6"         | false         | null
-        "border"        | "4.7"         | false         | null
-        "border"        | "4.8"         | false         | null
-        "agp330"        | "4.10.1"      | false         | null
-        "agp340-beta04" | "5.1.1"       | false         | null
     }
 }

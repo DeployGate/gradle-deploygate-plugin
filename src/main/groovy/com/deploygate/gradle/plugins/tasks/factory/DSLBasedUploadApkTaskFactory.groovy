@@ -16,7 +16,7 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
 
     @Override
     void registerUploadArtifactTask(@Nonnull String variantNameOrCustomName, Object... dependsOn) {
-        def lazyUploadApkTask = taskFactory.registerOrFindBy(uploadApkTaskName(variantNameOrCustomName), UploadApkTask)
+        def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantNameOrCustomName), UploadApkTask)
 
         if (!lazyUploadApkTask) {
             project.logger.debug("It sounds $variantNameOrCustomName's upload apk task has been already registered by me or other factories")
@@ -57,7 +57,7 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
             return
         }
 
-        taskFactory.register(AGGREGATION_APK_TASK_NAME, DefaultTask).configure { dgTask ->
+        taskFactory.registerOrFindBy(AGGREGATION_APK_TASK_NAME, DefaultTask).configure { dgTask ->
             dgTask.group = GROUP_NAME
             dgTask.dependsOn(dependsOn.flatten())
         }
