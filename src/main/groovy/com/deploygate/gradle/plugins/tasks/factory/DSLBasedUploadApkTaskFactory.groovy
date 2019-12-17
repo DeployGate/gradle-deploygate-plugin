@@ -57,7 +57,7 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
             return
         }
 
-        taskFactory.register(AGGREGATION_TASK_NAME, DefaultTask).configure { dgTask ->
+        taskFactory.register(AGGREGATION_APK_TASK_NAME, DefaultTask).configure { dgTask ->
             dgTask.group = GROUP_NAME
             dgTask.dependsOn(dependsOn.flatten())
         }
