@@ -27,10 +27,10 @@ class UploadApkTaskConfigurationSpec extends Specification {
         def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
         expect:
-        configuration.message == message
-        configuration.distributionKey == distributionKey
-        configuration.releaseNote == distributionReleaseNote
-        configuration.visibility == visibility
+        configuration.uploadParams.message == message
+        configuration.uploadParams.distributionKey == distributionKey
+        configuration.uploadParams.releaseNote == distributionReleaseNote
+        configuration.uploadParams.visibility == visibility
         configuration.isSigningReady == signingReady
         configuration.isUniversalApk == universalApk
 
@@ -53,7 +53,7 @@ class UploadApkTaskConfigurationSpec extends Specification {
         def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
         expect:
-        configuration.apkFile == sourceFile ?: apkFile
+        configuration.artifactFile == sourceFile ?: apkFile
 
         where:
         sourceFile               | apkFile
@@ -63,34 +63,4 @@ class UploadApkTaskConfigurationSpec extends Specification {
         new File("build.gradle") | new File("build.gradle")
     }
 
-    @Unroll
-    def "toUploadParams should not contain null values"() {
-        setup:
-        def configuration = new UploadApkTask.Configuration()
-        configuration.apkFile = apkFile
-        configuration.message = message
-        configuration.distributionKey = distributionKey
-        configuration.releaseNote = releaseNote
-        configuration.visibility = visibility
-        configuration.isSigningReady = isSigningReady
-        configuration.isUniversalApk = isUniversalApk
-
-        and:
-        def params = configuration.toUploadParams()
-
-        expect:
-        params["message"] == message
-        params["distribution_key"] == distributionKey
-        params["release_note"] == releaseNote
-        params["visibility"] == visibility
-        message != null || !params.containsKey("message")
-        distributionKey != null || !params.containsKey("distribution_key")
-        releaseNote != null || !params.containsKey("release_note")
-        visibility != null || !params.containsKey("visibility")
-
-        where:
-        message   | distributionKey   | releaseNote   | visibility | isSigningReady | isUniversalApk | apkFile
-        null            | null              | null          | null       | false          | false          | null
-        "message" | "distributionKey" | "releaseNote" | "public"   | true           | true           | new File("build.gradle")
-    }
 }
