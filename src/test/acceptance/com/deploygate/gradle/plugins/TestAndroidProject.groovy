@@ -105,6 +105,11 @@ ndk.dir=${androidSdk}/ndk-bundle
     }
 
     void gradleProperties(Map<String, Object> vars) {
-        temporaryFolder.newFile("gradle.properties") << vars.collect { "${it.key}=${it.value}" }.join("\n")
+        def newVars = vars + [
+                "org.gradle.daemon": false,
+                "org.gradle.parallel": false,
+                "org.gradle.jvmargs": "-Xmx1536m -XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError"
+        ]
+        temporaryFolder.newFile("gradle.properties") << newVars.collect { "${it.key}=${it.value}" }.join("\n")
     }
 }
