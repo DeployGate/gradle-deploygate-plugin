@@ -1,12 +1,12 @@
 package com.deploygate.gradle.plugins.tasks
 
-import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
+import com.deploygate.gradle.plugins.artifacts.DirectAabInfo
 import com.deploygate.gradle.plugins.dsl.Distribution
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class UploadApkTaskConfigurationSpec extends Specification {
+class UploadAabTaskConfigurationSpec extends Specification {
 
     @Unroll
     def "create a configuration"() {
@@ -21,42 +21,40 @@ class UploadApkTaskConfigurationSpec extends Specification {
         deployment.skipAssemble = skipAssemble
 
         and:
-        def apkInfo = new DirectApkInfo("dep1", null, signingReady, universalApk)
+        def aabInfo = new DirectAabInfo("dep1", null)
 
         and:
-        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
+        def configuration = UploadAabTask.createConfiguration(deployment, aabInfo)
 
         expect:
         configuration.uploadParams.message == message
         configuration.uploadParams.distributionKey == distributionKey
         configuration.uploadParams.releaseNote == distributionReleaseNote
         configuration.uploadParams.visibility == visibility
-        configuration.isSigningReady == signingReady
-        configuration.isUniversalApk == universalApk
 
         where:
-        message   | distributionKey   | distributionReleaseNote   | visibility | skipAssemble | signingReady | universalApk
-        null            | null              | null                      | null       | false        | false        | false
-        "message" | "distributionKey" | "distributionReleaseNote" | "public"   | true         | true         | true
+        message   | distributionKey   | distributionReleaseNote   | visibility | skipAssemble
+        null      | null              | null                      | null       | false
+        "message" | "distributionKey" | "distributionReleaseNote" | "public"   | true
     }
 
     @Unroll
-    def "create a configuration for apk file handling"() {
+    def "create a configuration for aab file handling"() {
         setup:
         def deployment = new NamedDeployment("dep1")
         deployment.sourceFile = sourceFile
 
         and:
-        def apkInfo = new DirectApkInfo("dep1", apkFile, false, false)
+        def aabInfo = new DirectAabInfo("dep1", aabFile)
 
         and:
-        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
+        def configuration = UploadAabTask.createConfiguration(deployment, aabInfo)
 
         expect:
-        configuration.artifactFile == sourceFile ?: apkFile
+        configuration.artifactFile == sourceFile ?: aabFile
 
         where:
-        sourceFile               | apkFile
+        sourceFile               | aabFile
         null                     | null
         null                     | new File("build.gradle")
         new File("build.gradle") | null

@@ -12,7 +12,7 @@ class LogoutTaskFactoryImpl extends DeployGateTaskFactory implements LogoutTaskF
 
     @Override
     void registerLogoutTask() {
-        taskFactory.register(TASK_NAME, LogoutTask).configure {
+        taskFactory.registerOrFindBy(TASK_NAME, LogoutTask).configure {
             it.group = GROUP_NAME
         }
     }

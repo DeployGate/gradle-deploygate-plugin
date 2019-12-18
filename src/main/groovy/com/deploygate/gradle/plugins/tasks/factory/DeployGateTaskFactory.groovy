@@ -8,11 +8,17 @@ import javax.annotation.Nonnull
 
 abstract class DeployGateTaskFactory {
     public static final String GROUP_NAME = 'DeployGate'
-    public static String AGGREGATION_TASK_NAME = "uploadDeployGate"
+    public static String SUFFIX_APK_TASK_NAME = "uploadDeployGate"
+    public static String SUFFIX_AAB_TASK_NAME = "uploadDeployGateAab"
 
     @Nonnull
     static String uploadApkTaskName(@Nonnull String variantName) {
-        return "$AGGREGATION_TASK_NAME${variantName.capitalize()}"
+        return "$SUFFIX_APK_TASK_NAME${variantName.capitalize()}"
+    }
+
+    @Nonnull
+    static String uploadAabTaskName(@Nonnull String variantName) {
+        return "$SUFFIX_AAB_TASK_NAME${variantName.capitalize()}"
     }
 
     @Nonnull

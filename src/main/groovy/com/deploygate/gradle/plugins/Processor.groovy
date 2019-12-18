@@ -25,10 +25,16 @@ class Processor {
     private final LogoutTaskFactory logoutTaskFactory
 
     @Nonnull
-    private final UploadApkTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory
+    private final UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory
 
     @Nonnull
-    private final UploadApkTaskFactory<String> stringBasedUploadApkTaskFactory
+    private final UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadAabTaskFactory
+
+    @Nonnull
+    private final UploadArtifactTaskFactory<String> stringBasedUploadApkTaskFactory
+
+    @Nonnull
+    private final UploadArtifactTaskFactory<String> stringBasedUploadAabTaskFactory
 
     def declaredNames = new HashSet<String>()
 
@@ -38,7 +44,9 @@ class Processor {
                 new LoginTaskFactoryImpl(project),
                 new LogoutTaskFactoryImpl(project),
                 new AGPBasedUploadApkTaskFactory(project),
-                new DSLBasedUploadApkTaskFactory(project)
+                new AGPBasedUploadAabTaskFactory(project),
+                new DSLBasedUploadApkTaskFactory(project),
+                new DSLBasedUploadAabTaskFactory(project)
         )
     }
 
@@ -47,14 +55,18 @@ class Processor {
             @Nonnull Project project,
             @Nonnull LoginTaskFactory loginTaskFactory,
             @Nonnull LogoutTaskFactory logoutTaskFactory,
-            @Nonnull UploadApkTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory,
-            @Nonnull UploadApkTaskFactory<String> stringBasedUploadApkTaskFactory
+            @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory,
+            @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadAabTaskFactory,
+            @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadApkTaskFactory,
+            @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadAabTaskFactory
     ) {
         this.project = project
         this.loginTaskFactory = loginTaskFactory
         this.logoutTaskFactory = logoutTaskFactory
         this.applicationVariantBasedUploadApkTaskFactory = applicationVariantBasedUploadApkTaskFactory
+        this.applicationVariantBasedUploadAabTaskFactory = applicationVariantBasedUploadAabTaskFactory
         this.stringBasedUploadApkTaskFactory = stringBasedUploadApkTaskFactory
+        this.stringBasedUploadAabTaskFactory = stringBasedUploadAabTaskFactory
     }
 
     boolean canProcessVariantAware() {
@@ -79,11 +91,21 @@ class Processor {
     }
 
     def registerDeclarationAwareUploadApkTask(String variantOrCustomName) {
-        stringBasedUploadApkTaskFactory.registerUploadApkTask(variantOrCustomName, *dependencyAncestorOfUploadTaskNames)
+        stringBasedUploadApkTaskFactory.registerUploadArtifactTask(variantOrCustomName, *dependencyAncestorOfUploadTaskNames)
+    }
+
+    def registerDeclarationAwareUploadAabTask(String variantOrCustomName) {
+        stringBasedUploadAabTaskFactory.registerUploadArtifactTask(variantOrCustomName, *dependencyAncestorOfUploadTaskNames)
     }
 
     def registerAggregatedDeclarationAwareUploadApkTask(Collection<String> variantOrCustomNames) {
-        stringBasedUploadApkTaskFactory.registerAggregatedUploadApkTask(variantOrCustomNames.collect {
+        stringBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask(variantOrCustomNames.collect {
+            DeployGateTaskFactory.uploadApkTaskName(it)
+        })
+    }
+
+    def registerAggregatedDeclarationAwareUploadAabTask(Collection<String> variantOrCustomNames) {
+        stringBasedUploadAabTaskFactory.registerAggregatedUploadArtifactTask(variantOrCustomNames.collect {
             DeployGateTaskFactory.uploadApkTaskName(it)
         })
     }
@@ -94,7 +116,16 @@ class Processor {
             return
         }
 
-        applicationVariantBasedUploadApkTaskFactory.registerUploadApkTask(variant, *dependencyAncestorOfUploadTaskNames)
+        applicationVariantBasedUploadApkTaskFactory.registerUploadArtifactTask(variant, *dependencyAncestorOfUploadTaskNames)
+    }
+
+    def registerVariantAwareUploadAabTask(@Nonnull IApplicationVariant variant) {
+        if (!canProcessVariantAware()) {
+            project.logger.error("android gradle plugin not found but tried to create android-specific tasks. Ignored...")
+            return
+        }
+
+        applicationVariantBasedUploadAabTaskFactory.registerUploadArtifactTask(variant, *dependencyAncestorOfUploadTaskNames)
     }
 
     @VisibleForTesting

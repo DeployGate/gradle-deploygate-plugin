@@ -12,7 +12,7 @@ class LoginTaskFactoryImpl extends DeployGateTaskFactory implements LoginTaskFac
 
     @Override
     void registerLoginTask() {
-        taskFactory.register(TASK_NAME, LoginTask).configure {
+        taskFactory.registerOrFindBy(TASK_NAME, LoginTask).configure {
             it.group = GROUP_NAME
         }
     }

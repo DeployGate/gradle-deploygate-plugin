@@ -1,7 +1,9 @@
 package com.deploygate.gradle.plugins.artifacts
 
+
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import groovy.transform.PackageScope
+import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
@@ -10,8 +12,7 @@ class PackageAppTaskCompat {
     }
 
     @Nonnull
-    static ApkInfo getApkInfo(@Nonnull /* PackageApplication */ packageAppTask) {
-        String variantName = packageAppTask.name
+    static ApkInfo getApkInfo(@Nonnull /* PackageApplication */ packageAppTask, @Nonnull String variantName) {
         // outputScope is retrieved by the reflection
         Collection<String> apkNames = packageAppTask.outputScope.apkDatas*.outputFileName
         File outputDir = packageAppTask.outputDirectory
@@ -23,6 +24,26 @@ class PackageAppTaskCompat {
                 new File(outputDir, (String) apkNames[0]),
                 isSigningReady,
                 isUniversal,
+        )
+    }
+
+    @Nonnull
+    static AabInfo getAabInfo(@Nonnull /* PackageApplication */ packageAppTask, @Nonnull String variantName, @Nonnull Project project) {
+        final String aabName
+
+        if (AndroidGradlePlugin.isAppBundleArchiveNameChanged()) {
+            // outputScope is retrieved by the reflection
+            Collection<String> apkNames = packageAppTask.outputScope.apkDatas*.outputFileName
+            aabName = ((String) apkNames[0]).replaceFirst("\\.apk\$", ".aab")
+        } else {
+            aabName = "${project.properties["archivesBaseName"] as String}.aab"
+        }
+
+        def outputDir = new File(project.buildDir, "outputs/bundle/${variantName}")
+
+        return new DirectAabInfo(
+                variantName,
+                new File(outputDir, aabName),
         )
     }
 

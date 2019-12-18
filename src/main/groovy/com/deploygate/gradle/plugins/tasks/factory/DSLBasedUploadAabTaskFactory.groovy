@@ -1,7 +1,9 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
+import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.tasks.UploadAabTask
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -9,17 +11,17 @@ import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
-class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements UploadArtifactTaskFactory<String> {
-    DSLBasedUploadApkTaskFactory(@Nonnull Project project) {
+class DSLBasedUploadAabTaskFactory extends DeployGateTaskFactory implements UploadArtifactTaskFactory<String> {
+    DSLBasedUploadAabTaskFactory(@Nonnull Project project) {
         super(project)
     }
 
     @Override
     void registerUploadArtifactTask(@Nonnull String variantNameOrCustomName, Object... dependsOn) {
-        def lazyUploadApkTask = taskFactory.register(uploadApkTaskName(variantNameOrCustomName), UploadApkTask)
+        def lazyUploadAabTask = taskFactory.register(uploadAabTaskName(variantNameOrCustomName), UploadAabTask)
 
-        if (!lazyUploadApkTask) {
-            project.logger.debug("It sounds $variantNameOrCustomName's upload apk task has been already registered by me or other factories")
+        if (!lazyUploadAabTask) {
+            project.logger.debug("It sounds $variantNameOrCustomName's upload aab task has been already registered by me or other factories")
             return
         }
 
@@ -36,15 +38,15 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
             project.logger.debug("$variantNameOrCustomName required assmble but ignored")
         }
 
-        lazyUploadApkTask.configure { dgTask ->
+        lazyUploadAabTask.configure { dgTask ->
             dgTask.variantName = variantNameOrCustomName
             dgTask.dependsOn(dependsOn)
         }
 
-        def apkInfo = new DefaultPresetApkInfo(variantNameOrCustomName)
-        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
+        def aabInfo = new DefaultPresetAabInfo(variantNameOrCustomName)
+        def configuration = UploadAabTask.createConfiguration(deployment, aabInfo)
 
-        lazyUploadApkTask.configure { dgTask ->
+        lazyUploadAabTask.configure { dgTask ->
             dgTask.configuration = configuration
             dgTask.applyTaskProfile()
         }
@@ -57,7 +59,7 @@ class DSLBasedUploadApkTaskFactory extends DeployGateTaskFactory implements Uplo
             return
         }
 
-        taskFactory.registerOrFindBy(SUFFIX_APK_TASK_NAME, DefaultTask).configure { dgTask ->
+        taskFactory.registerOrFindBy(SUFFIX_AAB_TASK_NAME, DefaultTask).configure { dgTask ->
             dgTask.group = GROUP_NAME
             dgTask.dependsOn(dependsOn.flatten())
         }
