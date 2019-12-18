@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
+import com.deploygate.gradle.plugins.artifacts.DirectAabInfo
 import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
@@ -34,13 +35,12 @@ class AGPBasedUploadAabTaskFactory extends DeployGateTaskFactory implements Uplo
 
         dgTask.lazyPackageApplication = applicationVariant.lazyPackageApplication()
 
-        applicationVariant.lazyPackageApplication().configure { packageAppTask ->
-            def aabInfo = PackageAppTaskCompat.getAabInfo(packageAppTask)
-            def configuration = UploadAabTask.createConfiguration(deployment, aabInfo)
+        // cannot get an aab name from package application
+        def baseName = project.properties["archivesBaseName"] as String
+        def aabInfo = new DirectAabInfo(variantName, new File(project.buildDir, "outputs/bundle/${variantName}/${baseName}.aab"))
 
-            dgTask.configuration = configuration
-            dgTask.applyTaskProfile()
-        }
+        dgTask.configuration = UploadAabTask.createConfiguration(deployment, aabInfo)
+        dgTask.applyTaskProfile()
     }
 
     @Override

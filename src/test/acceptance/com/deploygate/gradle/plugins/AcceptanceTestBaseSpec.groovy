@@ -45,6 +45,15 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
     abstract AGPEnv[] getTestTargetAGPEnvs()
 
+    AGPEnv[] getAppBundleTestTargetAGPEnvs() {
+        return testTargetAGPEnvs.findAll { isAppBundleSupport(it.agpVersion) }
+    }
+
+    boolean isAppBundleSupport(String agpVersion) {
+        def version = VersionString.tryParse(agpVersion)
+        return version.major >= 4 || version.major == 3 && version.minor > 1
+    }
+
     def setup() {
         testAndroidProject = new TestAndroidProject(testProjectDir)
         testDeployGatePlugin = new TestDeployGatePlugin()
@@ -90,6 +99,28 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         runner.withArguments("existsTask", "-PtaskName=uploadDeployGateFlavor2Flavor4Release").build()
         runner.withArguments("existsTask", "-PtaskName=uploadDeployGateCustomApk").build()
 
+        if (isAppBundleSupport(agpVersion)) {
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Debug").build()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Debug").build()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Debug").build()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Debug").build()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Release").build()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Release").build()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Release").build()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Release").build()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabCustomApk").build()
+        } else {
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Debug").buildAndFail()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Debug").buildAndFail()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Debug").buildAndFail()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Debug").buildAndFail()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Release").buildAndFail()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Release").buildAndFail()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Release").buildAndFail()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Release").buildAndFail()
+            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabCustomApk").buildAndFail()
+        }
+
         where:
         agpEnv << testTargetAGPEnvs
         agpVersion = agpEnv.agpVersion as String
@@ -126,6 +157,12 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         result.contains("uploadDeployGateFlavor1Flavor4Debug")
         result.contains("uploadDeployGateFlavor2Flavor4Debug")
         result.contains("uploadDeployGateCustomApk")
+        // regardless of aab support
+        !result.contains("uploadDeployGateAabFlavor1Flavor3Release")
+        !result.contains("uploadDeployGateAabFlavor2Flavor3Release")
+        !result.contains("uploadDeployGateAabFlavor1Flavor4Release")
+        !result.contains("uploadDeployGateAabFlavor2Flavor4Release")
+        !result.contains("uploadDeployGateAabCustomApk")
 
         where:
         agpEnv << testTargetAGPEnvs
@@ -134,7 +171,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     }
 
     @Unroll
-    def "flavor1Flavor3Debug #agpVersion"() {
+    def "flavor1Flavor3Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
                 "agpVersion": agpVersion
@@ -168,7 +205,41 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     }
 
     @Unroll
-    def "flavor2Flavor3Debug #agpVersion"() {
+    def "flavor1Flavor3Debug aab #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
+
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(gradleVersion)
+                .withArguments("uploadDeployGateAabFlavor1Flavor3Debug" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        buildResult.task(":uploadDeployGateAabFlavor1Flavor3Debug").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        missingPart(request, "message")
+        missingPart(request, "distribution_key")
+        missingPart(request, "release_note")
+        missingPart(request, "visibility")
+
+        where:
+        agpEnv << appBundleTestTargetAGPEnvs
+        agpVersion = agpEnv.agpVersion as String
+        gradleVersion = agpEnv.gradleVersion as String
+    }
+
+    @Unroll
+    def "flavor2Flavor3Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
                 "agpVersion": agpVersion
@@ -202,7 +273,41 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     }
 
     @Unroll
-    def "flavor1Flavor4Debug #agpVersion"() {
+    def "flavor2Flavor3Debug aab #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
+
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(gradleVersion)
+                .withArguments("uploadDeployGateAabFlavor2Flavor3Debug" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        buildResult.task(":uploadDeployGateAabFlavor2Flavor3Debug").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        request.getPart("message").body.asString() == "flavor2Flavor3Debug"
+        missingPart(request, "distribution_key")
+        missingPart(request, "release_note")
+        missingPart(request, "visibility")
+
+        where:
+        agpEnv << appBundleTestTargetAGPEnvs
+        agpVersion = agpEnv.agpVersion as String
+        gradleVersion = agpEnv.gradleVersion as String
+    }
+
+    @Unroll
+    def "flavor1Flavor4Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
                 "agpVersion": agpVersion
@@ -236,7 +341,41 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     }
 
     @Unroll
-    def "flavor2Flavor4Debug should fail unless assembling #agpVersion"() {
+    def "flavor1Flavor4Debug aab #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
+
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(gradleVersion)
+                .withArguments("uploadDeployGateAabFlavor1Flavor4Debug" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        buildResult.task(":uploadDeployGateAabFlavor1Flavor4Debug").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        request.getPart("message").body.asString() == "flavor1Flavor4Debug"
+        missingPart(request, "distribution_key")
+        missingPart(request, "release_note")
+        missingPart(request, "visibility")
+
+        where:
+        agpEnv << appBundleTestTargetAGPEnvs
+        agpVersion = agpEnv.agpVersion as String
+        gradleVersion = agpEnv.gradleVersion as String
+    }
+
+    @Unroll
+    def "flavor2Flavor4Debug apk should fail unless assembling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
                 "agpVersion": agpVersion
@@ -261,7 +400,32 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     }
 
     @Unroll
-    def "flavor2Flavor4Debug require assembling #agpVersion"() {
+    def "flavor2Flavor4Debug aab should fail unless bundling #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
+
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(gradleVersion)
+                .withArguments("uploadDeployGateAabFlavor2Flavor4Debug" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.buildAndFail()
+
+        expect:
+        buildResult.task(":uploadDeployGateAabFlavor2Flavor4Debug").getOutcome() == TaskOutcome.FAILED
+
+        where:
+        agpEnv << appBundleTestTargetAGPEnvs
+        agpVersion = agpEnv.agpVersion as String
+        gradleVersion = agpEnv.gradleVersion as String
+    }
+
+    @Unroll
+    def "flavor2Flavor4Debug apk require assembling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
                 "agpVersion": agpVersion
@@ -305,7 +469,51 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     }
 
     @Unroll
-    def "customApk #agpVersion"() {
+    def "flavor2Flavor4Debug aab require bundling #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
+
+        def assembleRunner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(gradleVersion)
+                .withArguments("bundleFlavor2Flavor4Debug" /*, "--stacktrace" */)
+
+        def uploadRunner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(gradleVersion)
+                .withArguments("uploadDeployGateAabFlavor2Flavor4Debug" /*, "--stacktrace" */)
+
+        and:
+        def assembleBuildResult = assembleRunner.build()
+
+        and:
+        def uploadBuildResult = uploadRunner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        assembleBuildResult.task(":bundleFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
+        uploadBuildResult.task(":uploadDeployGateAabFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        request.getPart("message").body.asString() == "flavor2Flavor4Debug"
+        missingPart(request, "distribution_key")
+        missingPart(request, "release_note")
+        missingPart(request, "visibility")
+
+        where:
+        agpEnv << appBundleTestTargetAGPEnvs
+        agpVersion = agpEnv.agpVersion as String
+        gradleVersion = agpEnv.gradleVersion as String
+    }
+
+    @Unroll
+    def "customApk apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
                 "agpVersion": agpVersion
@@ -334,6 +542,40 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
         where:
         agpEnv << testTargetAGPEnvs
+        agpVersion = agpEnv.agpVersion as String
+        gradleVersion = agpEnv.gradleVersion as String
+    }
+
+    @Unroll
+    def "customApk aab #agpVersion"() {
+        given:
+        testAndroidProject.gradleProperties([
+                "agpVersion": agpVersion
+        ])
+
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
+                .withGradleVersion(gradleVersion)
+                .withArguments("uploadDeployGateAabCustomApk" /*, "--stacktrace" */)
+
+        and:
+        def buildResult = runner.build()
+        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
+        def request = result.requests.first()
+
+        expect:
+        buildResult.task(":uploadDeployGateAabCustomApk").outcome == TaskOutcome.SUCCESS
+        result.requests.size() == 1
+        request.getPart("token").body.asString() == "api token"
+        request.getPart("file").body.present
+        request.getPart("message").body.asString() == "custom message"
+        request.getPart("distribution_key").body.asString() == "custom distributionKey"
+        request.getPart("release_note").body.asString() == "custom releaseNote"
+        request.getPart("visibility").body.asString() == "custom visibility"
+
+        where:
+        agpEnv << appBundleTestTargetAGPEnvs
         agpVersion = agpEnv.agpVersion as String
         gradleVersion = agpEnv.gradleVersion as String
     }

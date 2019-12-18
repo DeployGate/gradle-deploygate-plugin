@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.internal.agp
 
+
 import com.deploygate.gradle.plugins.internal.VersionString
 import org.gradle.api.Plugin
 import org.gradle.api.Project

@@ -100,10 +100,14 @@ abstract class UploadArtifactTask extends DefaultTask {
 
     // Add TaskAction annotation in overrider classes
     void doUpload() {
-        assert lazyPackageApplication != null
-        // evaluate surely
-        // ref: https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
-        lazyPackageApplication.get()
+        if (lazyPackageApplication) {
+            // evaluate surely
+            // ref: https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
+            lazyPackageApplication.get()
+            logger.debug("$variantName's package application task has been evaluated")
+        } else {
+            logger.debug("$variantName's package application task is not found")
+        }
 
         runArtifactSpecificVerification()
         uploadArtifactToServer()

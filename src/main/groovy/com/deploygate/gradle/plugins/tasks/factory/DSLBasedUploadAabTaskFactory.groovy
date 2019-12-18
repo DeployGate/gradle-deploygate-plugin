@@ -59,7 +59,7 @@ class DSLBasedUploadAabTaskFactory extends DeployGateTaskFactory implements Uplo
             return
         }
 
-        taskFactory.registerOrFindBy(AGGREGATION_AAB_TASK_NAME, DefaultTask).configure { dgTask ->
+        taskFactory.registerOrFindBy(SUFFIX_AAB_TASK_NAME, DefaultTask).configure { dgTask ->
             dgTask.group = GROUP_NAME
             dgTask.dependsOn(dependsOn.flatten())
         }
