@@ -221,7 +221,6 @@ You can configure proxy settings via system properties. Please follow the offici
 
 - To create a new distribution is not supported
 - Split apks are not supported
-- Android App Bundle is not supported. See [a tracking issue](https://github.com/DeployGate/gradle-deploygate-plugin/issues/60) and [a workaround](./example/app/build.gradle#L61).
 - Tasks will be added after project-evaluated
 
 ## <a name="snapshot">Snapshot</a>
