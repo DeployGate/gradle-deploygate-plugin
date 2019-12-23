@@ -1,5 +1,14 @@
 # ChangeLog
 
+## ver 2.1.0
+
+- Support Android Studio 3.6.0-rc01 (and beta01-05) ref: [#90](https://github.com/DeployGate/gradle-deploygate-plugin/issues/90)
+- Support App Bundle Upload ref: [#60](https://github.com/DeployGate/gradle-deploygate-plugin/issues/60)
+
+## ver 2.0.2
+
+- Fixed `skipAssemble=true` caused a build failure because of AGP API breaking changes ref: [#86](https://github.com/DeployGate/gradle-deploygate-plugin/issues/86)
+
 ## ver 2.0.1
 
 - Fixed unexpected broken v1 configuration on Kotlin DSL
