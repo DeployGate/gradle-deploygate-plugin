@@ -57,16 +57,16 @@ class AndroidGradlePlugin {
         return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 3
     }
 
+    static boolean isAppBundleArchiveNameChanged() {
+        return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 5
+    }
+
     static boolean isSigningConfigProviderSupported() {
         return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 6
     }
 
     static boolean isOutputDirectoryProviderSupported() {
         return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 6
-    }
-
-    static boolean isAppBundleArchiveNameChanged() {
-        return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 5
     }
 
     @Nonnull
