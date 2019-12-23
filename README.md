@@ -83,6 +83,8 @@ This plugin does not work with non-app modules and/or library modules correctly.
 * `logoutDeployGate` - Delete current credentials
 * `uploadDeployGate<capitalized VariantName>` - Build and upload an apk artifact of *\<VariantName\>*
 * `uploadDeployGate` - Run uploadDeployGateXXX tasks which are defined in a gradle file
+* `uploadDeployGateAab<capitalized VariantName>` - Build and upload an aab artifact of *\<VariantName\>*
+* `uploadDeployGateAab` - Run uploadDeployGateAabXXX tasks which are defined in a gradle file
 
 *NOTE: Tasks, which relate with variants which generate split apks, are not visible because they do not belong to any group.*
 
@@ -100,18 +102,18 @@ This task deletes stored credentials on your local.
 
 #### uploadDeployGate\<capitalized VariantName\>
 
-This task will do:
+These task will do:
 
-- Assemble your app
+- Assemble your app / Bundle your app
 - Start set-up your DeployGate credentials if no credential is found
-- Upload your app to DeployGate
+- Upload a built artifact to DeployGate
 
 You can continue to deploy updates by running the same task once credential prepared.
 
-**uploadDeployGate**
+**uploadDeployGate and/or uploadDeployGateAab**
 
 If you define deployment names in `deployments` section, there will also be `uploadDeployGate` task which can upload all the associated deployments at once.
-For example, `uploadDeployGate` will run `uploadDeployGateFoo` and `uploadDeployGateBar` based on a configuration below.
+For example, `uploadDeployGate` will run `uploadDeployGateFoo` and `uploadDeployGateBar`, and `uploadDeployGateAab` will run `uploadDeployGateAabFoo` and `uploadDeployGateAabBar` based on a configuration below.
 
 ```
 deploygate {
