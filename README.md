@@ -100,7 +100,7 @@ If no credentials are found, this requests you to log in to DeployGate and save 
 
 This task deletes stored credentials on your local.
 
-#### uploadDeployGate\<capitalized VariantName\>
+#### uploadDeployGate\<capitalized VariantName\> or uploadDeployGateAab\<capitalized VariantName\>
 
 These task will do:
 

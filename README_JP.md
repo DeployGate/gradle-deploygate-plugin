@@ -81,6 +81,8 @@ DeployGate Gradle プラグインは非 app モジュールや android-library �
 * `logoutDeployGate` - ローカルに保存された認証情報削除します
 * `uploadDeployGate<capitalized VariantName>` - *\<VariantName\>* に対応した apk をアップロードします
 * `uploadDeployGate` - 設定に明示的に記述された uploadDeployGateXXX タスクを全て実行します
+* `uploadDeployGateAab<capitalized VariantName>` - *\<VariantName\>* に対応した aab をアップロードします
+* `uploadDeployGateAab` - 設定に明示的に記述された uploadDeployGateAabXXX タスクを全て実行します
 
 *NOTE: Split apks に紐付いたタスクは `:tasks` で表示されません。*
 
@@ -95,19 +97,19 @@ DeployGate Gradle プラグインは非 app モジュールや android-library �
 
 ローカルに保存されている認証情報を削除します。
 
-#### uploadDeployGate\<capitalized VariantName\>
+#### uploadDeployGate\<capitalized VariantName\> または uploadDeployGateAab\<capitalized VariantName\>
 
-- assemble タスクの実行
+- assemble または bundle タスクの実行
 - (認証情報がない場合) loginDeployGate タスクの実行
-- DeployGate への apk のアップロード
+- DeployGate への apk/aab のアップロード
 
 を行います。認証情報を設定できればタスクを実行することで、継続的にアプリの更新を行うことができます。
 
-**uploadDeployGate**
+**uploadDeployGate または uploadDeployGateAab**
 
 後述する `deployments` ブロックで宣言した名前に関連する `uploadDeployGateXXX` タスクを全て実行し、まとめて複数の設定を DeployGate にデプロイすることができます。
 
-下記の設定であれば、 `uploadDeployGate` は `uploadDeployGateFoo` と `uploadDeployGateBar` を実行します。
+下記の設定であれば、 `uploadDeployGate` は `uploadDeployGateFoo` と `uploadDeployGateBar` を、`uploadDeployGateAab` は `uploadDeployGateAabFoo` と `uploadDeployGateAabBar` を実行します。
 
 ```
 deploygate {
@@ -214,7 +216,6 @@ System プロパティからプロキシの設定が可能です。詳細は Gra
 
 - 配布ページの新規作成ができない
 - Split apks (multiple apks) のアップロードには対応していません
-- Android App Bundle には対応していません。 [Issue](https://github.com/DeployGate/gradle-deploygate-plugin/issues/60) または [ワークアラウンド](./example/app/build.gradle#L61)を御覧ください。
 - プロジェクトの評価後にタスクが生成されます。
 
 ## <a name="snapshot">スナップショット</a>
