@@ -78,11 +78,11 @@ commands: &commands
       gradle_version:
         type: string
       no_aab_support:
-        type: boolean
-        default: false
+        type: string
+        default: "false"
       no_kts_support:
-        type: boolean
-        default: false
+        type: string
+        default: "false"
     steps:
       - run: rm -fr build/reports/tests/acceptanceTest build/test-results/tests/acceptanceTest || true
       - run:
@@ -132,17 +132,17 @@ orbs:
         - acceptance_test:
             agp_version: '3.0.0'
             gradle_version: '4.1'
-            no_aab_support: true
-            no_kts_support: true
+            no_aab_support: "true"
+            no_kts_support: "true"
         - acceptance_test:
             agp_version: '3.1.0'
             gradle_version: '4.4'
-            no_aab_support: true
-            no_kts_support: true
+            no_aab_support: "true"
+            no_kts_support: "true"
         - acceptance_test:
             agp_version: '3.2.0'
             gradle_version: '4.6'
-            no_kts_support: true
+            no_kts_support: "true"
         - acceptance_test:
             agp_version: '3.3.2'
             gradle_version: '4.10.1'
@@ -184,7 +184,7 @@ workflows:
   version: 2
   on_commit:
     jobs:
-    - gradle/unit_tests
+#    - gradle/unit_tests
     - gradle/acceptance_tests
   deploy:
     jobs:
