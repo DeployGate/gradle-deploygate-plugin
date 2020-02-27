@@ -30,18 +30,28 @@ ext {
 }
 
 sourceSets {
-    acceptanceTest {
+    unrollAcceptanceTest {
+        groovy.srcDirs += ["src/test/unrollAcceptance"]
+        resources.srcDirs += test.resources.srcDirs
+    }
+    pluginAcceptanceTest {
         groovy.srcDirs += ["src/test/acceptance"]
         resources.srcDirs += test.resources.srcDirs
     }
 }
 
 configurations {
-    acceptanceTestCompileOnly.extendsFrom testCompileOnly
-    acceptanceTestRuntime.extendsFrom testRuntime
-    acceptanceTestRuntimeOnly.extendsFrom testRuntimeOnly
-    acceptanceTestImplementation.extendsFrom testImplementation
-    acceptanceTestApi.extendsFrom testApi
+    unrollAcceptanceTestCompileOnly.extendsFrom testCompileOnly
+    unrollAcceptanceTestRuntime.extendsFrom testRuntime
+    unrollAcceptanceTestRuntimeOnly.extendsFrom testRuntimeOnly
+    unrollAcceptanceTestImplementation.extendsFrom testImplementation
+    unrollAcceptanceTestApi.extendsFrom testApi
+
+    pluginAcceptanceTestCompileOnly.extendsFrom testCompileOnly
+    pluginAcceptanceTestRuntime.extendsFrom testRuntime
+    pluginAcceptanceTestRuntimeOnly.extendsFrom testRuntimeOnly
+    pluginAcceptanceTestImplementation.extendsFrom testImplementation
+    pluginAcceptanceTestApi.extendsFrom testApi
 }
 
 // For testing. The classpaths of this plugin must be specified
@@ -80,9 +90,15 @@ dependencies {
     testRuntimeOnly files(createClasspathManifest)
 }
 
-tasks.create("acceptanceTest", Test) {
-    testClassesDirs = sourceSets.acceptanceTest.output.classesDirs
-    classpath = sourceSets.acceptanceTest.runtimeClasspath
+tasks.create("testUnrollAcceptanceTest", Test) {
+    testClassesDirs = sourceSets.unrollAcceptanceTest.output.classesDirs
+    classpath = sourceSets.unrollAcceptanceTest.runtimeClasspath
+    dependsOn("createClasspathManifest")
+}
+
+tasks.create("testPluginAcceptanceTest", Test) {
+    testClassesDirs = sourceSets.pluginAcceptanceTest.output.classesDirs
+    classpath = sourceSets.pluginAcceptanceTest.runtimeClasspath
     dependsOn("createClasspathManifest")
 }
 

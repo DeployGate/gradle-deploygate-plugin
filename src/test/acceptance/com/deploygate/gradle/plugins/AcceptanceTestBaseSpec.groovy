@@ -7,8 +7,8 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import spock.lang.IgnoreIf
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import javax.annotation.Nonnull
 
@@ -16,16 +16,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 
 abstract class AcceptanceTestBaseSpec extends Specification {
-
-    static class AGPEnv {
-        String agpVersion
-        String gradleVersion
-
-        AGPEnv(String agpVersion, String gradleVersion) {
-            this.agpVersion = agpVersion
-            this.gradleVersion = gradleVersion
-        }
-    }
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
@@ -42,12 +32,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     TestDeployGatePlugin testDeployGatePlugin
 
     abstract void useProperResource()
-
-    abstract AGPEnv[] getTestTargetAGPEnvs()
-
-    AGPEnv[] getAppBundleTestTargetAGPEnvs() {
-        return testTargetAGPEnvs.findAll { isAppBundleSupport(it.agpVersion) }
-    }
 
     boolean isAppBundleSupport(String agpVersion) {
         def version = VersionString.tryParse(agpVersion)
@@ -73,7 +57,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         )
     }
 
-    @Unroll
     def "check tasks' existence #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -122,12 +105,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         }
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
     def "check task children of uploadDeployGate #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -165,12 +146,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         !result.contains("uploadDeployGateAabCustomApk")
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
     def "flavor1Flavor3Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -181,7 +160,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
                 .withProjectDir(testProjectDir.root)
                 .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
                 .withGradleVersion(gradleVersion)
-                .withArguments("uploadDeployGateFlavor1Flavor3Debug" , "--stacktrace" )
+                .withArguments("uploadDeployGateFlavor1Flavor3Debug", "--stacktrace")
 
         and:
         def buildResult = runner.build()
@@ -199,12 +178,11 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
+    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor1Flavor3Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -233,12 +211,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpEnv << appBundleTestTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
     def "flavor2Flavor3Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -267,12 +243,11 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
+    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor3Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -301,12 +276,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpEnv << appBundleTestTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
     def "flavor1Flavor4Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -335,12 +308,11 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
+    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor1Flavor4Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -369,12 +341,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpEnv << appBundleTestTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
     def "flavor2Flavor4Debug apk should fail unless assembling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -394,12 +364,11 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         buildResult.task(":uploadDeployGateFlavor2Flavor4Debug").getOutcome() == TaskOutcome.FAILED
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
+    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor4Debug aab should fail unless bundling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -419,12 +388,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         buildResult.task(":uploadDeployGateAabFlavor2Flavor4Debug").getOutcome() == TaskOutcome.FAILED
 
         where:
-        agpEnv << appBundleTestTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
     def "flavor2Flavor4Debug apk require assembling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -463,12 +430,11 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
+    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor4Debug aab require bundling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -507,12 +473,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "visibility")
 
         where:
-        agpEnv << appBundleTestTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
     def "customApk apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -541,12 +505,11 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("visibility").body.asString() == "custom visibility"
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @Unroll
+    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "customApk aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -575,9 +538,8 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("visibility").body.asString() == "custom visibility"
 
         where:
-        agpEnv << appBundleTestTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
     private static boolean missingPart(LoggedRequest request, String name) {

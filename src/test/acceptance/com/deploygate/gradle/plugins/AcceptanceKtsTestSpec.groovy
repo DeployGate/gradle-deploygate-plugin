@@ -1,8 +1,10 @@
 package com.deploygate.gradle.plugins
 
 import org.gradle.testkit.runner.GradleRunner
+import spock.lang.IgnoreIf
 import spock.lang.Unroll
 
+@IgnoreIf({ Boolean.valueOf(env["NO_KTS_SUPPORT"]) })
 class AcceptanceKtsTestSpec extends AcceptanceTestBaseSpec {
 
     @Override
@@ -10,18 +12,6 @@ class AcceptanceKtsTestSpec extends AcceptanceTestBaseSpec {
         testAndroidProject.useAcceptanceKtsResourceDir()
     }
 
-    @Override
-    AGPEnv[] getTestTargetAGPEnvs() {
-        return [
-                new AGPEnv("3.3.2", "4.10.1"),
-                new AGPEnv("3.4.0", "5.1.1"),
-                new AGPEnv("3.5.1", "5.4.1"),
-                new AGPEnv("3.6.0", "5.6.4"),
-                new AGPEnv("4.0.0-beta01", "6.1.1"),
-        ]
-    }
-
-    @Unroll
     def "Backward compatibility #agpVersion"() {
         given:
         testAndroidProject.useGradleKtsForBackwardCompatibilityResource()
@@ -38,8 +28,7 @@ class AcceptanceKtsTestSpec extends AcceptanceTestBaseSpec {
         runner.withArguments("existsTask", "-PtaskName=loginDeployGate").build()
 
         where:
-        agpEnv << testTargetAGPEnvs
-        agpVersion = agpEnv.agpVersion as String
-        gradleVersion = agpEnv.gradleVersion as String
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 }

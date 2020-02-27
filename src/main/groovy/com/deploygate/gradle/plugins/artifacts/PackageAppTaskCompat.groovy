@@ -66,7 +66,7 @@ class PackageAppTaskCompat {
     }
 
     static Collection<String> getApkNames(packageAppTask) {
-        if (!AndroidGradlePlugin.isOutputDirectoryProviderSupported()) {
+        if (!AndroidGradlePlugin.isAppBundleArchiveNameChanged()) {
             return packageAppTask.outputScope.apkDatas*.outputFileName
         } else {
             return packageAppTask.getApkNames()
