@@ -9,7 +9,7 @@ executors: &executors
       ANDROID_HOME: /home/circleci/android
   android_java:
     docker:
-      - image: circleci/android:api-28
+      - image: circleci/android:api-29
     working_directory: ~/gradle-deploygate-plugin
     environment:
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false'
