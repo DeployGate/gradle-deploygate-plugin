@@ -85,15 +85,16 @@ commands: &commands
         default: false
     steps:
       - run: rm -fr build/reports/tests/acceptanceTest build/test-results/tests/acceptanceTest || true
-      - run: ./gradlew acceptanceTest
-        environment:
-          TEST_AGP_VERSION: << parameters.agp_version >>
-          TEST_GRADLE_VERSION: << parameters.gradle_version >>
-          NO_AAB_SUPPORT: << parameters.no_aab_support >>
-          NO_KTS_SUPPORT: << parameters.no_kts_support >>
+      - run:
+          command: ./gradlew testPluginAcceptanceTest
+          environment:
+            TEST_AGP_VERSION: << parameters.agp_version >>
+            TEST_GRADLE_VERSION: << parameters.gradle_version >>
+            NO_AAB_SUPPORT: << parameters.no_aab_support >>
+            NO_KTS_SUPPORT: << parameters.no_kts_support >>
       - store_artifacts:
           path: build/reports/tests/acceptanceTest
-          destination: reports/tests/acceptanceTest/<< paremeters.agp_version >>
+          destination: reports/tests/acceptanceTest/<< parameters.agp_version >>
           when: always
       - store_test_results:
           path: build/test-results/tests/acceptanceTest
@@ -110,7 +111,7 @@ orbs:
         - checkout
         - use_gradle_cache:
             prefix: unit
-        - ./gradlew install test
+        - run: ./gradlew install test
         - save_gradle_cache:
             prefix: unit
         - store_artifacts:
@@ -126,7 +127,7 @@ orbs:
         - download_sdk:
             zip_hash: "4333796"
             version: v2
-       - use_gradle_cache:
+        - use_gradle_cache:
             prefix: acceptance
         - acceptance_test:
             agp_version: '3.0.0'
