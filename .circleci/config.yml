@@ -84,7 +84,7 @@ commands: &commands
         type: string
         default: "false"
     steps:
-      - run: rm -fr build/reports/tests/acceptanceTest build/test-results/tests/acceptanceTest || true
+      - run: rm -fr build/reports/tests/testPluginAcceptanceTest build/test-results/tests/testPluginAcceptanceTest || true
       - run:
           command: ./gradlew testPluginAcceptanceTest
           environment:
@@ -93,12 +93,12 @@ commands: &commands
             NO_AAB_SUPPORT: << parameters.no_aab_support >>
             NO_KTS_SUPPORT: << parameters.no_kts_support >>
       - store_artifacts:
-          path: build/reports/tests/acceptanceTest
-          destination: reports/tests/acceptanceTest/<< parameters.agp_version >>
-          when: always
+           path: build/reports/tests/testPluginAcceptanceTest
+           destination: reports/tests/testPluginAcceptanceTest/<< parameters.agp_version >>
+           when: always
       - store_test_results:
-          path: build/test-results/tests/acceptanceTest
-          when: always
+           path: build/test-results/tests/testPluginAcceptanceTest
+           when: always
 
 orbs:
   gradle:
@@ -129,6 +129,13 @@ orbs:
             version: v2
         - use_gradle_cache:
             prefix: acceptance
+        - run: ./gradlew testUnrollAcceptanceTest
+        - store_artifacts:
+            path: build/reports/tests/testUnrollAcceptanceTest
+            when: always
+        - store_test_results:
+            path: build/test-results/tests/testUnrollAcceptanceTest
+            when: always
         - acceptance_test:
             agp_version: '3.0.0'
             gradle_version: '4.1'
@@ -184,7 +191,7 @@ workflows:
   version: 2
   on_commit:
     jobs:
-#    - gradle/unit_tests
+    - gradle/unit_tests
     - gradle/acceptance_tests
   deploy:
     jobs:
