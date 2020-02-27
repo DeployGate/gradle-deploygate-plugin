@@ -181,7 +181,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
                 .withProjectDir(testProjectDir.root)
                 .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
                 .withGradleVersion(gradleVersion)
-                .withArguments("uploadDeployGateFlavor1Flavor3Debug" /*, "--stacktrace" */)
+                .withArguments("uploadDeployGateFlavor1Flavor3Debug" , "--stacktrace" )
 
         and:
         def buildResult = runner.build()
