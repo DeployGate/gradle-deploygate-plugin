@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins.artifacts
 
-
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import groovy.transform.PackageScope
 import org.gradle.api.Project
@@ -14,7 +13,7 @@ class PackageAppTaskCompat {
     @Nonnull
     static ApkInfo getApkInfo(@Nonnull /* PackageApplication */ packageAppTask, @Nonnull String variantName) {
         // outputScope is retrieved by the reflection
-        Collection<String> apkNames = packageAppTask.outputScope.apkDatas*.outputFileName
+        Collection<String> apkNames = getApkNames(packageAppTask)
         File outputDir = getOutputDirectory(packageAppTask)
         boolean isUniversal = apkNames.size() == 1
         boolean isSigningReady = hasSigningConfig(packageAppTask)
@@ -33,7 +32,7 @@ class PackageAppTaskCompat {
 
         if (AndroidGradlePlugin.isAppBundleArchiveNameChanged()) {
             // outputScope is retrieved by the reflection
-            Collection<String> apkNames = packageAppTask.outputScope.apkDatas*.outputFileName
+            Collection<String> apkNames = getApkNames(packageAppTask)
             aabName = ((String) apkNames[0]).replaceFirst("\\.apk\$", ".aab")
         } else {
             aabName = "${project.properties["archivesBaseName"] as String}.aab"
@@ -63,6 +62,14 @@ class PackageAppTaskCompat {
             return packageAppTask.outputDirectory
         } else {
             return packageAppTask.outputDirectory.getAsFile().get()
+        }
+    }
+
+    static Collection<String> getApkNames(packageAppTask) {
+        if (!AndroidGradlePlugin.isOutputFilenameDesignChanged()) {
+            return packageAppTask.outputScope.apkDatas*.outputFileName
+        } else {
+            return packageAppTask.getApkNames()
         }
     }
 }

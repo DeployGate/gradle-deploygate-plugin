@@ -69,6 +69,10 @@ class AndroidGradlePlugin {
         return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 6
     }
 
+    static boolean isOutputFilenameDesignChanged() {
+        return getVersion().major >= 4
+    }
+
     @Nonnull
     static String androidAssembleTaskName(@Nonnull String variantName) {
         return "assemble${variantName.capitalize()}"

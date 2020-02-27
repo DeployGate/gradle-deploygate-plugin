@@ -9,7 +9,7 @@ executors: &executors
       ANDROID_HOME: /home/circleci/android
   android_java:
     docker:
-      - image: circleci/android:api-28
+      - image: circleci/android:api-29
     working_directory: ~/gradle-deploygate-plugin
     environment:
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false'
@@ -37,7 +37,7 @@ commands: &commands
               rm sdk-tools.zip
             fi
 
-            yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;28.0.3" "platforms;android-28" "platform-tools" >/dev/null 2>&1 || if [ $? -ne '141' ]; then exit $?; fi;
+            yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;29.0.2" "platforms;android-29" "platform-tools" >/dev/null 2>&1 || if [ $? -ne '141' ]; then exit $?; fi;
       - save_cache:
           paths:
             - ~/android
@@ -47,22 +47,58 @@ commands: &commands
       cache_version:
         type: string
         default: v3
-      steps:
-        type: steps
+      prefix:
+        type: string
     steps:
       - restore_cache:
           keys:
-          - gradle-<< parameters.cache_version >>-{{ checksum "build.gradle" }}
+          - gradle-<< parameters.cache_version >>-<< parameters.prefix >>-{{ checksum "build.gradle" }}
+          - gradle-<< parameters.cache_version >>-<< parameters.prefix >>-
           - gradle-<< parameters.cache_version >>-
           - gradle-
-      - << parameters.steps >>
+  save_gradle_cache:
+    parameters:
+      cache_version:
+        type: string
+        default: v3
+      prefix:
+        type: string
+    steps:
       - save_cache:
           paths:
-          - ~/.android
-          - ~/.gradle
-          - .gradle
-          - ~/.m2
-          key: gradle-<< parameters.cache_version >>-{{ checksum "build.gradle" }}
+            - ~/.android
+            - ~/.gradle
+            - .gradle
+            - ~/.m2
+          key: gradle-<< parameters.cache_version >>-<< parameters.prefix >>-{{ checksum "build.gradle" }}
+  acceptance_test:
+    parameters:
+      agp_version:
+        type: string
+      gradle_version:
+        type: string
+      no_aab_support:
+        type: string
+        default: "false"
+      no_kts_support:
+        type: string
+        default: "false"
+    steps:
+      - run: rm -fr build/reports/tests/testPluginAcceptanceTest build/test-results/tests/testPluginAcceptanceTest || true
+      - run:
+          command: ./gradlew testPluginAcceptanceTest
+          environment:
+            TEST_AGP_VERSION: << parameters.agp_version >>
+            TEST_GRADLE_VERSION: << parameters.gradle_version >>
+            NO_AAB_SUPPORT: << parameters.no_aab_support >>
+            NO_KTS_SUPPORT: << parameters.no_kts_support >>
+      - store_artifacts:
+           path: build/reports/tests/testPluginAcceptanceTest
+           destination: reports/tests/testPluginAcceptanceTest/<< parameters.agp_version >>
+           when: always
+      - store_test_results:
+           path: build/test-results/tests/testPluginAcceptanceTest
+           when: always
 
 orbs:
   gradle:
@@ -74,8 +110,10 @@ orbs:
         steps:
         - checkout
         - use_gradle_cache:
-            steps:
-            - run: ./gradlew install test
+            prefix: unit
+        - run: ./gradlew install test
+        - save_gradle_cache:
+            prefix: unit
         - store_artifacts:
             path: build/reports/tests/test
             when: always
@@ -90,24 +128,56 @@ orbs:
             zip_hash: "4333796"
             version: v2
         - use_gradle_cache:
-            steps:
-            - run: ./gradlew acceptanceTest
+            prefix: acceptance
+        - run: ./gradlew testUnrollAcceptanceTest
         - store_artifacts:
-            path: build/reports/tests/acceptanceTest
+            path: build/reports/tests/testUnrollAcceptanceTest
             when: always
         - store_test_results:
-            path: build/test-results/tests/acceptanceTest
+            path: build/test-results/tests/testUnrollAcceptanceTest
             when: always
+        - acceptance_test:
+            agp_version: '3.0.0'
+            gradle_version: '4.1'
+            no_aab_support: "true"
+            no_kts_support: "true"
+        - acceptance_test:
+            agp_version: '3.1.0'
+            gradle_version: '4.4'
+            no_aab_support: "true"
+            no_kts_support: "true"
+        - acceptance_test:
+            agp_version: '3.2.0'
+            gradle_version: '4.6'
+            no_kts_support: "true"
+        - acceptance_test:
+            agp_version: '3.3.2'
+            gradle_version: '4.10.1'
+        - acceptance_test:
+            agp_version: '3.4.1'
+            gradle_version: '5.1.1'
+        - acceptance_test:
+            agp_version: '3.5.1'
+            gradle_version: '5.4.1'
+        - acceptance_test:
+            agp_version: '3.6.0'
+            gradle_version: '5.6.4'
+        - acceptance_test:
+            agp_version: '4.0.0-beta01'
+            gradle_version: '6.1.1'
+        - save_gradle_cache:
+            prefix: acceptance
+
       release:
         executor: android_java
         steps:
         - checkout
         - use_gradle_cache:
-            steps:
-              - deploy:
-                  command: |
-                    ./release.sh
-                    curl -X POST -d "payload=$(cat .circleci/bintray.json)" $OUTGOING_WEBHOOK_URL
+            prefix: unit
+        - deploy:
+            command: |
+              ./release.sh
+              curl -X POST -d "payload=$(cat .circleci/bintray.json)" $OUTGOING_WEBHOOK_URL
 
 workflows_filter:
   release: &release
