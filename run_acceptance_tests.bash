@@ -15,6 +15,6 @@ done < <(cat<<EOF
 3.3.2 4.10.1 false false
 3.5.1 5.4.1 false false
 3.6.0 5.6.4 false false
-4.0.0-beta01 6.1.1 false false
+4.0.0 6.1.1 false false
 EOF
 )
