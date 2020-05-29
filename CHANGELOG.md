@@ -1,5 +1,9 @@
 # ChangeLog
 
+## ver 2.2.0
+
+- Support Android Studio 4.0.0 ref: [#100](https://github.com/DeployGate/gradle-deploygate-plugin/issues/100), [#102](https://github.com/DeployGate/gradle-deploygate-plugin/pull/102)
+
 ## ver 2.1.0
 
 - Support Android Studio 3.6.0-rc01 (and beta01-05) ref: [#90](https://github.com/DeployGate/gradle-deploygate-plugin/issues/90)
