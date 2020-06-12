@@ -5,6 +5,7 @@ import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.google.common.annotations.VisibleForTesting
+import com.google.gson.Gson
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.HttpResponseException
@@ -14,6 +15,8 @@ import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
@@ -68,6 +71,9 @@ abstract class UploadArtifactTask extends DefaultTask {
     Configuration configuration
 
     private def lazyPackageApplication
+
+    @OutputFile
+    File response = new File(new File(new File(project.buildDir, "deploygate"), name), "response.json")
 
     void setVariantName(@Nonnull String variantName) {
         if (this.variantName && this.variantName != variantName) {
@@ -133,11 +139,24 @@ abstract class UploadArtifactTask extends DefaultTask {
 
         def response = postRequestToUpload(appOwnerName, apiToken, configuration.artifactFile, configuration.uploadParams)
 
+        writeUploadResponse(response.data)
+
         handleResponse(response, response.data)
     }
 
     private void onBeforeUpload() {
         project.deploygate.notifyServer 'start_upload', ['length': Long.toString(configuration.artifactFile.length())]
+    }
+
+    private void writeUploadResponse(data) {
+        if (!response.parentFile.exists()) {
+            response.parentFile.mkdirs()
+        }
+
+        if (response.exists()) {
+            response.delete()
+        }
+        response.write(new Gson().toJson(data))
     }
 
     private void handleResponse(HttpResponseDecorator response, data) {
@@ -158,6 +177,7 @@ abstract class UploadArtifactTask extends DefaultTask {
 
     @Nonnull
     @VisibleForTesting
+    @Internal
     String getApiToken() {
         def apiToken = project.deploygate.apiToken
 
@@ -170,6 +190,7 @@ abstract class UploadArtifactTask extends DefaultTask {
 
     @Nonnull
     @VisibleForTesting
+    @Internal
     String getAppOwnerName() {
         def appOwnerName = project.deploygate.appOwnerName
 
