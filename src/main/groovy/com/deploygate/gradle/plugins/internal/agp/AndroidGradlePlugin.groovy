@@ -74,7 +74,7 @@ class AndroidGradlePlugin {
     }
 
     static boolean isNewTransformArtifactAPI() {
-        return getVersion().major >= 4 && getVersion().minor >= 2
+        return getVersion().major >= 4 && getVersion().minor >= 1
     }
 
     @Nonnull
