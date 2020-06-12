@@ -68,8 +68,10 @@ class PackageAppTaskCompat {
     static Collection<String> getApkNames(packageAppTask) {
         if (!AndroidGradlePlugin.isOutputFilenameDesignChanged()) {
             return packageAppTask.outputScope.apkDatas*.outputFileName
-        } else {
+        } else if (!AndroidGradlePlugin.isNewTransformArtifactAPI()) {
             return packageAppTask.getApkNames()
+        } else {
+            return packageAppTask.variantOutputs.get().collect { it.outputFileName.get() }
         }
     }
 }

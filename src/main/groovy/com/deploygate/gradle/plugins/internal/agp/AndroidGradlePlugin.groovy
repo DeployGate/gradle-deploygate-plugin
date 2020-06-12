@@ -73,6 +73,10 @@ class AndroidGradlePlugin {
         return getVersion().major >= 4
     }
 
+    static boolean isNewTransformArtifactAPI() {
+        return getVersion().major >= 4 && getVersion().minor >= 2
+    }
+
     @Nonnull
     static String androidAssembleTaskName(@Nonnull String variantName) {
         return "assemble${variantName.capitalize()}"

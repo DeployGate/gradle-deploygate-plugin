@@ -85,6 +85,7 @@ commands: &commands
         default: "false"
     steps:
       - run: rm -fr build/reports/tests/testPluginAcceptanceTest build/test-results/tests/testPluginAcceptanceTest || true
+      - run: echo "Env. agp(<< parameters.agp_version >>) and gradle(<< parameters.gradle_version >>)"
       - run:
           command: ./gradlew testPluginAcceptanceTest
           environment:
