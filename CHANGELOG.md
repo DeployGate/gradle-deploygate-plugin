@@ -1,5 +1,11 @@
 # ChangeLog
 
+## ver 2.3.0
+
+- Expose the response of Upload API for other tasks [#109](https://github.com/DeployGate/gradle-deploygate-plugin/pull/109)
+
+Includes changes to support Android Studio 4.1.0-beta01, 4.2.0-alpha01 [#106](https://github.com/DeployGate/gradle-deploygate-plugin/pull/106)
+
 ## ver 2.2.0
 
 - Support Android Studio 4.0.0 ref: [#100](https://github.com/DeployGate/gradle-deploygate-plugin/issues/100), [#102](https://github.com/DeployGate/gradle-deploygate-plugin/pull/102)
