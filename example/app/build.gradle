@@ -74,6 +74,15 @@ def buildUniversalApk = project.tasks.create("buildUniversalApk", DefaultTask.cl
         }
     }
 }
+
+def showUploadResponse = project.tasks.create("showUploadResponse", DefaultTask.class) {
+    dependsOn("uploadDeployGateFlavor1Debug")
+    doLast {
+        def file = project.tasks.findByName("uploadDeployGateFlavor1Debug").response as File
+        println(file.text)
+    }
+}
+
 project.afterEvaluate {
     // Gradle 4.10.0 is required
     project.tasks.named("uploadDeployGateUniversalApkOfAab").configure { dgTask ->
