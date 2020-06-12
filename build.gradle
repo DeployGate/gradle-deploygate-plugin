@@ -75,6 +75,7 @@ dependencies {
 
     implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
     implementation 'org.apache.httpcomponents:httpmime:4.2.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     testImplementation gradleTestKit()
     testImplementation 'junit:junit:4.12'
