@@ -85,6 +85,7 @@ commands: &commands
         default: "false"
     steps:
       - run: rm -fr build/reports/tests/testPluginAcceptanceTest build/test-results/tests/testPluginAcceptanceTest || true
+      - run: echo "Env. agp(<< parameters.agp_version >>) and gradle(<< parameters.gradle_version >>)"
       - run:
           command: ./gradlew testPluginAcceptanceTest
           environment:
@@ -163,8 +164,11 @@ orbs:
             agp_version: '3.6.3'
             gradle_version: '5.6.4'
         - acceptance_test:
-            agp_version: '4.0.0'
-            gradle_version: '6.1.1'
+            agp_version: '4.1.0-beta01'
+            gradle_version: '6.5-rc-1'
+        - acceptance_test:
+            agp_version: '4.2.0-alpha01'
+            gradle_version: '6.5-rc-1'
         - save_gradle_cache:
             prefix: acceptance
 
