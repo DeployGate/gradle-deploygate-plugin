@@ -29,7 +29,7 @@ buildscript {
 }
 ```
 
-If you are using the new plugin block DSL, then the following is required in your *setting.gradle*.
+If you are using the new plugin block DSL, then the following is required in your *settings.gradle*.
 
 ```groovy
 pluginManagement {
