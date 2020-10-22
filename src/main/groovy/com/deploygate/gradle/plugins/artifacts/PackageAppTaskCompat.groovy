@@ -49,7 +49,6 @@ class PackageAppTaskCompat {
     @PackageScope
     static boolean hasSigningConfig(packageAppTask) {
         if (!AndroidGradlePlugin.isSigningConfigCollectionSupported()) {
-            packageAppTask.signingConfigData
             return packageAppTask.signingConfig != null
         } else if (!AndroidGradlePlugin.isSigningConfigProviderSupported()) {
             return packageAppTask.signingConfig != null && !packageAppTask.signingConfig.isEmpty()
