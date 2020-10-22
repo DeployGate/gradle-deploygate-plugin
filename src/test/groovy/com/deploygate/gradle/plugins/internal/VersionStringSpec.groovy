@@ -14,15 +14,16 @@ class VersionStringSpec extends Specification {
         result.major == major
         result.minor == minor
         result.patch == patch
-        result.addition == addition
+        result.prerelease == prerelease
+        result.metaBuild == metaBuild
 
         where:
-        version          | major | minor | patch | addition
-        "1.0"            | 1     | 0     | 0     | null
-        "1.2.3"          | 1     | 2     | 3     | null
-        "1.0.3-extra"    | 1     | 0     | 3     | "extra"
-        "1.0.3-extra03"  | 1     | 0     | 3     | "extra03"
-        "1.0.3-extra-03" | 1     | 0     | 3     | "extra-03"
+        version          | major | minor | patch | prerelease | metaBuild
+        "1.0"            | 1     | 0     | 0     | null       | 0
+        "1.2.3"          | 1     | 2     | 3     | null       | 0
+        "1.0.3-extra"    | 1     | 0     | 3     | "extra"    | 0
+        "1.0.3-extra03"  | 1     | 0     | 3     | "extra"    | 3
+        "1.0.3-extra-03" | 1     | 0     | 3     | "extra"    | 3
     }
 
     @Unroll
@@ -31,15 +32,45 @@ class VersionStringSpec extends Specification {
         def result = VersionString.tryParse(version)
 
         expect:
-        result.toString().startsWith(version)
+        result.toString() == stringVersion
 
         where:
-        version << [
-                "1.0",
-                "1.2.3",
-                "1.0.3-extra",
-                "1.0.3-extra03",
-                "1.0.3-extra-03"
-        ]
+        version          | stringVersion
+        "1.0"            | "1.0"
+        "1.2.3"          | "1.2.3"
+        "1.0.3-extra"    | "1.0.3-extra0"
+        "1.0.3-extra03"  | "1.0.3-extra3"
+        "1.0.3-extra-03" | "1.0.3-extra3"
+    }
+
+    @Unroll
+    def "compareTo. Unrolled #version"() {
+        given:
+        def lhs = VersionString.tryParse(version)
+        def rhs = VersionString.tryParse(stringVersion)
+
+        expect:
+        lhs <=> rhs == expected
+
+        where:
+        version          | stringVersion  | expected
+        "1.0"            | "1.0"          | 0
+        "1.2.1"          | "1.2.3"        | -1
+        "1.2.3"          | "1.2.3"        | 0
+        "1.0.3-extra"    | "1.0.3-extra0" | 0
+        "1.0.3-extra03"  | "1.0.3-extra3" | 0
+        "1.0.3-rc1"      | "1.0.3-alpha1" | 1
+        "1.0.3-rc1"      | "1.0.3-beta1"  | 1
+        "1.0.3-alpha1"   | "1.0.3-rc1"    | -1
+        "1.0.3-alpha1"   | "1.0.3-beta1"  | -1
+        "1.0.3-beta1"    | "1.0.3-rc1"    | -1
+        "1.0.3-beta1"    | "1.0.3-beta2"  | -1
+        "1.0.3-beta2"    | "1.0.3-beta1"  | 1
+        "1.0.3"          | "1.0.3-alpha1" | 1
+        "1.0.3"          | "1.0.3-beta1"  | 1
+        "1.0.3"          | "1.0.3-rc1"    | 1
+        "1.0.3-alpha1"   | "1.0.3"        | -1
+        "1.0.3-beta1"    | "1.0.3"        | -1
+        "1.0.3-rc1"      | "1.0.3"        | -1
     }
 }
