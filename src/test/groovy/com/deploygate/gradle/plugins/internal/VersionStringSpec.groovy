@@ -36,7 +36,7 @@ class VersionStringSpec extends Specification {
 
         where:
         version          | stringVersion
-        "1.0"            | "1.0"
+        "1.0"            | "1.0.0"
         "1.2.3"          | "1.2.3"
         "1.0.3-extra"    | "1.0.3-extra0"
         "1.0.3-extra03"  | "1.0.3-extra3"
@@ -46,14 +46,14 @@ class VersionStringSpec extends Specification {
     @Unroll
     def "compareTo. Unrolled #version"() {
         given:
-        def lhs = VersionString.tryParse(version)
-        def rhs = VersionString.tryParse(stringVersion)
+        def lhs = VersionString.tryParse(leftVersion)
+        def rhs = VersionString.tryParse(rightVersion)
 
         expect:
         lhs <=> rhs == expected
 
         where:
-        version          | stringVersion  | expected
+        leftVersion      | rightVersion   | expected
         "1.0"            | "1.0"          | 0
         "1.2.1"          | "1.2.3"        | -1
         "1.2.3"          | "1.2.3"        | 0
