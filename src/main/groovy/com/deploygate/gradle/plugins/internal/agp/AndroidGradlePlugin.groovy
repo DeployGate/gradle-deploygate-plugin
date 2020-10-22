@@ -77,6 +77,11 @@ class AndroidGradlePlugin {
         return getVersion().major >= 4 && getVersion().minor >= 1
     }
 
+    static boolean isResolvableSigningConfigProviderSupported() {
+        return getVersion().major >= 4 && getVersion().minor >= 2 && getVersion().patch >= 0 &&
+                (getVersion().addition == null || getVersion().addition.toInteger() >= 14)
+    }
+
     @Nonnull
     static String androidAssembleTaskName(@Nonnull String variantName) {
         return "assemble${variantName.capitalize()}"

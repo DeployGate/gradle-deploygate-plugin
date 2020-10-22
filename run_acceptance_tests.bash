@@ -17,6 +17,7 @@ done < <(cat<<EOF
 3.6.0 5.6.4 false false
 4.0.0 6.1.1 false false
 4.1.0 6.5 false false
-4.2.0-alpha01 6.5-rc-1 false false
+4.2.0-alpha13 6.5 false false
+4.2.0-alpha14 6.5 false false
 EOF
 )
