@@ -52,8 +52,10 @@ class PackageAppTaskCompat {
             return packageAppTask.signingConfig != null
         } else if (!AndroidGradlePlugin.isSigningConfigProviderSupported()) {
             return packageAppTask.signingConfig != null && !packageAppTask.signingConfig.isEmpty()
-        } else {
+        } else if (!AndroidGradlePlugin.isResolvableSigningConfigProviderSupported()) {
             return packageAppTask.signingConfig != null && !packageAppTask.signingConfig.signingConfigFileCollection // no need to check `empty` for now
+        } else {
+            return packageAppTask.signingConfigData.resolve() != null
         }
     }
 

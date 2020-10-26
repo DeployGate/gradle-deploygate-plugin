@@ -46,35 +46,39 @@ class AndroidGradlePlugin {
     }
 
     static boolean isAppBundleSupported() {
-        return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 2
+        return getVersion() >= VersionString.tryParse("3.2.0-alpha1")
     }
 
     static boolean isSigningConfigCollectionSupported() {
-        return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 3
+        return getVersion() >= VersionString.tryParse("3.3.0-alpha1")
     }
 
     static boolean isTaskProviderBased() {
-        return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 3
+        return getVersion() >= VersionString.tryParse("3.3.0-alpha1")
     }
 
     static boolean isAppBundleArchiveNameChanged() {
-        return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 5
+        return getVersion() >= VersionString.tryParse("3.5.0-alpha1")
     }
 
     static boolean isSigningConfigProviderSupported() {
-        return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 6
+        return getVersion() >= VersionString.tryParse("3.6.0-alpha1")
     }
 
     static boolean isOutputDirectoryProviderSupported() {
-        return getVersion().major >= 4 || getVersion().major == 3 && getVersion().minor >= 6
+        return getVersion() >= VersionString.tryParse("3.6.0-alpha1")
     }
 
     static boolean isOutputFilenameDesignChanged() {
-        return getVersion().major >= 4
+        return getVersion() >= VersionString.tryParse("4.0.0-alpha1")
     }
 
     static boolean isNewTransformArtifactAPI() {
-        return getVersion().major >= 4 && getVersion().minor >= 1
+        return getVersion() >= VersionString.tryParse("4.1.0-alpha1")
+    }
+
+    static boolean isResolvableSigningConfigProviderSupported() {
+        return getVersion() >= VersionString.tryParse("4.2.0-alpha14")
     }
 
     @Nonnull
