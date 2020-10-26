@@ -217,6 +217,12 @@ workflows:
           - gradle/unit_tests
           - gradle/acceptance_tests
         <<: *release
+  deploy-rc:
+    jobs:
+    - gradle/unit_tests:
+        <<: *rc
+    - gradle/acceptance_tests:
+        <<: *rc
     - gradle/release:
         requires: 
           - gradle/unit_tests
