@@ -37,7 +37,7 @@ commands: &commands
               rm sdk-tools.zip
             fi
 
-            yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;29.0.2" "platforms;android-29" "platform-tools" >/dev/null 2>&1 || if [ $? -ne '141' ]; then exit $?; fi;
+            yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;29.0.2" "build-tools;30.0.0" "platforms;android-29" "platform-tools" >/dev/null 2>&1 || if [ $? -ne '141' ]; then exit $?; fi;
       - save_cache:
           paths:
             - ~/android
