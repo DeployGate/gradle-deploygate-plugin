@@ -193,6 +193,12 @@ workflows_filter:
         ignore: /.*/
       tags:
         only: /^[0-9]+\.[0-9]+\.[0-9]+$/
+  rc: &rc
+    filters:
+      branches:
+        ignore: /.*/
+      tags:
+        only: /^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9][0-9]$/
 
 workflows:
   version: 2
@@ -211,3 +217,8 @@ workflows:
           - gradle/unit_tests
           - gradle/acceptance_tests
         <<: *release
+    - gradle/release:
+        requires: 
+          - gradle/unit_tests
+          - gradle/acceptance_tests
+        <<: *rc
