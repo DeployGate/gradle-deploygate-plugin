@@ -70,5 +70,6 @@ class AndroidGradlePluginAcceptanceSpec extends Specification {
         "4.1.0"          | "6.5"
         "4.2.0-alpha13"  | "6.7-rc-4"
         "4.2.0-alpha14"  | "6.7-rc-4"
+        "7.0.0-alpha05"  | "6.7-rc-4"
     }
 }

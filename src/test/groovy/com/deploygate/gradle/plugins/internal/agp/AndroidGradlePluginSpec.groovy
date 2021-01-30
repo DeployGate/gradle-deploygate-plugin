@@ -57,6 +57,7 @@ class AndroidGradlePluginSpec extends Specification {
         "4.1.0"                    | true                 | true                               | true
         "4.2.0-alpha13"            | true                 | true                               | true
         "4.2.0-alpha14"            | true                 | true                               | true
+        "7.0.0-alpha05"            | true                 | true                               | true
         "${Integer.MAX_VALUE}.0.0" | true                 | true                               | true // fallback
     }
 }
