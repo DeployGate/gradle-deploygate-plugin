@@ -168,7 +168,7 @@ orbs:
             gradle_version: '6.5'
         - acceptance_test:
             agp_version: '4.2.0-beta04'
-            gradle_version: '6.7-rc-4'
+            gradle_version: '6.7.1'
         - acceptance_test:
             agp_version: '7.0.0-alpha05'
             gradle_version: '6.8'
