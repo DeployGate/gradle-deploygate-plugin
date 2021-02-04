@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins.internal.agp
 
-
 import com.deploygate.gradle.plugins.internal.VersionString
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -22,7 +21,6 @@ class AndroidGradlePlugin {
                 project.plugins.whenPluginAdded { Plugin plugin ->
                     if (plugin.class.name == "com.android.build.gradle.AppPlugin") {
                         project.logger.warn("com.android.application should be applied before DeployGate plugin")
-
                         AGP_VERSION = VersionString.tryParse(getVersionString(plugin.class.classLoader))
                         checkModelLevel(agpPlugin.class.classLoader, project.logger)
                     }
@@ -98,6 +96,12 @@ class AndroidGradlePlugin {
      * @return
      */
     private static String getVersionString(ClassLoader classLoader) {
+        try {
+            return classLoader.loadClass("com.android.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
+        } catch (Throwable ignored) {
+        }
+
+        // before 4.1 or lower
         try {
             return classLoader.loadClass("com.android.builder.model.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
         } catch (Throwable ignored) {
