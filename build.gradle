@@ -1,19 +1,22 @@
 buildscript {
     repositories {
-        jcenter()
+        gradlePluginPortal()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.gradle.publish:plugin-publish-plugin:0.12.0'
     }
 }
 
 apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'com.gradle.plugin-publish'
 apply plugin: 'maven'
-apply plugin: 'com.jfrog.bintray'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
 version = new File(rootProject.projectDir, 'src/main/resources/VERSION').text.trim()
+
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -134,24 +137,34 @@ artifacts {
     archives sourcesJar
 }
 
-// Release
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    pkg {
-        repo = 'maven'
-        name = project.archivesBaseName
-        userOrg = 'deploygate'
-        licenses = ['Apache-2.0']
-        websiteUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin'
-        issueTrackerUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin/issues'
-        vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin.git'
-        githubRepo = 'DeployGate/gradle-deploygate-plugin'
-        version {
-            name = project.version
-            released = new Date()
+gradlePlugin {
+    plugins {
+        deployGateGradlePlugin {
+            id = 'com.deploygate'
+            implementationClass = "com.deploygate.gradle.plugins.DeployGatePlugin"
+        }
+    }
+}
+
+pluginBundle {
+    description = 'This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.'
+    website = 'https://github.com/DeployGate/gradle-deploygate-plugin'
+    vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin.git'
+    tags = [
+            'android',
+            'gradle',
+            'deploygate'
+    ]
+
+    plugins {
+        deployGateGradlePlugin {
+            displayName = "Gradle DeployGate Plugin"
+            version = rootProject.file("VERSION").text.trim()
         }
     }
 
-    configurations = ['archives']
+    mavenCoordinates {
+        groupId = 'com.deploygate'
+        artifactId = 'gradle'
+    }
 }

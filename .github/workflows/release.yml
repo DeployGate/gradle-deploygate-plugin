@@ -1,0 +1,38 @@
+name: Release artifacts
+
+on:
+  push:
+    tags:
+      - \d.\d.\d
+
+jobs:
+  production-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: "[[ refs/tags/$(cat VERSION) == $GITHUB_REF ]]"
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8.0.x'
+          java-package: jdk
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Publish plugin
+        run: ./gradlew publishPlugins -Dgradle.publish.key=$GRADLE_PORTAL_PUBLISH_KEY -Dgradle.publish.secret=$GRADLE_PORTAL_PUBLISH_SECRET
+        env:
+          GRADLE_PORTAL_PUBLISH_KEY: ${{ secrets.GRADLE_PORTAL_PUBLISH_KEY }}
+          GRADLE_PORTAL_PUBLISH_SECRET: ${{ secrets.GRADLE_PORTAL_PUBLISH_SECRET }}
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_TITLE: 'Gradle Plugin Release'
+          SLACK_MESSAGE: "${{ github.ref }} has been published to Gradle Plugin Portal. ref: https://plugins.gradle.org/u/deploygate"
+          SLACK_WEBHOOK: ${{ secrets.SHARED_FOR_RELEASE_ARTIFACT_SLACK_INCOMING_WEBHOOK_URL }}

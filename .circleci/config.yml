@@ -175,56 +175,9 @@ orbs:
         - save_gradle_cache:
             prefix: acceptance
 
-      release:
-        executor: android_java
-        steps:
-        - checkout
-        - use_gradle_cache:
-            prefix: unit
-        - deploy:
-            command: |
-              ./release.sh
-              curl -X POST -d "payload=$(cat .circleci/bintray.json)" $OUTGOING_WEBHOOK_URL
-
-workflows_filter:
-  release: &release
-    filters:
-      branches:
-        ignore: /.*/
-      tags:
-        only: /^[0-9]+\.[0-9]+\.[0-9]+$/
-  rc: &rc
-    filters:
-      branches:
-        ignore: /.*/
-      tags:
-        only: /^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9][0-9]$/
-
 workflows:
   version: 2
   on_commit:
     jobs:
     - gradle/unit_tests
     - gradle/acceptance_tests
-  deploy:
-    jobs:
-    - gradle/unit_tests:
-        <<: *release
-    - gradle/acceptance_tests:
-        <<: *release
-    - gradle/release:
-        requires: 
-          - gradle/unit_tests
-          - gradle/acceptance_tests
-        <<: *release
-  deploy-rc:
-    jobs:
-    - gradle/unit_tests:
-        <<: *rc
-    - gradle/acceptance_tests:
-        <<: *rc
-    - gradle/release:
-        requires: 
-          - gradle/unit_tests
-          - gradle/acceptance_tests
-        <<: *rc
