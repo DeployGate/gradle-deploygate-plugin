@@ -1,7 +1,7 @@
 #  Gradle DeployGate Plugin
 
 [![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
-[ ![Download](https://api.bintray.com/packages/deploygate/maven/gradle/images/download.svg) ](https://bintray.com/deploygate/maven/gradle/_latestVersion)
+[ ![Download](https://img.shields.io/maven-central/v/com.deploygate/gradle) ](https://search.maven.org/artifact/com.deploygate/gradle)
 
 This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
 
@@ -11,7 +11,7 @@ This is the DeployGate plugin for the Gradle. You can build and deploy your apps
 
 Snapshot? See [how to use snapshot](#snapshot)
 
-1 ) Add jcenter to and the dependency of this plugin to your *build.gradle*.
+1 ) Add mavenCentral to and the dependency of this plugin to your *build.gradle*.
 
 ```groovy
 buildscript {
@@ -19,7 +19,7 @@ buildscript {
     deployGatePluginVersion = '...'
   }
   repositories {
-    jcenter()
+    mavenCentral()
   }
 
   dependencies {
@@ -34,7 +34,7 @@ If you are using the new plugin block DSL, then the following is required in you
 ```groovy
 pluginManagement {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     resolutionStrategy {
         eachPlugin {
