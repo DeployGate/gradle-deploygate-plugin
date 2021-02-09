@@ -1,7 +1,7 @@
 #  Gradle DeployGate Plugin
 
 [![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
-[ ![Download](https://api.bintray.com/packages/deploygate/maven/gradle/images/download.svg) ](https://bintray.com/deploygate/maven/gradle/_latestVersion)
+[ ![Download](https://img.shields.io/maven-central/v/com.deploygate/gradle) ](https://search.maven.org/artifact/com.deploygate/gradle)
 
 DeployGate Gradle プラグインです。DeployGate 経由でアプリを配信するための Gradle タスクが簡単に設定できます。
 
@@ -11,7 +11,7 @@ DeployGate Gradle プラグインです。DeployGate 経由でアプリを配信
 
 スナップショットリリースを使いたい方は[こちら](#snapshot)。
 
-1 ) *build.gradle* を編集し、jcenter と DeployGate Gradle プラグインの記述を追加します。
+1 ) *build.gradle* を編集し、mavenCentral と DeployGate Gradle プラグインの記述を追加します。
 
 ```groovy
 buildscript {
@@ -19,7 +19,7 @@ buildscript {
     deployGatePluginVersion = '...'
   }
   repositories {
-    jcenter()
+    mavenCentral()
   }
 
   dependencies {
@@ -34,7 +34,7 @@ plugin ブロック記法を利用している人は *setting.gradle* に下記�
 ```groovy
 pluginManagement {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     resolutionStrategy {
         eachPlugin {
