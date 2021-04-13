@@ -169,6 +169,9 @@ orbs:
         - acceptance_test:
             agp_version: '4.2.0-beta04'
             gradle_version: '6.7.1'
+        - acceptance_test:
+            agp_version: '4.2.0-beta04'
+            gradle_version: '7.0'
         - save_gradle_cache:
             prefix: acceptance
 
