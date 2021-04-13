@@ -65,9 +65,11 @@ abstract class UploadArtifactTask extends DefaultTask {
         )
     }
 
+    @Internal
     @Nullable
     private String variantName
 
+    @Internal
     Configuration configuration
 
     private def lazyPackageApplication
