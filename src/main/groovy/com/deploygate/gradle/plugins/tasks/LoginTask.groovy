@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import groovyx.net.http.ContentType
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 import java.util.concurrent.CountDownLatch
@@ -16,11 +17,11 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 class LoginTask extends DefaultTask {
-    def port = 0
+    @Internal def port = 0
 
-    CountDownLatch latch
+    @Internal CountDownLatch latch
     boolean saved
-    CliCredentialStore localCredential
+    @Internal CliCredentialStore localCredential
 
     @TaskAction
     def setup() {
@@ -46,6 +47,13 @@ class LoginTask extends DefaultTask {
     boolean hasCredentialInEnv() {
         [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1)].any() &&
                 [System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN)].any()
+    }
+
+    // From Gradle 7.0, only one method to get boolean property value is allowed
+    // whereas Groovy generates both isSaved() and getSaved(), Gradle 7.0 considers 2 getters exist for saved property.
+    // To suppress getSaved() we explicitly define isSaved().
+    private boolean isSaved() {
+        saved
     }
 
     private boolean hasSavedCredential() {
