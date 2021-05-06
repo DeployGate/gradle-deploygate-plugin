@@ -9,9 +9,15 @@ on:
 jobs:
   production-release:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_SCRIPT_TEST: true
     steps:
       - uses: actions/checkout@v2
-      - run: echo "${GITHUB_REF#refs/tags/}" > src/main/resources/VERSION
+      - run: |
+          if [[ "$(cat src/main/resources/VERSION)" != "${GITHUB_REF#refs/tags/}" ]]; then
+            echo "version must keep the consistency" 1>&2
+            exit 1
+          fi
       - uses: actions/setup-java@v1
         with:
           java-version: '8.0.x'
