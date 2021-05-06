@@ -130,7 +130,7 @@ def getRepositoryUsername() {
 }
 
 def getRepositoryPassword() {
-    return hasProperty('nextPassword') ? nextPassword : ""
+    return hasProperty('nexusPassword') ? nexusPassword : ""
 }
 
 def isRelease() {

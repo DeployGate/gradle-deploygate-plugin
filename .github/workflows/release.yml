@@ -34,8 +34,8 @@ jobs:
         run: |
           echo >> gradle.properties
           cat<<EOF >> gradle.properties
-          NEXUS_USERNAME=$SHARED_NEXUS_USERNAME
-          NEXUS_PASSWORD=$SHARED_NEXUS_PASSWORD
+          nexusUsername=$SHARED_NEXUS_USERNAME
+          nexusPassword=$SHARED_NEXUS_PASSWORD
           EOF
         env:
           NEXUS_USERNAME: ${{ secrets.SHARED_NEXUS_USERNAME }}
