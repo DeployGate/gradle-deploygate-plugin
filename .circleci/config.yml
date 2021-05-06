@@ -1,6 +1,6 @@
 version: 2.1
 
-executors: &executors
+executors:
   acceptance_test:
     machine: true
     working_directory: ~/gradle-deploygate-plugin
@@ -14,13 +14,15 @@ executors: &executors
     environment:
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false'
 
-commands: &commands
+commands:
   download_sdk:
     parameters:
       version:
         type: string
+        default: "v2"
       zip_hash:
         type: string
+        default: "4333796"
     steps:
       - restore_cache:
           keys:
@@ -101,130 +103,121 @@ commands: &commands
            path: build/test-results/tests/testPluginAcceptanceTest
            when: always
 
-orbs:
-  gradle:
-    commands: *commands
-    executors: *executors
-    jobs:
-      unit_tests:
-        executor: android_java
-        steps:
-        - checkout
-        - use_gradle_cache:
-            prefix: unit
-        - run: ./gradlew install test
-        - save_gradle_cache:
-            prefix: unit
-        - store_artifacts:
-            path: build/reports/tests/test
-            when: always
-        - store_test_results:
-            path: build/test-results/tests/test
-            when: always
-      acceptance_tests:
-        executor: acceptance_test
-        steps:
-        - checkout
-        - download_sdk:
-            zip_hash: "4333796"
-            version: v2
-        - use_gradle_cache:
-            prefix: acceptance
-        - run: ./gradlew testUnrollAcceptanceTest
-        - store_artifacts:
-            path: build/reports/tests/testUnrollAcceptanceTest
-            when: always
-        - store_test_results:
-            path: build/test-results/tests/testUnrollAcceptanceTest
-            when: always
-        - acceptance_test:
-            agp_version: '3.0.0'
-            gradle_version: '4.1'
-            no_aab_support: "true"
-            no_kts_support: "true"
-        - acceptance_test:
-            agp_version: '3.1.0'
-            gradle_version: '4.4'
-            no_aab_support: "true"
-            no_kts_support: "true"
-        - acceptance_test:
-            agp_version: '3.2.0'
-            gradle_version: '4.6'
-            no_kts_support: "true"
-        - acceptance_test:
-            agp_version: '3.3.2'
-            gradle_version: '4.10.1'
-        - acceptance_test:
-            agp_version: '3.4.1'
-            gradle_version: '5.1.1'
-        - acceptance_test:
-            agp_version: '3.5.1'
-            gradle_version: '5.4.1'
-        - acceptance_test:
-            agp_version: '3.6.3'
-            gradle_version: '5.6.4'
-        - acceptance_test:
-            agp_version: '4.1.0'
-            gradle_version: '6.5'
-        - acceptance_test:
-            agp_version: '4.2.0'
-            gradle_version: '6.7.1'
-        - acceptance_test:
-            agp_version: '4.2.0'
-            gradle_version: '7.0'
-        - save_gradle_cache:
-            prefix: acceptance
+jobs:
+  unit_tests:
+    executor: android_java
+    steps:
+    - checkout
+    - use_gradle_cache:
+        prefix: unit
+    - run: ./gradlew install test
+    - save_gradle_cache:
+        prefix: unit
+    - store_artifacts:
+        path: build/reports/tests/test
+        when: always
+    - store_test_results:
+        path: build/test-results/tests/test
+        when: always
+  acceptance_tests_for_running_env:
+    executor: acceptance_test
+    parameters:
+      agp_version:
+        type: string
+      gradle_version:
+        type: string
+      no_aab_support:
+        type: string
+        default: "false"
+      no_kts_support:
+        type: string
+        default: "false"
+    steps:
+      - checkout
+      - download_sdk
+      - use_gradle_cache:
+          prefix: acceptance
+      - run: echo "Env. agp(<< parameters.agp_version >>) and gradle(<< parameters.gradle_version >>)"
+      - run:
+          command: ./gradlew testPluginAcceptanceTest
+          environment:
+            TEST_AGP_VERSION: << parameters.agp_version >>
+            TEST_GRADLE_VERSION: << parameters.gradle_version >>
+            NO_AAB_SUPPORT: << parameters.no_aab_support >>
+            NO_KTS_SUPPORT: << parameters.no_kts_support >>
+      - store_artifacts:
+          path: build/reports/tests/testPluginAcceptanceTest
+          destination: reports/tests/testPluginAcceptanceTest/<< parameters.agp_version >>
+          when: always
+      - store_test_results:
+          path: build/test-results/tests/testPluginAcceptanceTest
+          when: always
 
-      release:
-        executor: android_java
-        steps:
-        - checkout
-        - use_gradle_cache:
-            prefix: unit
-        - deploy:
-            command: |
-              ./release.sh
-              curl -X POST -d "payload=$(cat .circleci/bintray.json)" $OUTGOING_WEBHOOK_URL
-
-workflows_filter:
-  release: &release
-    filters:
-      branches:
-        ignore: /.*/
-      tags:
-        only: /^[0-9]+\.[0-9]+\.[0-9]+$/
-  rc: &rc
-    filters:
-      branches:
-        ignore: /.*/
-      tags:
-        only: /^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9][0-9]$/
+  acceptance_tests:
+    executor: acceptance_test
+    steps:
+    - checkout
+    - download_sdk
+    - use_gradle_cache:
+        prefix: acceptance
+    - run: ./gradlew testUnrollAcceptanceTest
+    - store_artifacts:
+        path: build/reports/tests/testUnrollAcceptanceTest
+        when: always
+    - store_test_results:
+        path: build/test-results/tests/testUnrollAcceptanceTest
+        when: always
+    - save_gradle_cache:
+        prefix: acceptance
 
 workflows:
   version: 2
   on_commit:
     jobs:
-    - gradle/unit_tests
-    - gradle/acceptance_tests
-  deploy:
-    jobs:
-    - gradle/unit_tests:
-        <<: *release
-    - gradle/acceptance_tests:
-        <<: *release
-    - gradle/release:
-        requires: 
-          - gradle/unit_tests
-          - gradle/acceptance_tests
-        <<: *release
-  deploy-rc:
-    jobs:
-    - gradle/unit_tests:
-        <<: *rc
-    - gradle/acceptance_tests:
-        <<: *rc
-    - gradle/release:
-        requires: 
-          - gradle/unit_tests
-          - gradle/acceptance_tests
-        <<: *rc
+      - unit_tests
+      - acceptance_tests
+      - acceptance_tests_for_running_env:
+          name: 'test-3.0.0'
+          agp_version: '3.0.0'
+          gradle_version: '4.1'
+          no_aab_support: "true"
+          no_kts_support: "true"
+      - acceptance_tests_for_running_env:
+          name: 'test-3.1.0'
+          agp_version: '3.1.0'
+          gradle_version: '4.4'
+          no_aab_support: "true"
+          no_kts_support: "true"
+      - acceptance_tests_for_running_env:
+          name: 'test-3.2.0'
+          agp_version: '3.2.0'
+          gradle_version: '4.6'
+          no_kts_support: "true"
+      - acceptance_tests_for_running_env:
+          name: 'test-3.3.2'
+          agp_version: '3.3.2'
+          gradle_version: '4.10.1'
+      - acceptance_tests_for_running_env:
+          name: 'test-3.4.1'
+          agp_version: '3.4.1'
+          gradle_version: '5.1.1'
+      - acceptance_tests_for_running_env:
+          name: 'test-3.5.1'
+          agp_version: '3.5.1'
+          gradle_version: '5.4.1'
+      - acceptance_tests_for_running_env:
+          name: 'test-3.6.3'
+          agp_version: '3.6.3'
+          gradle_version: '5.6.4'
+      - acceptance_tests_for_running_env:
+          name: 'test-4.1.0'
+          agp_version: '4.1.0'
+          gradle_version: '6.5'
+      - acceptance_tests_for_running_env:
+          name: 'test-4.2.0'
+          agp_version: '4.2.0'
+          gradle_version: '6.7.1'
+      - acceptance_tests_for_running_env:
+          name: 'test-4.2.0-v2'
+          agp_version: '4.2.0'
+          gradle_version: '7.0'
