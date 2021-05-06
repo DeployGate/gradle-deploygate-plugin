@@ -1,9 +1,7 @@
 package com.deploygate.gradle.plugins.internal.agp
 
-import com.deploygate.gradle.plugins.internal.gradle.LazyConfigurableTask
-import com.deploygate.gradle.plugins.internal.gradle.SingleTask
-import com.deploygate.gradle.plugins.internal.gradle.TaskProvider
 import org.gradle.api.Task
+import org.gradle.api.tasks.TaskProvider
 
 import javax.annotation.Nonnull
 
@@ -24,11 +22,7 @@ class IApplicationVariantImpl implements IApplicationVariant {
 
     @Override
     @Nonnull
-    LazyConfigurableTask lazyPackageApplication() {
-        if (AndroidGradlePlugin.taskProviderBased) {
-            return new TaskProvider(applicationVariant.packageApplicationProvider as org.gradle.api.tasks.TaskProvider)
-        } else {
-            return new SingleTask(applicationVariant.packageApplication as Task)
-        }
+    TaskProvider<? extends Task> packageApplicationTaskProvider() {
+        return applicationVariant.packageApplicationProvider
     }
 }

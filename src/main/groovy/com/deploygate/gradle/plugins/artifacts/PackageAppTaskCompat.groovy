@@ -30,13 +30,10 @@ class PackageAppTaskCompat {
     static AabInfo getAabInfo(@Nonnull /* PackageApplication */ packageAppTask, @Nonnull String variantName, @Nonnull Project project) {
         final String aabName
 
-        if (AndroidGradlePlugin.isAppBundleArchiveNameChanged()) {
-            // outputScope is retrieved by the reflection
-            Collection<String> apkNames = getApkNames(packageAppTask)
-            aabName = ((String) apkNames[0]).replaceFirst("\\.apk\$", ".aab")
-        } else {
-            aabName = "${project.properties["archivesBaseName"] as String}.aab"
-        }
+        // TODO Use Artifact API
+        // outputScope is retrieved by the reflection
+        Collection<String> apkNames = getApkNames(packageAppTask)
+        aabName = ((String) apkNames[0]).replaceFirst("\\.apk\$", ".aab")
 
         def outputDir = new File(project.buildDir, "outputs/bundle/${variantName}")
 
@@ -48,9 +45,7 @@ class PackageAppTaskCompat {
 
     @PackageScope
     static boolean hasSigningConfig(packageAppTask) {
-        if (!AndroidGradlePlugin.isSigningConfigCollectionSupported()) {
-            return packageAppTask.signingConfig != null
-        } else if (!AndroidGradlePlugin.isSigningConfigProviderSupported()) {
+        if (!AndroidGradlePlugin.isSigningConfigProviderSupported()) {
             return packageAppTask.signingConfig != null && !packageAppTask.signingConfig.isEmpty()
         } else if (!AndroidGradlePlugin.isResolvableSigningConfigProviderSupported()) {
             return packageAppTask.signingConfig != null && !packageAppTask.signingConfig.signingConfigFileCollection // no need to check `empty` for now

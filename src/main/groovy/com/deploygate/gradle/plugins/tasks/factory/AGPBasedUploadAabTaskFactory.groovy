@@ -33,9 +33,9 @@ class AGPBasedUploadAabTaskFactory extends DeployGateTaskFactory implements Uplo
             dgTask.dependsOn([androidBundleTaskName(variantName), *dependsOn].flatten())
         }
 
-        dgTask.lazyPackageApplication = applicationVariant.lazyPackageApplication()
+        dgTask.packageApplicationTaskProvider = applicationVariant.packageApplicationTaskProvider()
 
-        applicationVariant.lazyPackageApplication().configure { packageAppTask ->
+        applicationVariant.packageApplicationTaskProvider().configure { packageAppTask ->
             def aabInfo = PackageAppTaskCompat.getAabInfo(packageAppTask, variantName, project)
 
             dgTask.configuration = UploadAabTask.createConfiguration(deployment, aabInfo)

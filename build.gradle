@@ -81,8 +81,7 @@ dependencies {
     // 2.21.0 will break behaviors of multipart requests :thinking_face:
     testImplementation "com.github.tomakehurst:wiremock:2.20.0"
 
-    testImplementation 'org.spockframework.spock:spock-core:spock-1.2'
-//    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
+    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
 
     // for ApplyPluginSpec
     testRuntimeOnly "com.android.tools.build:gradle:$agpVersion"
@@ -154,7 +153,6 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.java
-                artifact jar
                 artifact sourcesJar
                 artifact javadocJar
                 groupId = project.group

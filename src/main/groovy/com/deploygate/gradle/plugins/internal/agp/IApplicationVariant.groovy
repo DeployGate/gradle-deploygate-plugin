@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins.internal.agp
 
-import com.deploygate.gradle.plugins.internal.gradle.LazyConfigurableTask
+import org.gradle.api.Task
+import org.gradle.api.tasks.TaskProvider
 
 import javax.annotation.Nonnull
 
@@ -10,8 +11,8 @@ interface IApplicationVariant {
     String getName()
 
     /**
-     * @return LazyConfigurableTask of com.android.build.gradle.tasks.PackageApplication
+     * @return TaskProvider of com.android.build.gradle.tasks.PackageApplication
      */
     @Nonnull
-    LazyConfigurableTask lazyPackageApplication()
+    TaskProvider<? extends Task> packageApplicationTaskProvider()
 }

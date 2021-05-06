@@ -124,7 +124,7 @@ class DSLBasedUploadAabTaskFactorySpec extends Specification {
         dslBasedUploadAabTaskFactory = new DSLBasedUploadAabTaskFactory(project)
 
         and:
-        project.tasks.create("uploadDeployGateAabDep1")
+        project.tasks.create("uploadDeployGateAabDep1", UploadAabTask)
 
         when:
         dslBasedUploadAabTaskFactory.registerUploadArtifactTask("dep1")
@@ -134,7 +134,6 @@ class DSLBasedUploadAabTaskFactorySpec extends Specification {
 
         then:
         task
-        !(task instanceof UploadAabTask)
     }
 
     def "registerAggregatedUploadArtifactTask should not allow adding names which do not exist in build.gradle"() {

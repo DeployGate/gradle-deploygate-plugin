@@ -25,15 +25,6 @@ class GradleCompat {
         return GRADLE_VERSION
     }
 
-    @Nonnull
-    static <T extends Task> LazyConfigurableTask<T> newLazyConfigurableTask(@Nonnull Project project, @Nonnull String taskName, @Nonnull Class<T> klass) {
-        if (version.major > 4 || version.major == 4 && version.minor >= 9) {
-            return new TaskProvider(project.tasks.register(taskName, klass))
-        } else {
-            return new SingleTask(project.tasks.create(taskName, klass))
-        }
-    }
-
     static void configureEach(@Nonnull any, @Nonnull Closure closure) {
         if (version.major > 4 || version.major == 4 && version.minor >= 9) {
             any.configureEach(closure)
