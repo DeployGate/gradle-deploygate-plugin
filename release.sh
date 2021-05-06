@@ -2,4 +2,4 @@
 
 set -eu
 
-./gradlew clean build publishToMavenRepository --stacktrace
+./gradlew clean build publishReleasePublicationToMavenRepository --stacktrace
