@@ -4,7 +4,7 @@ plugins {
     id "deploygate"
 }
 
-GradleCompat.newLazyConfigurableTask(project, "task1", DefaultTask)
+project.tasks.register("task1", DefaultTask)
 
 def task1 = project.tasks.findByName("task1")
 

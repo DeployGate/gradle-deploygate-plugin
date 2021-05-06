@@ -1,0 +1,114 @@
+name: Build and run tests
+
+on:
+  pull_request
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8.0.x'
+          java-package: jdk
+      - uses: android-actions/setup-android@v2
+      - run: sdkmanager "build-tools;29.0.2" "build-tools;30.0.0" "build-tools;30.0.2" "platforms;android-29" "platform-tools"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - run: ./gradlew publishToMavenLocal test
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-reports
+          path: build/reports/tests/test
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-results
+          path: build/test-results/tests/test
+
+  acceptance-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8.0.x'
+          java-package: jdk
+      - uses: android-actions/setup-android@v2
+      - run: sdkmanager "build-tools;29.0.2" "build-tools;30.0.0" "build-tools;30.0.2" "platforms;android-29" "platform-tools"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - run: ./gradlew testUnrollAcceptanceTest
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-reports
+          path: build/reports/tests/testUnrollAcceptanceTest
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-results
+          path: build/test-results/tests/testUnrollAcceptanceTest
+
+  acceptance-test-runtime-env:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agp_version:    ['3.5.1', '3.6.3', '4.1.0', '4.2.0', '4.2.0']
+        include:
+          - agp_version: '3.5.1'
+            gradle_version: '5.4.1'
+          - agp_version: '3.6.3'
+            gradle_version: '5.6.4'
+          - agp_version: '4.1.0'
+            gradle_version: '6.5'
+          - agp_version: '4.2.0'
+            gradle_version: '6.7.1'
+          - agp_version: '4.2.0'
+            gradle_version: '7.0'
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8.0.x'
+          java-package: jdk
+      - uses: android-actions/setup-android@v2
+      - run: sdkmanager "build-tools;29.0.2" "build-tools;30.0.0" "build-tools;30.0.2" "platforms;android-29" "platform-tools"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - run: ./gradlew testPluginAcceptanceTest
+        env:
+          TEST_AGP_VERSION: ${{ matrix.agp_version }}
+          TEST_GRADLE_VERSION: ${{ matrix.gradle_version }}
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-reports-${{ matrix.agp_version }}-with-${{ matrix.gradle_version }}
+          path: build/reports/tests/testPluginAcceptanceTest
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-results-${{ matrix.agp_version }}-with-${{ matrix.gradle_version }}
+          path: build/test-results/tests/testPluginAcceptanceTest

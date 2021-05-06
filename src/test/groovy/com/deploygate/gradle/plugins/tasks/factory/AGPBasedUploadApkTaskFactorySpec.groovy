@@ -6,10 +6,11 @@ import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
-import com.deploygate.gradle.plugins.internal.gradle.LazyConfigurableTask
+
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
@@ -51,13 +52,13 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         def variantName = "dep1"
         def variant = Mock(IApplicationVariant)
         variant.name >> variantName
-        variant.lazyPackageApplication() >> Stub(LazyConfigurableTask, name: variantName)
+        variant.packageApplicationTaskProvider() >> Stub(TaskProvider, name: variantName)
 
         and:
         agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
 
         and:
-        PackageAppTaskCompat.metaClass.static.getApkInfo = { LazyConfigurableTask _ ->
+        PackageAppTaskCompat.metaClass.static.getApkInfo = { TaskProvider _ ->
             new DirectApkInfo(variantName, null, true, true)
         }
 
@@ -78,13 +79,13 @@ class AGPBasedUploadApkTaskFactorySpec extends Specification {
         def variantName = "dep1"
         def variant = Mock(IApplicationVariant)
         variant.name >> variantName
-        variant.lazyPackageApplication() >> Stub(LazyConfigurableTask, name: variantName)
+        variant.packageApplicationTaskProvider() >> Stub(TaskProvider, name: variantName)
 
         and:
         agpBasedUploadApkTaskFactory = new AGPBasedUploadApkTaskFactory(project)
 
         and:
-        PackageAppTaskCompat.metaClass.static.getApkInfo = { LazyConfigurableTask _ ->
+        PackageAppTaskCompat.metaClass.static.getApkInfo = { TaskProvider _ ->
             new DirectApkInfo(variantName, null, true, true)
         }
 

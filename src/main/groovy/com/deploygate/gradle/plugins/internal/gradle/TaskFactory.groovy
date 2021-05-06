@@ -1,7 +1,10 @@
 package com.deploygate.gradle.plugins.internal.gradle
 
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.UnknownTaskException
+import org.gradle.api.tasks.TaskProvider
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
@@ -15,25 +18,22 @@ class TaskFactory {
     }
 
     @Nullable
-    final <T extends Task> LazyConfigurableTask<T> register(@Nonnull String taskName, @Nonnull Class<T> klass) {
-        def existingTask = findByName(taskName)
-
-        if (existingTask) {
+    final <T extends Task> TaskProvider<T> register(@Nonnull String taskName, @Nonnull Class<T> klass) {
+        try {
+            project.tasks.named(taskName, klass)
             return null
+        } catch (UnknownTaskException ignore) {
+            return project.tasks.register(taskName, klass)
         }
-
-        return GradleCompat.newLazyConfigurableTask(project, taskName, klass)
     }
 
     @Nullable
-    final <T extends Task> LazyConfigurableTask<T> registerOrFindBy(@Nonnull String taskName, @Nonnull Class<T> klass) {
-        def existingTask = findByName(taskName)
-
-        if (existingTask) {
-            return new SingleTask(existingTask as T)
+    final <T extends Task> TaskProvider<T> registerOrFindBy(@Nonnull String taskName, @Nonnull Class<T> klass) {
+        try {
+            return project.tasks.named(taskName, klass)
+        } catch (UnknownTaskException ignore) {
+            return project.tasks.register(taskName, klass)
         }
-
-        return GradleCompat.newLazyConfigurableTask(project, taskName, klass)
     }
 
     final boolean exists(@Nonnull String taskName) {

@@ -1,0 +1,47 @@
+name: Release artifacts
+
+on:
+  push:
+    tags:
+      - \d.\d.\d
+      - \d.\d.\d-(alpha|rc)\d
+
+jobs:
+  production-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "${GITHUB_REF#refs/tags/}" > src/main/resources/VERSION
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8.0.x'
+          java-package: jdk
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Set up gradle.properties for sigining and nexus
+        run: |
+          echo >> gradle.properties
+          cat<<EOF >> gradle.properties
+          NEXUS_USERNAME=$SHARED_NEXUS_USERNAME
+          NEXUS_PASSWORD=$SHARED_NEXUS_PASSWORD
+          EOF
+        env:
+          NEXUS_USERNAME: ${{ secrets.SHARED_NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.SHARED_NEXUS_PASSWORD }}
+      - name: Publish artifacts
+        run: ./release.sh
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_SECRET_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_TITLE: 'Gradle Plugin Release'
+          SLACK_MESSAGE: "${{ github.ref }} has been published to Sonatype. ref: https://oss.sonatype.org/"
+          SLACK_WEBHOOK: ${{ secrets.SHARED_FOR_RELEASE_ARTIFACT_SLACK_INCOMING_WEBHOOK_URL }}

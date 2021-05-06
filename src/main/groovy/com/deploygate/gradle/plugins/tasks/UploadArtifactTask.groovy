@@ -72,7 +72,7 @@ abstract class UploadArtifactTask extends DefaultTask {
     @Internal
     Configuration configuration
 
-    private def lazyPackageApplication
+    private def packageApplicationTaskProvider
 
     @OutputFile
     File response = new File(new File(new File(project.buildDir, "deploygate"), name), "response.json")
@@ -102,16 +102,16 @@ abstract class UploadArtifactTask extends DefaultTask {
         this.configuration = configuration
     }
 
-    void setLazyPackageApplication(lazyPackageApplication) {
-        this.lazyPackageApplication = lazyPackageApplication
+    void setpackageApplicationTaskProvider(packageApplicationTaskProvider) {
+        this.packageApplicationTaskProvider = packageApplicationTaskProvider
     }
 
     // Add TaskAction annotation in overrider classes
     void doUpload() {
-        if (lazyPackageApplication) {
+        if (packageApplicationTaskProvider) {
             // evaluate surely
             // ref: https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
-            lazyPackageApplication.get()
+            packageApplicationTaskProvider.get()
             logger.debug("$variantName's package application task has been evaluated")
         } else {
             logger.debug("$variantName's package application task is not found")

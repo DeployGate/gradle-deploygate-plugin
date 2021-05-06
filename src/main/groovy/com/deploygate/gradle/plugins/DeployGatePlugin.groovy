@@ -66,10 +66,7 @@ class DeployGatePlugin implements Plugin<Project> {
 
         processor.declaredNames.forEach { variantOrCustomName ->
             processor.registerDeclarationAwareUploadApkTask(variantOrCustomName)
-
-            if (AndroidGradlePlugin.isAppBundleSupported()) {
-                processor.registerDeclarationAwareUploadAabTask(variantOrCustomName)
-            }
+            processor.registerDeclarationAwareUploadAabTask(variantOrCustomName)
         }
 
         processor.registerAggregatedDeclarationAwareUploadApkTask(processor.declaredNames)
@@ -84,10 +81,7 @@ class DeployGatePlugin implements Plugin<Project> {
             def variantProxy = new IApplicationVariantImpl(variant)
 
             processor.registerVariantAwareUploadApkTask(variantProxy)
-
-            if (AndroidGradlePlugin.isAppBundleSupported()) {
-                processor.registerVariantAwareUploadAabTask(variantProxy)
-            }
+            processor.registerVariantAwareUploadAabTask(variantProxy)
         }
     }
 }

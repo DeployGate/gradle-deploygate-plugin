@@ -46,13 +46,6 @@ class GradleCompatAcceptanceSpec extends Specification {
 
         where:
         gradleVersion << [
-                "4.1",
-                "4.4",
-                "4.6",
-                "4.8",
-                "4.9",
-                "4.10.1",
-                "5.1.1",
                 "5.4.1",
                 "5.6.4",
                 "6.1.1",

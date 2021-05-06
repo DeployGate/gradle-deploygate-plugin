@@ -1,17 +1,16 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.artifacts.DirectAabInfo
-import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
 import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
-import com.deploygate.gradle.plugins.internal.gradle.LazyConfigurableTask
+
 import com.deploygate.gradle.plugins.tasks.UploadAabTask
-import com.deploygate.gradle.plugins.tasks.UploadApkTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
@@ -53,13 +52,13 @@ class AGPBasedUploadAabTaskFactorySpec extends Specification {
         def variantName = "dep1"
         def variant = Mock(IApplicationVariant)
         variant.name >> variantName
-        variant.lazyPackageApplication() >> Stub(LazyConfigurableTask, name: variantName)
+        variant.packageApplicationTaskProvider() >> Stub(TaskProvider, name: variantName)
 
         and:
         agpBasedUploadAabTaskFactory = new AGPBasedUploadAabTaskFactory(project)
 
         and:
-        PackageAppTaskCompat.metaClass.static.getAabInfo = { LazyConfigurableTask _ ->
+        PackageAppTaskCompat.metaClass.static.getAabInfo = { TaskProvider _ ->
             new DirectAabInfo(variantName, null)
         }
 
@@ -80,13 +79,13 @@ class AGPBasedUploadAabTaskFactorySpec extends Specification {
         def variantName = "dep1"
         def variant = Mock(IApplicationVariant)
         variant.name >> variantName
-        variant.lazyPackageApplication() >> Stub(LazyConfigurableTask, name: variantName)
+        variant.packageApplicationTaskProvider() >> Stub(TaskProvider, name: variantName)
 
         and:
         agpBasedUploadAabTaskFactory = new AGPBasedUploadAabTaskFactory(project)
 
         and:
-        PackageAppTaskCompat.metaClass.static.getAabInfo = { LazyConfigurableTask _ ->
+        PackageAppTaskCompat.metaClass.static.getAabInfo = { TaskProvider _ ->
             new DirectAabInfo(variantName, null)
         }
 

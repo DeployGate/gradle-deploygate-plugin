@@ -43,22 +43,6 @@ class AndroidGradlePlugin {
         return project.plugins.hasPlugin("com.android.application")
     }
 
-    static boolean isAppBundleSupported() {
-        return getVersion() >= VersionString.tryParse("3.2.0-alpha1")
-    }
-
-    static boolean isSigningConfigCollectionSupported() {
-        return getVersion() >= VersionString.tryParse("3.3.0-alpha1")
-    }
-
-    static boolean isTaskProviderBased() {
-        return getVersion() >= VersionString.tryParse("3.3.0-alpha1")
-    }
-
-    static boolean isAppBundleArchiveNameChanged() {
-        return getVersion() >= VersionString.tryParse("3.5.0-alpha1")
-    }
-
     static boolean isSigningConfigProviderSupported() {
         return getVersion() >= VersionString.tryParse("3.6.0-alpha1")
     }

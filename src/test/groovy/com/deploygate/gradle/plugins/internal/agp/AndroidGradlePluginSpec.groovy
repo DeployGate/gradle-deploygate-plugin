@@ -31,32 +31,4 @@ class AndroidGradlePluginSpec extends Specification {
         then:
         AndroidGradlePlugin.isApplied(project)
     }
-
-    @ConfineMetaClassChanges([AndroidGradlePlugin])
-    @Unroll
-    def "feature catalog verification. Unrolled #agpVersion"() {
-        given:
-        AndroidGradlePlugin.metaClass.static.getVersion = { ->
-            VersionString.tryParse(agpVersion)
-        }
-
-        expect:
-        AndroidGradlePlugin.isAppBundleSupported() == isAppBundleSupported
-        AndroidGradlePlugin.isSigningConfigCollectionSupported() == isSigningConfigCollectionSupported
-        AndroidGradlePlugin.isTaskProviderBased() == isTaskProviderBased
-
-        where:
-        agpVersion                 | isAppBundleSupported | isSigningConfigCollectionSupported | isTaskProviderBased
-        "3.0.0"                    | false                | false                              | false
-        "3.1.0"                    | false                | false                              | false
-        "3.2.0"                    | true                 | false                              | false
-        "3.2.1"                    | true                 | false                              | false
-        "3.3.0"                    | true                 | true                               | true
-        "3.4.0"                    | true                 | true                               | true
-        "4.0.0"                    | true                 | true                               | true
-        "4.1.0"                    | true                 | true                               | true
-        "4.2.0"                    | true                 | true                               | true
-        "7.0.0-alpha05"            | true                 | true                               | true
-        "${Integer.MAX_VALUE}.0.0" | true                 | true                               | true // fallback
-    }
 }
