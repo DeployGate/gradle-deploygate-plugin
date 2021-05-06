@@ -183,7 +183,7 @@ afterEvaluate {
         }
 
         signing {
-            required { isRelease() && gradle.taskGraph.hasTask("publishToMavenRepository") }
+            required { (isRelease() || System.getenv("RELEASE_SCRIPT_TEST") == "true") && gradle.taskGraph.hasTask("publishToMavenRepository") }
 
             def signingKey = findProperty("signingKey")
             def signingPassword = findProperty("signingPassword")

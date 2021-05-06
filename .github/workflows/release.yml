@@ -2,16 +2,17 @@ name: Release artifacts
 
 on:
   push:
-    tags:
-      - \d.\d.\d
-      - \d.\d.\d-(alpha|rc)\d
+    branches:
+      - try/release
 
 jobs:
   production-release:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_SCRIPT_TEST: true
     steps:
       - uses: actions/checkout@v2
-      - run: echo "${GITHUB_REF#refs/tags/}" > src/main/resources/VERSION
+      # - run: echo "${GITHUB_REF#refs/tags/}" > src/main/resources/VERSION
       - uses: actions/setup-java@v1
         with:
           java-version: '8.0.x'
