@@ -2,14 +2,11 @@ buildscript {
     repositories {
         jcenter()
     }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-    }
 }
 
 apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 group = 'com.deploygate'
 archivesBaseName = 'gradle'
@@ -27,6 +24,7 @@ repositories {
 ext {
     agpVersion = '3.3.2'
     unstableAgpVersion = '4.2.0-beta04'
+    releaseVersion = version
 }
 
 sourceSets {
@@ -128,30 +126,73 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
+def getRepositoryUsername() {
+    return hasProperty('nexusUsername') ? nexusUsername : ""
 }
 
-// Release
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    pkg {
-        repo = 'maven'
-        name = project.archivesBaseName
-        userOrg = 'deploygate'
-        licenses = ['Apache-2.0']
-        websiteUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin'
-        issueTrackerUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin/issues'
-        vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin.git'
-        githubRepo = 'DeployGate/gradle-deploygate-plugin'
-        version {
-            name = project.version
-            released = new Date()
+def getRepositoryPassword() {
+    return hasProperty('nextPassword') ? nextPassword : ""
+}
+
+def isRelease() {
+    return rootProject.ext.releaseVersion =~ /^\d+\.\d+\.\d+$/
+}
+
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                url = isRelease() ? "https://oss.sonatype.org/service/local/staging/deploy/maven2/" : "https://oss.sonatype.org/content/repositories/snapshots/"
+
+                credentials(PasswordCredentials) {
+                    username = getRepositoryUsername()
+                    password = getRepositoryPassword()
+                }
+            }
+        }
+
+        publications {
+            release(MavenPublication) {
+                from components.java
+                artifact jar
+                artifact sourcesJar
+                artifact javadocJar
+                groupId = project.group
+                artifactId = project.archivesBaseName
+                version = project.version
+                pom {
+                    name = "Gradle DeployGate Plugin"
+                    description = "This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task."
+                    url = 'https://github.com/DeployGate/gradle-deploygate-plugin'
+                    licenses {
+                        license {
+                            name =  "The Apache Software License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                            distribution = "repo"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = "deploygate"
+                            name = "DeployGate"
+                        }
+                    }
+                    scm {
+                        url = 'https://github.com/DeployGate/gradle-deploygate-plugin'
+                    }
+                }
+            }
+        }
+
+        signing {
+            required { isRelease() && gradle.taskGraph.hasTask("publishToMavenRepository") }
+
+            def signingKey = findProperty("signingKey")
+            def signingPassword = findProperty("signingPassword")
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            publishing.publications.configureEach { publication ->
+                sign publication
+            }
         }
     }
-
-    configurations = ['archives']
 }

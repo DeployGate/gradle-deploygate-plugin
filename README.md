@@ -251,7 +251,7 @@ You can try this plugin locally by following the steps below.
 
 0. Clone this repository
 1. Edit `/VERSION` file to a non-released version (e.g. 2.0.0-beta01)
-2. Run `./gradlew install` to make it available on your local
+2. Run `./gradlew publishToMavenLocal` to make it available on your local
 3. Add mavenLocal to buildscript repository of a test project
 4. Specify the version which you specify at step 1
 

@@ -110,7 +110,7 @@ jobs:
     - checkout
     - use_gradle_cache:
         prefix: unit
-    - run: ./gradlew install test
+    - run: ./gradlew publishToMavenLocal test
     - save_gradle_cache:
         prefix: unit
     - store_artifacts:
