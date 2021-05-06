@@ -111,8 +111,8 @@ project.tasks.withType(Test).configureEach {
             "ANDROID_HOME": System.getenv("ANDROID_HOME"),
             "TEST_AGP_VERSION": System.getenv("TEST_AGP_VERSION"),
             "TEST_GRADLE_VERSION": System.getenv("TEST_GRADLE_VERSION"),
-            "NO_AAB_SUPPORT": System.getenv("NO_AAB_SUPPORT"),
-            "NO_KTS_SUPPORT": System.getenv("NO_KTS_SUPPORT")
+            "NO_AAB_SUPPORT": false, // TODO Remove this
+            "NO_KTS_SUPPORT": false // TODO Remove this
     ])
 }
 

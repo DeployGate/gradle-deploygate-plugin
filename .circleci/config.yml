@@ -79,12 +79,6 @@ commands:
         type: string
       gradle_version:
         type: string
-      no_aab_support:
-        type: string
-        default: "false"
-      no_kts_support:
-        type: string
-        default: "false"
     steps:
       - run: rm -fr build/reports/tests/testPluginAcceptanceTest build/test-results/tests/testPluginAcceptanceTest || true
       - run: echo "Env. agp(<< parameters.agp_version >>) and gradle(<< parameters.gradle_version >>)"
@@ -93,8 +87,6 @@ commands:
           environment:
             TEST_AGP_VERSION: << parameters.agp_version >>
             TEST_GRADLE_VERSION: << parameters.gradle_version >>
-            NO_AAB_SUPPORT: << parameters.no_aab_support >>
-            NO_KTS_SUPPORT: << parameters.no_kts_support >>
       - store_artifacts:
            path: build/reports/tests/testPluginAcceptanceTest
            destination: reports/tests/testPluginAcceptanceTest/<< parameters.agp_version >>
@@ -126,12 +118,6 @@ jobs:
         type: string
       gradle_version:
         type: string
-      no_aab_support:
-        type: string
-        default: "false"
-      no_kts_support:
-        type: string
-        default: "false"
     steps:
       - checkout
       - download_sdk
@@ -143,8 +129,6 @@ jobs:
           environment:
             TEST_AGP_VERSION: << parameters.agp_version >>
             TEST_GRADLE_VERSION: << parameters.gradle_version >>
-            NO_AAB_SUPPORT: << parameters.no_aab_support >>
-            NO_KTS_SUPPORT: << parameters.no_kts_support >>
       - store_artifacts:
           path: build/reports/tests/testPluginAcceptanceTest
           destination: reports/tests/testPluginAcceptanceTest/<< parameters.agp_version >>
@@ -176,31 +160,6 @@ workflows:
     jobs:
       - unit_tests
       - acceptance_tests
-      - acceptance_tests_for_running_env:
-          name: 'test-3.0.0'
-          agp_version: '3.0.0'
-          gradle_version: '4.1'
-          no_aab_support: "true"
-          no_kts_support: "true"
-      - acceptance_tests_for_running_env:
-          name: 'test-3.1.0'
-          agp_version: '3.1.0'
-          gradle_version: '4.4'
-          no_aab_support: "true"
-          no_kts_support: "true"
-      - acceptance_tests_for_running_env:
-          name: 'test-3.2.0'
-          agp_version: '3.2.0'
-          gradle_version: '4.6'
-          no_kts_support: "true"
-      - acceptance_tests_for_running_env:
-          name: 'test-3.3.2'
-          agp_version: '3.3.2'
-          gradle_version: '4.10.1'
-      - acceptance_tests_for_running_env:
-          name: 'test-3.4.1'
-          agp_version: '3.4.1'
-          gradle_version: '5.1.1'
       - acceptance_tests_for_running_env:
           name: 'test-3.5.1'
           agp_version: '3.5.1'
