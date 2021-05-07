@@ -5,8 +5,6 @@
 
 DeployGate Gradle プラグインです。DeployGate 経由でアプリを配信するための Gradle タスクが簡単に設定できます。
 
-*最新バージョンは v2 です。移行するにあたっては[v1 から v2 への移行](#migrate-v2) を参照ください。*
-
 ## Getting started
 
 スナップショットリリースを使いたい方は[こちら](#snapshot)。
@@ -68,6 +66,18 @@ DeployGate Gradle プラグインは非 app モジュールや android-library �
 3 ) これでデプロイの初期設定は完了しています。
 
 実行するタスクについては次の `Usage#Tasks` セクションを参照してください。
+
+## Version Compatibility
+
+Android Gradle Plugin | Gradle DeployGate Plugin
+:----|:----
+< 3.0.0 | 1.1.5 (保守されません)
+3.3.x, 3.4.x, 3.5.x | 2.0.0から
+3.6.x | 2.1.0から
+4.0.x | 2.2.0から
+4.1.x | 2.3.0から
+4.2.x | 2.4.0から
+7.0.0 (Arctic Fox) | 未対応
 
 ## Usage
 

@@ -1,5 +1,10 @@
 # ChangeLog
 
+## ver 2.4.0
+
+- Support Android Studio 4.2.0 stable [#114](https://github.com/DeployGate/gradle-deploygate-plugin/pull/114)
+- Support Gradle 7.0 which is the min required version of Arctic Fox [#121](https://github.com/DeployGate/gradle-deploygate-plugin/pull/121)
+
 ## ver 2.3.0
 
 - Expose the response of Upload API for other tasks [#109](https://github.com/DeployGate/gradle-deploygate-plugin/pull/109)
