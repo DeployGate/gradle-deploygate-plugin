@@ -9,8 +9,6 @@ on:
 jobs:
   production-release:
     runs-on: ubuntu-latest
-    env:
-      RELEASE_SCRIPT_TEST: true
     steps:
       - uses: actions/checkout@v2
       - run: |
@@ -31,9 +29,11 @@ jobs:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Set up gradle.properties for sigining and nexus
+        # Add timeout setting due to https://github.com/DeployGate/gradle-deploygate-plugin/runs/2523846388
         run: |
           echo >> gradle.properties
           cat<<EOF >> gradle.properties
+          systemProp.org.gradle.internal.http.socketTimeout=120000
           nexusUsername=${{ secrets.SHARED_NEXUS_USERNAME }}
           nexusPassword=${{ secrets.SHARED_NEXUS_PASSWORD }}
           EOF
