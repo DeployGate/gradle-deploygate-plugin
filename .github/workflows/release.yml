@@ -34,12 +34,9 @@ jobs:
         run: |
           echo >> gradle.properties
           cat<<EOF >> gradle.properties
-          nexusUsername=$SHARED_NEXUS_USERNAME
-          nexusPassword=$SHARED_NEXUS_PASSWORD
+          nexusUsername=${{ secrets.SHARED_NEXUS_USERNAME }}
+          nexusPassword=${{ secrets.SHARED_NEXUS_PASSWORD }}
           EOF
-        env:
-          NEXUS_USERNAME: ${{ secrets.SHARED_NEXUS_USERNAME }}
-          NEXUS_PASSWORD: ${{ secrets.SHARED_NEXUS_PASSWORD }}
       - name: Publish artifacts
         run: ./release.sh
         env:
