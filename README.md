@@ -5,13 +5,11 @@
 
 This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
 
-*We have migrated to `v2`. See [Migrate from v1 to v2](#migrate-v2) for the migration for more detail*
-
 ## Getting started
 
 Snapshot? See [how to use snapshot](#snapshot)
 
-1 ) Add mavenCentral to and the dependency of this plugin to your *build.gradle*.
+1 ) Add mavenCentral and the dependency of this plugin to your *build.gradle*.
 
 ```groovy
 buildscript {
@@ -70,6 +68,18 @@ This plugin does not work with non-app modules and/or library modules correctly.
 ### If you are using `dg` command (for MacOSX)
 
 [dg](https://github.com/deploygate/deploygate-cli) will make diffs to apply this plugin if you run `dg deploy` on the project root. 
+
+## Version Compatibility
+
+Android Gradle Plugin | Gradle DeployGate Plugin
+:----|:----
+< 3.0.0 | 1.1.5 (No longer maintained)
+3.3.x, 3.4.x, 3.5.x | since 2.0.0
+3.6.x | since 2.1.0
+4.0.x | since 2.2.0
+4.1.x | since 2.3.0
+4.2.x | since 2.4.0
+7.0.0 (Arctic Fox) | Not yet supported
 
 ## Usage
 
