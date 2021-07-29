@@ -6,7 +6,6 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import javax.annotation.Nonnull
 
@@ -38,8 +37,7 @@ class AndroidGradlePluginAcceptanceSpec extends Specification {
      *
      * @return
      */
-    @Unroll
-    def "version verification. Unrolled #agpVersion"() {
+    def "version verification"() {
         given:
         testAndroidProject.gradleProperties([
                 "agpVersion": agpVersion
@@ -58,12 +56,8 @@ class AndroidGradlePluginAcceptanceSpec extends Specification {
         result.output.trim().contains(expectedAgpVersion)
 
         where:
-        agpVersion       | minGradleVersion | expectedAgpVersion
-        "3.5.0"          | "5.4.1"          | "3.5.0"
-        "3.6.0"          | "5.6.4"          | "3.6.0"
-        "4.0.0"          | "6.1.1"          | "4.0.0"
-        "4.1.0"          | "6.5"            | "4.1.0"
-        "4.2.0"          | "6.7.1"          | "4.2.0"
-        "7.0.0"          | "7.0.2"          | "7.0.0"
+        agpVersion = System.getenv("TEST_AGP_VERSION")
+        minGradleVersion = System.getenv("TEST_GRADLE_VERSION")
+        expectedAgpVersion = agpVersion
     }
 }
