@@ -79,7 +79,7 @@ Android Gradle Plugin | Gradle DeployGate Plugin
 4.0.x | since 2.2.0
 4.1.x | since 2.3.0
 4.2.x | since 2.4.0
-7.0.0 (Arctic Fox) | Not yet supported
+7.0.x (Arctic Fox) | since 2.4.0
 
 ## Usage
 
