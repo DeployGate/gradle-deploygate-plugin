@@ -83,9 +83,9 @@ jobs:
           - agp_version: '4.2.0'
             gradle_version: '6.7.1'
           - agp_version: '4.2.0'
-            gradle_version: '7.0'
+            gradle_version: '7.0.2'
           - agp_version: '7.0.0'
-            gradle_version: '7.0'
+            gradle_version: '7.0.2'
 
     steps:
       - uses: actions/checkout@v2
