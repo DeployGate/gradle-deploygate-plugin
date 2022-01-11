@@ -95,7 +95,7 @@ class VersionString implements Comparable<VersionString> {
 
     @Override
     String toString() {
-        def builder = new StringBuffer()
+        def builder = new StringBuilder()
 
         builder.append(major)
         builder.append(".")
@@ -107,6 +107,24 @@ class VersionString implements Comparable<VersionString> {
             builder.append("-")
             builder.append(prerelease)
             builder.append(metaBuild)
+        }
+
+        return builder.toString()
+    }
+
+    String toArtifactString() {
+        def builder = new StringBuilder()
+
+        builder.append(major)
+        builder.append(".")
+        builder.append(minor)
+        builder.append(".")
+        builder.append(patch)
+
+        if (prerelease != null) {
+            builder.append("-")
+            builder.append(prerelease)
+            builder.append(String.format(Locale.US, "%02d", metaBuild))
         }
 
         return builder.toString()

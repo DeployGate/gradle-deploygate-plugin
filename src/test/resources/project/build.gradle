@@ -25,6 +25,6 @@ android {
 
 task printAGPVersion() {
     doLast {
-        println AndroidGradlePlugin.getVersion().toString()
+        println AndroidGradlePlugin.getVersion().toArtifactString()
     }
 }
