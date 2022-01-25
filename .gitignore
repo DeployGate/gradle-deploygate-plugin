@@ -22,3 +22,5 @@ src/test/project/userHome
 local.properties
 
 out/
+
+src/main/resources/VERSION_NAME

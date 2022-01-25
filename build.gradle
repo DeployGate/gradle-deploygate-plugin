@@ -74,6 +74,7 @@ dependencies {
     implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
     implementation 'org.apache.httpcomponents:httpmime:4.2.5'
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2' // for jdk 11 or over
 
     testImplementation gradleTestKit()
     testImplementation 'junit:junit:4.12'
@@ -192,5 +193,30 @@ afterEvaluate {
                 sign publication
             }
         }
+    }
+}
+
+project.afterEvaluate {
+    def process = "git rev-parse HEAD".execute([], rootDir)
+    def version_name
+
+    if (process.waitFor() == 0) {
+        version_name = process.text.trim()
+    } else {
+        version_name = "unavailable"
+    }
+
+    if (System.getenv("CI") != "true") {
+        version_name += "(local)"
+    }
+
+    def file = rootProject.file("src/main/resources/VERSION_NAME")
+
+    if (file.exists()) {
+        if (file.text.trim() != version_name) {
+            file.write(version_name, "UTF-8")
+        }
+    } else {
+        file.write(version_name, "UTF-8")
     }
 }
