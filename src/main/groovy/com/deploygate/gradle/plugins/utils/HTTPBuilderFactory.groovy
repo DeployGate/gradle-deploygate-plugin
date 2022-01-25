@@ -16,7 +16,9 @@ class HTTPBuilderFactory {
 
     static HTTPBuilder setDefaultRequestHeaders(HTTPBuilder httpBuilder) {
         httpBuilder.headers = [
-                'User-Agent': Config.USER_AGENT
+                'User-Agent': "gradle-deploygate-plugin/${Config.VERSION}",
+                'X-DEPLOYGATE-CLIENT-ID': "gradle-plugin/${Config.VERSION_CODE}",
+                'X-DEPLOYGATE-CLIENT-VERSION-NAME': "${Config.VERSION}-${Config.VERSION_NAME}"
         ]
         httpBuilder
     }

@@ -80,6 +80,16 @@ class VersionString implements Comparable<VersionString> {
         this.metaBuild = metaBuild
     }
 
+    long toLong() {
+        long code = patch * 100 + minor * 100 * 100 + major * 100 * 100 * 100
+
+        if (prerelease == null) {
+            code += (PRERELEASE_DELTAS[prerelease] ?: 99)
+        }
+
+        return code
+    }
+
     @Override
     int compareTo(@NotNull VersionString versionString) {
         return [
