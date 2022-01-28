@@ -79,8 +79,8 @@ jobs:
           - '4.2.0'
           - '4.2.0'
           - '7.0.0'
-          - '7.1.0-rc01'
-          - '7.2.0-alpha07'
+          - '7.1.0'
+          - '7.2.0-beta01'
         include:
           - agp_version: '3.5.1'
             gradle_version: '5.4.1'
@@ -100,11 +100,11 @@ jobs:
           - agp_version: '7.0.0'
             gradle_version: '7.0.2'
             java_version: '11'
-          - agp_version: '7.1.0-rc01'
+          - agp_version: '7.1.0'
             gradle_version: '7.2'
             java_version: '11'
-          - agp_version: '7.2.0-alpha07'
-            gradle_version: '7.3'
+          - agp_version: '7.2.0-beta01'
+            gradle_version: '7.3.3'
             java_version: '11'
 
     steps:
