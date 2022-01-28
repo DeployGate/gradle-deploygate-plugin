@@ -104,7 +104,7 @@ jobs:
             gradle_version: '7.2'
             java_version: '11'
           - agp_version: '7.2.0-beta01'
-            gradle_version: '7.3'
+            gradle_version: '7.3.3'
             java_version: '11'
 
     steps:
