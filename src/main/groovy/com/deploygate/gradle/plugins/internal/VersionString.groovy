@@ -57,7 +57,7 @@ class VersionString implements Comparable<VersionString> {
                 metaBuild = meta.length() > 0 ? Math.abs(meta.toInteger()) : 0
             }
 
-            new VersionString(major, minor, patch, prerelease, metaBuild)
+            new VersionString(major, minor, patch, prerelease, metaBuild, version)
         } catch (NumberFormatException ignore) {
             return null
         }
@@ -71,13 +71,15 @@ class VersionString implements Comparable<VersionString> {
     final String prerelease
 
     final int metaBuild
+    final String original
 
-    VersionString(int major, int minor, int patch, @Nullable String prerelease, int metaBuild) {
+    VersionString(int major, int minor, int patch, @Nullable String prerelease, int metaBuild, String original) {
         this.major = major
         this.minor = minor
         this.patch = patch
         this.prerelease = prerelease
         this.metaBuild = metaBuild
+        this.original = original
     }
 
     long toLong() {
@@ -105,21 +107,7 @@ class VersionString implements Comparable<VersionString> {
 
     @Override
     String toString() {
-        def builder = new StringBuilder()
-
-        builder.append(major)
-        builder.append(".")
-        builder.append(minor)
-        builder.append(".")
-        builder.append(patch)
-
-        if (prerelease != null) {
-            builder.append("-")
-            builder.append(prerelease)
-            builder.append(metaBuild)
-        }
-
-        return builder.toString()
+        return original
     }
 
     String toArtifactString() {
