@@ -1,6 +1,7 @@
 package com.deploygate.gradle.plugins.utils
 
 import com.deploygate.gradle.plugins.Config
+import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.RESTClient
 import org.apache.http.impl.conn.ProxySelectorRoutePlanner
@@ -18,7 +19,8 @@ class HTTPBuilderFactory {
         httpBuilder.headers = [
                 'User-Agent': "gradle-deploygate-plugin/${Config.VERSION}",
                 'X-DEPLOYGATE-CLIENT-ID': "gradle-plugin/${Config.VERSION_CODE}",
-                'X-DEPLOYGATE-CLIENT-VERSION-NAME': "${Config.VERSION}-${Config.VERSION_NAME}"
+                'X-DEPLOYGATE-CLIENT-VERSION-NAME': "${Config.VERSION}-${Config.VERSION_NAME}",
+                'X-DEPLOYGATE-GRADLE-PLUGIN-AGP-VERSION': "${AndroidGradlePlugin.getVersion() ?: "null"}"
         ]
         httpBuilder
     }

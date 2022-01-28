@@ -36,11 +36,11 @@ class VersionStringSpec extends Specification {
 
         where:
         version          | stringVersion
-        "1.0"            | "1.0.0"
+        "1.0"            | "1.0"
         "1.2.3"          | "1.2.3"
-        "1.0.3-extra"    | "1.0.3-extra0"
-        "1.0.3-extra03"  | "1.0.3-extra3"
-        "1.0.3-extra-03" | "1.0.3-extra3"
+        "1.0.3-extra"    | "1.0.3-extra"
+        "1.0.3-extra03"  | "1.0.3-extra03"
+        "1.0.3-extra-03" | "1.0.3-extra-03"
     }
 
     @Unroll
