@@ -17,7 +17,6 @@ class UploadApkTaskConfigurationSpec extends Specification {
             distribution.key = distributionKey
             distribution.releaseNote = distributionReleaseNote
         }
-        deployment.visibility = visibility
         deployment.skipAssemble = skipAssemble
 
         and:
@@ -30,14 +29,13 @@ class UploadApkTaskConfigurationSpec extends Specification {
         configuration.uploadParams.message == message
         configuration.uploadParams.distributionKey == distributionKey
         configuration.uploadParams.releaseNote == distributionReleaseNote
-        configuration.uploadParams.visibility == visibility
         configuration.isSigningReady == signingReady
         configuration.isUniversalApk == universalApk
 
         where:
-        message   | distributionKey   | distributionReleaseNote   | visibility | skipAssemble | signingReady | universalApk
-        null            | null              | null                      | null       | false        | false        | false
-        "message" | "distributionKey" | "distributionReleaseNote" | "public"   | true         | true         | true
+        message   | distributionKey   | distributionReleaseNote   | skipAssemble | signingReady | universalApk
+        null            | null              | null                      | false        | false        | false
+        "message" | "distributionKey" | "distributionReleaseNote" | true         | true         | true
     }
 
     @Unroll

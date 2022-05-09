@@ -8,8 +8,6 @@ interface DeploymentSyntax {
 
     void setMessage(@Nullable String message)
 
-    void setVisibility(@Nullable String visibility)
-
     void setSkipAssemble(boolean skipAssemble)
 
     void distribution(@Nonnull Closure closure)

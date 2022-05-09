@@ -16,9 +16,6 @@ class NamedDeployment implements Named, DeploymentSyntax {
     @Nullable
     String message
 
-    @Nullable
-    String visibility
-
     boolean skipAssemble
 
     // Avoid using Optional like Guava for now because we want to reduce external dependencies as much as possible.
@@ -96,7 +93,6 @@ class NamedDeployment implements Named, DeploymentSyntax {
         if (name != that.name) return false
         if (sourceFile != that.sourceFile) return false
         if (message != that.message) return false
-        if (visibility != that.visibility) return false
 
         return true
     }
@@ -106,7 +102,6 @@ class NamedDeployment implements Named, DeploymentSyntax {
         result = name.hashCode()
         result = 31 * result + (sourceFile != null ? sourceFile.hashCode() : 0)
         result = 31 * result + (message != null ? message.hashCode() : 0)
-        result = 31 * result + (visibility != null ? visibility.hashCode() : 0)
         result = 31 * result + (skipAssemble ? 1 : 0)
         result = 31 * result + (distribution != null ? distribution.hashCode() : 0)
         return result

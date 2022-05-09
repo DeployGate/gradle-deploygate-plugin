@@ -25,7 +25,6 @@ class DeployGatePlugin implements Plugin<Project> {
     static final String ENV_NAME_DISTRIBUTION_RELEASE_NOTE = "DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE"
     @Deprecated
     static final String ENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1 = "DEPLOYGATE_RELEASE_NOTE"
-    static final String ENV_NAME_APP_VISIBILITY = "DEPLOYGATE_VISIBILITY"
 
     static final String ENV_NAME_OPEN_APP_DETAIL_AFTER_UPLOAD = "DEPLOYGATE_OPEN_BROWSER"
 

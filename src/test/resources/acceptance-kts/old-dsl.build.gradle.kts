@@ -28,7 +28,6 @@ deploygate {
         create("customApk") {
             sourceFile = file("${project.projectDir}/texture/sample.apk")
             message = "custom message"
-            visibility = "custom visibility"
             distributionKey = "custom distributionKey"
             releaseNote = "custom releaseNote"
         }

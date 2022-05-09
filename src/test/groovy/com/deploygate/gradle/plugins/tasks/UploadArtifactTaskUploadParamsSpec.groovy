@@ -12,7 +12,6 @@ class UploadArtifactTaskUploadParamsSpec extends Specification {
         uploadParams.message = message
         uploadParams.distributionKey = distributionKey
         uploadParams.releaseNote = releaseNote
-        uploadParams.visibility = visibility
 
         and:
         def params = uploadParams.toMap()
@@ -21,15 +20,13 @@ class UploadArtifactTaskUploadParamsSpec extends Specification {
         params["message"] == message
         params["distribution_key"] == distributionKey
         params["release_note"] == releaseNote
-        params["visibility"] == visibility
         message != null || !params.containsKey("message")
         distributionKey != null || !params.containsKey("distribution_key")
         releaseNote != null || !params.containsKey("release_note")
-        visibility != null || !params.containsKey("visibility")
 
         where:
-        message   | distributionKey   | releaseNote   | visibility | isSigningReady | isUniversalApk | apkFile
-        null            | null              | null          | null       | false          | false          | null
-        "message" | "distributionKey" | "releaseNote" | "public"   | true           | true           | new File("build.gradle")
+        message   | distributionKey   | releaseNote   | isSigningReady | isUniversalApk | apkFile
+        null            | null              | null          | false          | false          | null
+        "message" | "distributionKey" | "releaseNote" | true           | true           | new File("build.gradle")
     }
 }

@@ -233,7 +233,6 @@ class DeployGateExtensionSpec extends Specification {
             distribution.key = "base"
             distribution.releaseNote = "base"
         }
-        base.visibility = "base"
         base.skipAssemble = false
 
         and:
@@ -247,7 +246,6 @@ class DeployGateExtensionSpec extends Specification {
         base.message == "base"
         base.distribution?.key == "base"
         base.distribution?.releaseNote == "base"
-        base.visibility == "base"
         !base.skipAssemble
 
         when:
@@ -257,7 +255,6 @@ class DeployGateExtensionSpec extends Specification {
             distribution.key = "other distributionKey"
             distribution.releaseNote = "other distributionReleaseNote"
         }
-        other.visibility = "other visibility"
         other.skipAssemble = true
 
         and:
@@ -268,7 +265,6 @@ class DeployGateExtensionSpec extends Specification {
         base.message == "base"
         base.distribution?.key == "base"
         base.distribution?.releaseNote == "base"
-        base.visibility == "base"
         base.skipAssemble // only skip assemble was changed
 
         when:
@@ -278,7 +274,6 @@ class DeployGateExtensionSpec extends Specification {
             distribution.key = null
             distribution.releaseNote = null
         }
-        base.visibility = null
         base.skipAssemble = false
 
         and:
@@ -289,7 +284,6 @@ class DeployGateExtensionSpec extends Specification {
         base.message == "other message"
         base.distribution?.key == "other distributionKey"
         base.distribution?.releaseNote == "other distributionReleaseNote"
-        base.visibility == "other visibility"
         base.skipAssemble
 
         when:
@@ -299,7 +293,6 @@ class DeployGateExtensionSpec extends Specification {
             distribution.key = ""
             distribution.releaseNote = ""
         }
-        base.visibility = ""
         base.skipAssemble = false
 
         and:
@@ -310,7 +303,6 @@ class DeployGateExtensionSpec extends Specification {
         base.message == "other message"
         base.distribution?.key == "other distributionKey"
         base.distribution?.releaseNote == "other distributionReleaseNote"
-        base.visibility == "other visibility"
         base.skipAssemble
     }
 
@@ -346,7 +338,6 @@ class DeployGateExtensionSpec extends Specification {
         env[DeployGatePlugin.ENV_NAME_MESSAGE] = message
         env[DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY] = distributionKey
         env[DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE] = distributionReleaseNote
-        env[DeployGatePlugin.ENV_NAME_APP_VISIBILITY] = visibility
         testSystemEnv.setEnv(env)
 
         Project project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
@@ -359,12 +350,11 @@ class DeployGateExtensionSpec extends Specification {
         deployment.message == message
         deployment.distribution?.key == distributionKey
         deployment.distribution?.releaseNote == distributionReleaseNote
-        deployment.visibility == visibility
         !deployment.skipAssemble // this var cannot be injected from env vars for now
 
         where:
-        sourceFilePath   | message   | distributionKey   | distributionReleaseNote   | visibility   | skipAssemble
-        null             | null      | null              | null                      | null         | null
-        "sourceFilePath" | "message" | "distributionKey" | "distributionReleaseNote" | "visibility" | true
+        sourceFilePath   | message   | distributionKey   | distributionReleaseNote   | skipAssemble
+        null             | null      | null              | null                      | null
+        "sourceFilePath" | "message" | "distributionKey" | "distributionReleaseNote" | true
     }
 }
