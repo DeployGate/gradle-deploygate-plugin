@@ -1,5 +1,14 @@
 # ChangeLog
 
+## ver 2.5.0
+
+- Deprecate `visibility` property [#136](https://github.com/DeployGate/gradle-deploygate-plugin/pull/136)
+
+This version also includes
+
+- Several improvements for developers' support.
+- Arctic Fox, Bumblebee, Chipmunk supports.  
+
 ## ver 2.4.0
 
 - Support Android Studio 4.2.0 stable [#114](https://github.com/DeployGate/gradle-deploygate-plugin/pull/114)
