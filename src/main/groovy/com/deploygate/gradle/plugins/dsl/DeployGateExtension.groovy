@@ -109,6 +109,7 @@ class DeployGateExtension implements ExtensionSyntax {
     static void mergeDeployments(@Nonnull NamedDeployment base, @Nullable NamedDeployment other) {
         base.sourceFile = base.sourceFile ?: other.sourceFile
         base.message = base.message ?: other.message
+        base._internalSetVisibility(base._internalGetVisibility() ?: other._internalGetVisibility())
         base.skipAssemble = base.skipAssemble || other.skipAssemble
         base.distribution { Distribution distribution ->
             distribution.key = base.distribution?.key ?: other.distribution?.key
@@ -125,6 +126,7 @@ class DeployGateExtension implements ExtensionSyntax {
                 System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE),
                 System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1)
         ].find { it }
+        String visibility = System.getenv(DeployGatePlugin.ENV_NAME_APP_VISIBILITY)
 
         def deployment = new NamedDeployment("environment-based")
 
@@ -134,6 +136,7 @@ class DeployGateExtension implements ExtensionSyntax {
             distribution.key = distributionKey
             distribution.releaseNote = distributionReleaseNote
         }
+        deployment._internalSetVisibility(visibility)
 
         return deployment
     }

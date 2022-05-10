@@ -55,13 +55,13 @@ class NamedDeployment implements Named, DeploymentSyntax {
     @Deprecated
     void setVisibility(@Nullable String visibility) {
         logger.deprecation("void setVisibility(String)", "2.5", "3.0", "This API has no effect and no alternative is available.")
-        this.visibility = visibility
+        _internalSetVisibility(visibility)
     }
 
     @Deprecated
     String getVisibility() {
         logger.deprecation("String getVisibility()", "2.5", "3.0", "This API has no effect and no alternative is available.")
-        return visibility
+        return _internalGetVisibility()
     }
 
     @Deprecated
@@ -107,6 +107,18 @@ class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     // end: backward compatibility
+
+    // just for avoiding deprecation logging. non-public api.
+
+    @Deprecated
+    void _internalSetVisibility(@Nullable String visibility) {
+        this.visibility = visibility
+    }
+
+    @Deprecated
+    String _internalGetVisibility() {
+        return visibility
+    }
 
     boolean equals(o) {
         if (this.is(o)) return true
