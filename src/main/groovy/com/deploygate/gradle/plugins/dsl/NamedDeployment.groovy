@@ -1,12 +1,15 @@
 package com.deploygate.gradle.plugins.dsl
 
 import com.deploygate.gradle.plugins.dsl.syntax.DeploymentSyntax
+import com.deploygate.gradle.plugins.internal.Logger
 import org.gradle.api.Named
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
 
 class NamedDeployment implements Named, DeploymentSyntax {
+    private static final Logger logger = Logger.getLogger(NamedDeployment)
+
     @Nonnull
     private String name
 
@@ -49,22 +52,28 @@ class NamedDeployment implements Named, DeploymentSyntax {
     // backward compatibility
 
     @Override
+    @Deprecated
     void setVisibility(@Nullable String visibility) {
+        logger.deprecation("void setVisibility(String)", "2.5", "3.0", "This API has no effect and no alternative is available.")
         this.visibility = visibility
     }
 
+    @Deprecated
     String getVisibility() {
+        logger.deprecation("String getVisibility()", "2.5", "3.0", "This API has no effect and no alternative is available.")
         return visibility
     }
 
     @Deprecated
     @Nullable
     String getDistributionKey() {
+        logger.deprecation("String getDistributionKey()", "2.0", "3.0", "Use distribution closure directly.")
         return distribution?.key
     }
 
     @Deprecated
     void setDistributionKey(@Nullable String distributionKey) {
+        logger.deprecation("void setDistributionKey(String)", "2.0", "3.0", "Use distribution closure instead.")
         distribution {
             delegate.key = distributionKey
         }
@@ -73,11 +82,13 @@ class NamedDeployment implements Named, DeploymentSyntax {
     @Deprecated
     @Nullable
     String getReleaseNote() {
+        logger.deprecation("String getReleaseNote()", "2.0", "3.0", "Use distribution closure directly.")
         return distribution?.releaseNote
     }
 
     @Deprecated
     void setReleaseNote(@Nullable String releaseNote) {
+        logger.deprecation("void setReleaseNote(String)", "2.0", "3.0", "Use distribution closure instead.")
         distribution {
             delegate.releaseNote = releaseNote
         }
@@ -85,11 +96,13 @@ class NamedDeployment implements Named, DeploymentSyntax {
 
     @Deprecated
     boolean getNoAssemble() {
+        logger.deprecation("boolean getNoAssemble()", "2.0", "3.0", "Use isSkipAssemble() instead.")
         return isSkipAssemble()
     }
 
     @Deprecated
     void setNoAssemble(boolean noAssemble) {
+        logger.deprecation("void setNoAssemble(boolean)", "2.0", "3.0", "Use setSkipAssemble() instead.")
         setSkipAssemble(noAssemble)
     }
 
