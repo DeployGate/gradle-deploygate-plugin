@@ -78,6 +78,9 @@ Android Gradle Plugin | Gradle DeployGate Plugin
 4.1.x | 2.3.0から
 4.2.x | 2.4.0から
 7.0.x (Arctic Fox) | 2.4.0から
+7.1.x (Bumblebee) | 2.4.0から
+7.2.x (Chipmunk) | 2.4.0から
+Dolphin (alpha) | 2.4.0から
 
 ## Usage
 

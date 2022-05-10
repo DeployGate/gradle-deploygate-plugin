@@ -81,8 +81,8 @@ Android Gradle Plugin | Gradle DeployGate Plugin
 4.2.x | since 2.4.0
 7.0.x (Arctic Fox) | since 2.4.0
 7.1.x (Bumblebee) | since 2.4.0
-7.2.x (Chipmunk) | todo
-Dolphin | todo
+7.2.x (Chipmunk) | since 2.4.0
+Dolphin (alpha) | since 2.4.0
 
 ## Usage
 
