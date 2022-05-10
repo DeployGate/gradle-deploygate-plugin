@@ -136,7 +136,9 @@ class DeployGateExtension implements ExtensionSyntax {
             distribution.key = distributionKey
             distribution.releaseNote = distributionReleaseNote
         }
-        deployment._internalSetVisibility(visibility)
+        if (visibility) {
+            deployment.visibility = visibility
+        }
 
         return deployment
     }

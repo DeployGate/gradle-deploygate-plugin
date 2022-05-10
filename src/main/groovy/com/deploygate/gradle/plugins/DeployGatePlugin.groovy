@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.internal.DeprecationLogger
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
@@ -34,6 +35,8 @@ class DeployGatePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        DeprecationLogger.reset()
+
         setupExtension(project)
         GradleCompat.init(project)
         AndroidGradlePlugin.init(project)
