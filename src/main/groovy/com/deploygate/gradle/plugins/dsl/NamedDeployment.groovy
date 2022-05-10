@@ -18,6 +18,10 @@ class NamedDeployment implements Named, DeploymentSyntax {
 
     boolean skipAssemble
 
+    @Nullable
+    @Deprecated
+    private String visibility
+
     // Avoid using Optional like Guava for now because we want to reduce external dependencies as much as possible.
     @Nonnull
     private Distribution[] optionalDistribution
@@ -43,6 +47,15 @@ class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     // backward compatibility
+
+    @Override
+    void setVisibility(@Nullable String visibility) {
+        this.visibility = visibility
+    }
+
+    String getVisibility() {
+        return visibility
+    }
 
     @Deprecated
     @Nullable

@@ -233,6 +233,7 @@ class DeployGateExtensionSpec extends Specification {
             distribution.key = "base"
             distribution.releaseNote = "base"
         }
+        base.visibility = "base"
         base.skipAssemble = false
 
         and:
@@ -246,6 +247,7 @@ class DeployGateExtensionSpec extends Specification {
         base.message == "base"
         base.distribution?.key == "base"
         base.distribution?.releaseNote == "base"
+        base.visibility == "base"
         !base.skipAssemble
 
         when:
@@ -255,6 +257,7 @@ class DeployGateExtensionSpec extends Specification {
             distribution.key = "other distributionKey"
             distribution.releaseNote = "other distributionReleaseNote"
         }
+        other.visibility = "other visibility"
         other.skipAssemble = true
 
         and:
@@ -265,6 +268,7 @@ class DeployGateExtensionSpec extends Specification {
         base.message == "base"
         base.distribution?.key == "base"
         base.distribution?.releaseNote == "base"
+        base.visibility == "base"
         base.skipAssemble // only skip assemble was changed
 
         when:
@@ -274,6 +278,7 @@ class DeployGateExtensionSpec extends Specification {
             distribution.key = null
             distribution.releaseNote = null
         }
+        base.visibility = null
         base.skipAssemble = false
 
         and:
@@ -284,6 +289,7 @@ class DeployGateExtensionSpec extends Specification {
         base.message == "other message"
         base.distribution?.key == "other distributionKey"
         base.distribution?.releaseNote == "other distributionReleaseNote"
+        base.visibility == "other visibility"
         base.skipAssemble
 
         when:
@@ -293,6 +299,7 @@ class DeployGateExtensionSpec extends Specification {
             distribution.key = ""
             distribution.releaseNote = ""
         }
+        base.visibility = ""
         base.skipAssemble = false
 
         and:
@@ -303,6 +310,7 @@ class DeployGateExtensionSpec extends Specification {
         base.message == "other message"
         base.distribution?.key == "other distributionKey"
         base.distribution?.releaseNote == "other distributionReleaseNote"
+        base.visibility == "other visibility"
         base.skipAssemble
     }
 
