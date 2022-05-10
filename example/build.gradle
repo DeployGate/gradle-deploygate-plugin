@@ -3,8 +3,8 @@
 buildscript {
     repositories {
         google()
+        mavenCentral()
         mavenLocal()
-        jcenter()
         // snapshot repo.
         maven { url 'https://jitpack.io' }
     }
@@ -50,7 +50,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
