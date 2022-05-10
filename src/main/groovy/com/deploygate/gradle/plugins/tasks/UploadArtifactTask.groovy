@@ -36,7 +36,6 @@ abstract class UploadArtifactTask extends DefaultTask {
         String message
         String distributionKey
         String releaseNote
-        String visibility
 
         HashMap<String, String> toMap() {
             HashMap<String, String> params = new HashMap<String, String>()
@@ -49,9 +48,6 @@ abstract class UploadArtifactTask extends DefaultTask {
             if (releaseNote != null) {
                 params.put("release_note", releaseNote)
             }
-            if (visibility != null) {
-                params.put("visibility", visibility)
-            }
             return params
         }
     }
@@ -60,8 +56,7 @@ abstract class UploadArtifactTask extends DefaultTask {
         return new UploadParams(
                 message: deployment.message,
                 distributionKey: deployment.distribution?.key,
-                releaseNote: deployment.distribution?.releaseNote,
-                visibility: deployment.visibility
+                releaseNote: deployment.distribution?.releaseNote
         )
     }
 

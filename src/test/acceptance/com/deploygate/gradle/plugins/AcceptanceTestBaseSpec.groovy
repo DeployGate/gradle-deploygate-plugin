@@ -175,7 +175,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "message")
         missingPart(request, "distribution_key")
         missingPart(request, "release_note")
-        missingPart(request, "visibility")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateFlavor1Flavor3Debug/response.json").size() > 0
 
         where:
@@ -209,7 +208,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         missingPart(request, "message")
         missingPart(request, "distribution_key")
         missingPart(request, "release_note")
-        missingPart(request, "visibility")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabFlavor1Flavor3Debug/response.json").size() > 0
 
         where:
@@ -242,7 +240,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("message").body.asString() == "flavor2Flavor3Debug"
         missingPart(request, "distribution_key")
         missingPart(request, "release_note")
-        missingPart(request, "visibility")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateFlavor2Flavor3Debug/response.json").size() > 0
 
         where:
@@ -276,7 +273,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("message").body.asString() == "flavor2Flavor3Debug"
         missingPart(request, "distribution_key")
         missingPart(request, "release_note")
-        missingPart(request, "visibility")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabFlavor2Flavor3Debug/response.json").size() > 0
 
         where:
@@ -309,7 +305,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("message").body.asString() == "flavor1Flavor4Debug"
         missingPart(request, "distribution_key")
         missingPart(request, "release_note")
-        missingPart(request, "visibility")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateFlavor1Flavor4Debug/response.json").size() > 0
 
         where:
@@ -343,7 +338,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("message").body.asString() == "flavor1Flavor4Debug"
         missingPart(request, "distribution_key")
         missingPart(request, "release_note")
-        missingPart(request, "visibility")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabFlavor1Flavor4Debug/response.json").size() > 0
 
         where:
@@ -433,7 +427,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("message").body.asString() == "flavor2Flavor4Debug"
         missingPart(request, "distribution_key")
         missingPart(request, "release_note")
-        missingPart(request, "visibility")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateFlavor2Flavor4Debug/response.json").size() > 0
 
         where:
@@ -477,7 +470,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("message").body.asString() == "flavor2Flavor4Debug"
         missingPart(request, "distribution_key")
         missingPart(request, "release_note")
-        missingPart(request, "visibility")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabFlavor2Flavor4Debug/response.json").size() > 0
 
         where:
@@ -510,7 +502,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("message").body.asString() == "custom message"
         request.getPart("distribution_key").body.asString() == "custom distributionKey"
         request.getPart("release_note").body.asString() == "custom releaseNote"
-        request.getPart("visibility").body.asString() == "custom visibility"
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateCustomApk/response.json").size() > 0
 
         where:
@@ -544,7 +535,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         request.getPart("message").body.asString() == "custom message"
         request.getPart("distribution_key").body.asString() == "custom distributionKey"
         request.getPart("release_note").body.asString() == "custom releaseNote"
-        request.getPart("visibility").body.asString() == "custom visibility"
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabCustomApk/response.json").size() > 0
 
         where:

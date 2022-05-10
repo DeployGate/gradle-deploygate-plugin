@@ -17,7 +17,6 @@ class UploadAabTaskConfigurationSpec extends Specification {
             distribution.key = distributionKey
             distribution.releaseNote = distributionReleaseNote
         }
-        deployment.visibility = visibility
         deployment.skipAssemble = skipAssemble
 
         and:
@@ -30,12 +29,11 @@ class UploadAabTaskConfigurationSpec extends Specification {
         configuration.uploadParams.message == message
         configuration.uploadParams.distributionKey == distributionKey
         configuration.uploadParams.releaseNote == distributionReleaseNote
-        configuration.uploadParams.visibility == visibility
 
         where:
-        message   | distributionKey   | distributionReleaseNote   | visibility | skipAssemble
-        null      | null              | null                      | null       | false
-        "message" | "distributionKey" | "distributionReleaseNote" | "public"   | true
+        message   | distributionKey   | distributionReleaseNote   | skipAssemble
+        null      | null              | null                      | false
+        "message" | "distributionKey" | "distributionReleaseNote" | true
     }
 
     @Unroll

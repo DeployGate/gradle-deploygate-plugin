@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.internal.DeprecationLogger
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
@@ -25,6 +26,7 @@ class DeployGatePlugin implements Plugin<Project> {
     static final String ENV_NAME_DISTRIBUTION_RELEASE_NOTE = "DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE"
     @Deprecated
     static final String ENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1 = "DEPLOYGATE_RELEASE_NOTE"
+    @Deprecated
     static final String ENV_NAME_APP_VISIBILITY = "DEPLOYGATE_VISIBILITY"
 
     static final String ENV_NAME_OPEN_APP_DETAIL_AFTER_UPLOAD = "DEPLOYGATE_OPEN_BROWSER"
@@ -33,6 +35,8 @@ class DeployGatePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        DeprecationLogger.reset()
+
         setupExtension(project)
         GradleCompat.init(project)
         AndroidGradlePlugin.init(project)

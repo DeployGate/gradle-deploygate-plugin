@@ -35,7 +35,6 @@ class NamedDeploymentSpec extends Specification {
             distribution.key = distributionKey
             distribution.releaseNote = distributionReleaseNote
         }
-        deployment.visibility = visibility
 
         expect:
         deployment.name == name
@@ -44,12 +43,11 @@ class NamedDeploymentSpec extends Specification {
         deployment.sourceFile == sourceFile
         deployment.distribution?.key == distributionKey
         deployment.distribution?.releaseNote == distributionReleaseNote
-        deployment.visibility == visibility
 
         where:
-        name  | message | skipAssemble | sourceFile      | distributionKey    | distributionReleaseNote     | visibility
-        "foo" | null          | true         | null            | null               | null                        | null
-        "bar" | "message"     | false        | new File("apk") | "distribution_key" | "distribution_release_note" | "private"
+        name  | message | skipAssemble | sourceFile      | distributionKey    | distributionReleaseNote
+        "foo" | null          | true         | null            | null               | null
+        "bar" | "message"     | false        | new File("apk") | "distribution_key" | "distribution_release_note"
     }
 
     def "verify empty NamedDeployment works"() {
@@ -63,6 +61,5 @@ class NamedDeploymentSpec extends Specification {
         deployment.sourceFile == null
         deployment.distribution?.key == null
         deployment.distribution?.releaseNote == null
-        deployment.visibility == null
     }
 }

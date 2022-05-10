@@ -109,7 +109,7 @@ class DeployGateExtension implements ExtensionSyntax {
     static void mergeDeployments(@Nonnull NamedDeployment base, @Nullable NamedDeployment other) {
         base.sourceFile = base.sourceFile ?: other.sourceFile
         base.message = base.message ?: other.message
-        base.visibility = base.visibility ?: other.visibility
+        base._internalSetVisibility(base._internalGetVisibility() ?: other._internalGetVisibility())
         base.skipAssemble = base.skipAssemble || other.skipAssemble
         base.distribution { Distribution distribution ->
             distribution.key = base.distribution?.key ?: other.distribution?.key
@@ -136,7 +136,9 @@ class DeployGateExtension implements ExtensionSyntax {
             distribution.key = distributionKey
             distribution.releaseNote = distributionReleaseNote
         }
-        deployment.visibility = visibility
+        if (visibility) {
+            deployment.visibility = visibility
+        }
 
         return deployment
     }
