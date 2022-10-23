@@ -3,7 +3,9 @@ package com.deploygate.gradle.plugins.dsl
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.dsl.syntax.DeploymentSyntax
 import com.deploygate.gradle.plugins.internal.DeprecationLogger
+import org.gradle.api.Action
 import org.gradle.api.Named
+import org.jetbrains.annotations.NotNull
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
@@ -39,13 +41,24 @@ class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     @Override
-    void distribution(@Nonnull Closure closure) {
-        optionalDistribution[0].configure(closure)
+    void distribution(@Nonnull Action<Distribution> builder) {
+        builder.execute(getDistribution())
     }
 
-    @Nullable
+    @Override
+    void distribution(@Nonnull Closure cl) {
+        cl.delegate = distribution
+        cl.resolveStrategy = Closure.DELEGATE_ONLY
+        cl.call(distribution)
+    }
+
+    boolean hasDistribution() {
+        return getDistribution().find { it.present }
+    }
+
+    @Nonnull
     Distribution getDistribution() {
-        return optionalDistribution.find { it.isPresent() }
+        return optionalDistribution[0]
     }
 
     // backward compatibility
@@ -67,7 +80,7 @@ class NamedDeployment implements Named, DeploymentSyntax {
     @Nullable
     String getDistributionKey() {
         DeprecationLogger.deprecation("NamedDeployment.getDistributionKey()", "2.0", "3.0", "Use distribution closure directly.")
-        return distribution?.key
+        return hasDistribution() ? distribution.key : null
     }
 
     @Deprecated
@@ -82,7 +95,7 @@ class NamedDeployment implements Named, DeploymentSyntax {
     @Nullable
     String getReleaseNote() {
         DeprecationLogger.deprecation("NamedDeployment.getReleaseNote()", "2.0", "3.0", "Use distribution closure directly.")
-        return distribution?.releaseNote
+        return hasDistribution() ? distribution.releaseNote : null
     }
 
     @Deprecated

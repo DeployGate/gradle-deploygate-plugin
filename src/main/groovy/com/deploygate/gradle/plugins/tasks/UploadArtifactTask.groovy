@@ -55,8 +55,8 @@ abstract class UploadArtifactTask extends DefaultTask {
     static UploadParams createUploadParams(@Nonnull NamedDeployment deployment) {
         return new UploadParams(
                 message: deployment.message,
-                distributionKey: deployment.distribution?.key,
-                releaseNote: deployment.distribution?.releaseNote
+                distributionKey: deployment.distribution.key,
+                releaseNote: deployment.distribution.releaseNote
         )
     }
 
