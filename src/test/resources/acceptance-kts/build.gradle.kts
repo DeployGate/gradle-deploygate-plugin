@@ -32,6 +32,16 @@ deploygate {
             message = "custom message"
             visibility = "custom visibility"
 
+            distribution {
+                key = "custom distributionKey"
+                releaseNote = "custom releaseNote"
+            }
+        }
+        create("customApkForBackwardCompatibility") {
+            sourceFile = file("${project.projectDir}/texture/sample.apk")
+            message = "custom message"
+            visibility = "custom visibility"
+
             distribution(closureOf<Distribution> {
                 key = "custom distributionKey"
                 releaseNote = "custom releaseNote"
