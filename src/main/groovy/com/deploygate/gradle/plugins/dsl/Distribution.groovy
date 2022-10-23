@@ -19,8 +19,8 @@ class Distribution implements DistributionSyntax {
     }
 
     void merge(@Nonnull Distribution other) {
-        this.key = this.key || other.key
-        this.releaseNote = this.releaseNote || other.releaseNote
+        this.key = this.key ?: other.key
+        this.releaseNote = this.releaseNote ?: other.releaseNote
     }
 
     boolean equals(o) {
