@@ -41,8 +41,8 @@ class NamedDeploymentSpec extends Specification {
         deployment.message == message
         deployment.skipAssemble == skipAssemble
         deployment.sourceFile == sourceFile
-        deployment.distribution?.key == distributionKey
-        deployment.distribution?.releaseNote == distributionReleaseNote
+        deployment.distribution.key == distributionKey
+        deployment.distribution.releaseNote == distributionReleaseNote
 
         where:
         name  | message | skipAssemble | sourceFile      | distributionKey    | distributionReleaseNote
@@ -59,7 +59,7 @@ class NamedDeploymentSpec extends Specification {
         deployment.message == null
         !deployment.skipAssemble
         deployment.sourceFile == null
-        deployment.distribution?.key == null
-        deployment.distribution?.releaseNote == null
+        deployment.distribution.key == null
+        deployment.distribution.releaseNote == null
     }
 }

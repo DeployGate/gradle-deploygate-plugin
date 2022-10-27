@@ -62,15 +62,15 @@ class DeployGateExtensionSpec extends Specification {
         then:
         dep1.name == "dep1"
         dep1.distribution
-        dep1.distribution?.key == "distributionKey1"
-        dep1.distribution?.releaseNote == "releaseNote1"
+        dep1.distribution.key == "distributionKey1"
+        dep1.distribution.releaseNote == "releaseNote1"
 
         when:
         def dep2 = extension.deployments.findByName("dep2")
 
         then:
         dep2.name == "dep2"
-        !dep2.distribution
+        !dep2.hasDistribution()
     }
 
     def "can accept a given extension"() {
@@ -118,8 +118,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         dep1.sourceFile == null
         dep1.message == null
-        dep1.distribution?.key == null
-        dep1.distribution?.releaseNote == null
+        dep1.distribution.key == null
+        dep1.distribution.releaseNote == null
         !dep1.skipAssemble
 
         when:
@@ -128,8 +128,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         dep2.sourceFile.name == "build.gradle"
         dep2.message == "message1"
-        dep2.distribution?.key == "distKey"
-        dep2.distribution?.releaseNote == "note1"
+        dep2.distribution.key == "distKey"
+        dep2.distribution.releaseNote == "note1"
         dep2.skipAssemble
     }
 
@@ -179,8 +179,8 @@ class DeployGateExtensionSpec extends Specification {
         dep3.name == "dep3"
         dep3.sourceFile == null
         dep3.message == null
-        dep3.distribution?.key == null
-        dep3.distribution?.releaseNote == null
+        dep3.distribution.key == null
+        dep3.distribution.releaseNote == null
         !dep3.skipAssemble
     }
 
@@ -245,8 +245,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         base.sourceFile == new File("base")
         base.message == "base"
-        base.distribution?.key == "base"
-        base.distribution?.releaseNote == "base"
+        base.distribution.key == "base"
+        base.distribution.releaseNote == "base"
         base.visibility == "base"
         !base.skipAssemble
 
@@ -266,8 +266,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         base.sourceFile == new File("base")
         base.message == "base"
-        base.distribution?.key == "base"
-        base.distribution?.releaseNote == "base"
+        base.distribution.key == "base"
+        base.distribution.releaseNote == "base"
         base.visibility == "base"
         base.skipAssemble // only skip assemble was changed
 
@@ -287,8 +287,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         base.sourceFile == new File("other")
         base.message == "other message"
-        base.distribution?.key == "other distributionKey"
-        base.distribution?.releaseNote == "other distributionReleaseNote"
+        base.distribution.key == "other distributionKey"
+        base.distribution.releaseNote == "other distributionReleaseNote"
         base.visibility == "other visibility"
         base.skipAssemble
 
@@ -308,8 +308,8 @@ class DeployGateExtensionSpec extends Specification {
         then:
         base.sourceFile == new File("other")
         base.message == "other message"
-        base.distribution?.key == "other distributionKey"
-        base.distribution?.releaseNote == "other distributionReleaseNote"
+        base.distribution.key == "other distributionKey"
+        base.distribution.releaseNote == "other distributionReleaseNote"
         base.visibility == "other visibility"
         base.skipAssemble
     }
@@ -328,7 +328,7 @@ class DeployGateExtensionSpec extends Specification {
         NamedDeployment deployment = DeployGateExtension.getEnvironmentBasedDeployment(project)
 
         expect:
-        deployment.distribution?.releaseNote == expectedDistributionReleaseNote
+        deployment.distribution.releaseNote == expectedDistributionReleaseNote
 
         where:
         v1DistributionReleaseNote   | distributionReleaseNote   | expectedDistributionReleaseNote
@@ -356,8 +356,8 @@ class DeployGateExtensionSpec extends Specification {
         expect:
         deployment.sourceFile == sourceFilePath?.with { project.file(sourceFilePath) }
         deployment.message == message
-        deployment.distribution?.key == distributionKey
-        deployment.distribution?.releaseNote == distributionReleaseNote
+        deployment.distribution.key == distributionKey
+        deployment.distribution.releaseNote == distributionReleaseNote
         !deployment.skipAssemble // this var cannot be injected from env vars for now
 
         where:

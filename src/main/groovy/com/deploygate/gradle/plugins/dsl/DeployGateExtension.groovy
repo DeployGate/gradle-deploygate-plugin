@@ -111,10 +111,7 @@ class DeployGateExtension implements ExtensionSyntax {
         base.message = base.message ?: other.message
         base._internalSetVisibility(base._internalGetVisibility() ?: other._internalGetVisibility())
         base.skipAssemble = base.skipAssemble || other.skipAssemble
-        base.distribution { Distribution distribution ->
-            distribution.key = base.distribution?.key ?: other.distribution?.key
-            distribution.releaseNote = base.distribution?.releaseNote ?: other.distribution?.releaseNote
-        }
+        base.distribution.merge(other.distribution)
     }
 
     @VisibleForTesting
