@@ -92,13 +92,13 @@ jobs:
             gradle_version: '7.4.2'
             java_version: '11'
           - agp_version: '7.4.0-beta03'
-            gradle_version: '7.4.2'
+            gradle_version: '7.5'
             java_version: '11'
           - agp_version: '8.0.0-alpha06'
-            gradle_version: '7.4.2'
+            gradle_version: '7.5'
             java_version: '11'
           - agp_version: '8.0.0-alpha06'
-            gradle_version: '7.4.2'
+            gradle_version: '7.5'
             java_version: '19'
 
 
