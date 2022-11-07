@@ -10,25 +10,16 @@ jobs:
   production-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: |
           if [[ "$(cat src/main/resources/VERSION)" != "${GITHUB_REF#refs/tags/}" ]]; then
             echo "version must keep the consistency" 1>&2
             exit 1
           fi
-      - uses: actions/setup-java@v1
+      - uses: ./.github/actions/setup-java
         with:
-          java-version: '8.0.x'
-          java-package: jdk
-      - uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-      - uses: actions/cache@v2
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Set up gradle.properties for sigining and nexus
+          java-version: '8'
+      - name: Set up gradle.properties for signing and nexus
         # Add timeout setting due to https://github.com/DeployGate/gradle-deploygate-plugin/runs/2523846388
         run: |
           echo >> gradle.properties
