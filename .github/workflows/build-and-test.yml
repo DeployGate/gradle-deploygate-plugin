@@ -94,10 +94,10 @@ jobs:
           - agp_version: '7.4.0-rc02'
             gradle_version: '7.5'
             java_version: '11'
-          - agp_version: '8.0.0-alpha10'
-            gradle_version: '7.5'
-            java_version: '17'
-            runner_gradle_version: '7.3'
+          # - agp_version: '8.0.0-alpha10'
+          #   gradle_version: '7.5'
+          #   java_version: '17'
+          #   runner_gradle_version: '7.3'
 
     steps:
       - uses: actions/checkout@v3
