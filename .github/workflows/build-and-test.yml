@@ -60,6 +60,8 @@ jobs:
           - '7.2.0'
           - '7.3.0'
           - '7.4.0-rc02'
+        runner_gradle_version:
+          - '5.4'
         include:
           - agp_version: '3.5.1'
             gradle_version: '5.4.1'
@@ -97,13 +99,14 @@ jobs:
           - agp_version: '8.0.0-alpha10'
             gradle_version: '7.5'
             java_version: '17'
-
+            runner_gradle_version: '6.5'
 
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-java
         with:
           java-version: ${{ matrix.java_version }}
+          gradle-version: ${{ matrix.runner_gradle_version || 'wrapper' }}
       - run: ./gradlew testPluginAcceptanceTest
         env:
           TEST_AGP_VERSION: ${{ matrix.agp_version }}
