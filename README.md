@@ -92,7 +92,7 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 |:-----|:-------------------------|:-------------------------|
 | 11   | 7.4.x-beta04 (Eel)       | 2.5.0 is OK              |
 | 11   | 8.0.x-alpha06 (Flamingo) | 2.5.0 is OK              |
-| 17   | 8.0.x-alpha06 (Flamingo) | NG                       |
+| 17   | 8.0.x-alpha10 (Flamingo) | still investigating              |
 
 ## Usage
 
