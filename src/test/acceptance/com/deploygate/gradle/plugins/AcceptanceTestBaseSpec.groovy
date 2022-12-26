@@ -7,7 +7,6 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 import javax.annotation.Nonnull
@@ -182,7 +181,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor1Flavor3Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -247,7 +245,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor3Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -312,7 +309,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor1Flavor4Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -368,7 +364,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor4Debug aab should fail unless bundling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -434,7 +429,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor4Debug aab require bundling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -509,7 +503,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "customApk aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([

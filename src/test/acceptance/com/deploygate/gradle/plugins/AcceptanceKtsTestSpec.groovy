@@ -1,10 +1,8 @@
 package com.deploygate.gradle.plugins
 
 import org.gradle.testkit.runner.GradleRunner
-import spock.lang.IgnoreIf
 import spock.lang.Unroll
 
-@IgnoreIf({ Boolean.valueOf(env["NO_KTS_SUPPORT"]) })
 class AcceptanceKtsTestSpec extends AcceptanceTestBaseSpec {
 
     @Override

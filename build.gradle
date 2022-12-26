@@ -22,8 +22,7 @@ repositories {
 }
 
 ext {
-    agpVersion = '3.3.2'
-    unstableAgpVersion = '4.2.0-beta04'
+    agpVersion = System.getenv("TEST_AGP_VERSION") ?: "4.2.0"
     releaseVersion = version
 }
 
@@ -69,7 +68,10 @@ task createClasspathManifest {
 dependencies {
     compileOnly gradleApi()
     compileOnly localGroovy()
-    compileOnly "com.android.tools.build:gradle:$unstableAgpVersion"
+    // Don't enable this on the repository because this artifact may include bytecode incompatibility.
+//    compileOnly "com.android.tools.build:gradle:$agpVersion"
+    implementation 'org.jetbrains:annotations:23.1.0'
+    implementation 'com.google.guava:guava-annotations:r03'
 
     implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
     implementation 'org.apache.httpcomponents:httpmime:4.2.5'
@@ -110,9 +112,7 @@ project.tasks.withType(Test).configureEach {
     environment([
             "ANDROID_HOME": System.getenv("ANDROID_HOME"),
             "TEST_AGP_VERSION": System.getenv("TEST_AGP_VERSION"),
-            "TEST_GRADLE_VERSION": System.getenv("TEST_GRADLE_VERSION"),
-            "NO_AAB_SUPPORT": false, // TODO Remove this
-            "NO_KTS_SUPPORT": false // TODO Remove this
+            "TEST_GRADLE_VERSION": System.getenv("TEST_GRADLE_VERSION")
     ])
 }
 
