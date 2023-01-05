@@ -3,9 +3,7 @@ package com.deploygate.gradle.plugins.dsl
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
-import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.google.common.annotations.VisibleForTesting
-import groovyx.net.http.ContentType
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
@@ -151,10 +149,10 @@ class DeployGateExtension implements ExtensionSyntax {
             query = query + data
         }
 
-        try {
-            HTTPBuilderFactory.httpBuilder(endpoint).post path: "/cli/notify",
-                    body: query, requestContentType: ContentType.URLENC
-        } catch (ignored) {
-        }
+//        try {
+//            HTTPBuilderFactory.httpBuilder(endpoint).post path: "/cli/notify",
+//                    body: query, requestContentType: ContentType.URLENC
+//        } catch (ignored) {
+//        }
     }
 }

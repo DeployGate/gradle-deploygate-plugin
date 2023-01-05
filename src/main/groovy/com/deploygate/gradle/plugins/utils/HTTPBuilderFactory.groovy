@@ -2,34 +2,39 @@ package com.deploygate.gradle.plugins.utils
 
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
-import groovyx.net.http.HTTPBuilder
-import groovyx.net.http.RESTClient
-import org.apache.http.impl.conn.ProxySelectorRoutePlanner
+import org.apache.hc.client5.http.classic.HttpClient
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
+import org.apache.hc.core5.http.message.BasicHeader
 
 class HTTPBuilderFactory {
-    static HTTPBuilder setDefaultProxy(HTTPBuilder httpBuilder) {
-        httpBuilder.client.routePlanner = new ProxySelectorRoutePlanner(
-                httpBuilder.client.connectionManager.schemeRegistry,
-                ProxySelector.default
-        )
-        httpBuilder
-    }
+    private static final Object LOCK = new Object()
+    private static HttpClient httpClient
 
-    static HTTPBuilder setDefaultRequestHeaders(HTTPBuilder httpBuilder) {
-        httpBuilder.headers = [
-                'User-Agent': "gradle-deploygate-plugin/${Config.VERSION}",
+    static HttpClient getHttpClient() {
+        if (httpClient != null) {
+            return httpClient
+        }
+
+        def headers = [
                 'X-DEPLOYGATE-CLIENT-ID': "gradle-plugin/${Config.VERSION_CODE}",
                 'X-DEPLOYGATE-CLIENT-VERSION-NAME': "${Config.VERSION}-${Config.VERSION_NAME}",
                 'X-DEPLOYGATE-GRADLE-PLUGIN-AGP-VERSION': "${AndroidGradlePlugin.getVersion() ?: "null"}"
-        ]
-        httpBuilder
-    }
+        ].collect {
+            new BasicHeader(it.key, it.value)
+        }
 
-    static HTTPBuilder httpBuilder(endpoint) {
-        setDefaultProxy(setDefaultRequestHeaders(new HTTPBuilder(endpoint)))
-    }
+        synchronized (LOCK) {
+            if (httpClient != null) {
+                return httpClient
+            }
 
-    static RESTClient restClient(endpoint) {
-        setDefaultProxy(setDefaultRequestHeaders(new RESTClient(endpoint))) as RESTClient
+            httpClient = HttpClientBuilder.create().
+                    useSystemProperties().
+                    setUserAgent("gradle-deploygate-plugin/${Config.VERSION}").
+                    setDefaultHeaders(headers).
+                    build()
+        }
+
+        return httpClient
     }
 }

@@ -3,16 +3,15 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.utils.BrowserUtils
-import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.google.common.annotations.VisibleForTesting
 import com.google.gson.Gson
-import groovyx.net.http.ContentType
-import groovyx.net.http.HttpResponseDecorator
-import groovyx.net.http.HttpResponseException
-import groovyx.net.http.Method
-import org.apache.http.entity.mime.MultipartEntity
-import org.apache.http.entity.mime.content.FileBody
-import org.apache.http.entity.mime.content.StringBody
+import org.apache.hc.client5.http.classic.HttpClient
+import org.apache.hc.client5.http.classic.methods.HttpPost
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder
+import org.apache.hc.client5.http.entity.mime.StringBody
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
+import org.apache.hc.core5.http.ContentType
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Internal
@@ -20,7 +19,8 @@ import org.gradle.api.tasks.OutputFile
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
-import java.nio.charset.Charset
+
+import static org.apache.hc.core5.http.ContentType.DEFAULT_BINARY
 
 abstract class UploadArtifactTask extends DefaultTask {
     static class Configuration {
@@ -134,11 +134,11 @@ abstract class UploadArtifactTask extends DefaultTask {
 
         onBeforeUpload()
 
-        def response = postRequestToUpload(appOwnerName, apiToken, configuration.artifactFile, configuration.uploadParams)
+        postRequestToUpload(appOwnerName, apiToken, configuration.artifactFile, configuration.uploadParams)
 
-        writeUploadResponse(response.data)
-
-        handleResponse(response, response.data)
+//        writeUploadResponse(response.data)
+//
+//        handleResponse(response, response.data)
     }
 
     private void onBeforeUpload() {
@@ -156,21 +156,21 @@ abstract class UploadArtifactTask extends DefaultTask {
         response.write(new Gson().toJson(data))
     }
 
-    private void handleResponse(HttpResponseDecorator response, data) {
-        if (!(200 <= response.status && response.status < 300) || data.error) {
-            throw new GradleException("${variantName} failed due to ${data.message}")
-        }
-
-        if (data.error)
-            project.deploygate.notifyServer 'upload_finished', ['error': true, message: data.message]
-        else {
-            def sent = project.deploygate.notifyServer 'upload_finished', ['path': data.results.path]
-
-            if (!sent && (Config.shouldOpenAppDetailAfterUpload() || data.results.revision == 1)) {
-                BrowserUtils.openBrowser "${project.deploygate.endpoint}${data.results.path}"
-            }
-        }
-    }
+//    private void handleResponse(HttpResponseDecorator response, data) {
+//        if (!(200 <= response.status && response.status < 300) || data.error) {
+//            throw new GradleException("${variantName} failed due to ${data.message}")
+//        }
+//
+//        if (data.error)
+//            project.deploygate.notifyServer 'upload_finished', ['error': true, message: data.message]
+//        else {
+//            def sent = project.deploygate.notifyServer 'upload_finished', ['path': data.results.path]
+//
+//            if (!sent && (Config.shouldOpenAppDetailAfterUpload() || data.results.revision == 1)) {
+//                BrowserUtils.openBrowser "${project.deploygate.endpoint}${data.results.path}"
+//            }
+//        }
+//    }
 
     @Nonnull
     @VisibleForTesting
@@ -198,26 +198,35 @@ abstract class UploadArtifactTask extends DefaultTask {
         appOwnerName.trim()
     }
 
-    private HttpResponseDecorator postRequestToUpload(String appOwnerName, String apiToken, File artifactFile, UploadParams uploadParams) {
-        MultipartEntity entity = new MultipartEntity()
-        Charset charset = Charset.forName('UTF-8')
+    private void postRequestToUpload(String appOwnerName, String apiToken, File artifactFile, UploadParams uploadParams) {
 
-        entity.addPart("file", new FileBody(artifactFile.getAbsoluteFile()))
-        entity.addPart("token", new StringBody(apiToken, charset))
+        HttpPost httpPost = new HttpPost("${project.deploygate.endpoint}/api/users/${appOwnerName}/apps")
+        httpPost.setHeader("Authorization", "Bearer ${apiToken}")
 
-        def params = uploadParams.toMap()
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setMode(HttpMultipartMode.STRICT)
+        builder.addBinaryBody("file", artifactFile, ContentType.MULTIPART_FORM_DATA, artifactFile.name)
 
-        for (String key : params.keySet()) {
-            entity.addPart(key, new StringBody(params.get(key), charset))
+        if (uploadParams.message != null) {
+            builder.addPart("message", new StringBody(uploadParams.message, ContentType.MULTIPART_FORM_DATA))
         }
 
-        try {
-            HTTPBuilderFactory.restClient(project.deploygate.endpoint).request(Method.POST, ContentType.JSON) { req ->
-                uri.path = "/api/users/${appOwnerName}/apps"
-                req.entity = entity
-            } as HttpResponseDecorator
-        } catch (HttpResponseException e) {
-            e.response
+        if (uploadParams.distributionKey != null) {
+            builder.addPart("distribution_key", new StringBody(uploadParams.distributionKey, ContentType.MULTIPART_FORM_DATA))
+
+            if (uploadParams.releaseNote != null) {
+                builder.addPart("release_note", new StringBody(uploadParams.releaseNote, ContentType.MULTIPART_FORM_DATA))
+            }
         }
+
+        def entity = builder.build()
+        httpPost.setEntity(entity)
+
+        HttpClient httpClient = HttpClientBuilder.create().build()
+
+        httpClient.execute(httpPost) {
+            logger.error("hello")
+        }
+
     }
 }

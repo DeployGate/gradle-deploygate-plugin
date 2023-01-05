@@ -3,11 +3,9 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.utils.BrowserUtils
-import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
-import groovyx.net.http.ContentType
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
@@ -154,8 +152,8 @@ class LoginTask extends DefaultTask {
 
     String getCredentialJsonFromKey(key) {
         try {
-            HTTPBuilderFactory.restClient(project.deploygate.endpoint).
-                    get(path: '/cli/credential', query: [key: key], contentType: ContentType.TEXT).data.text
+//            HTTPBuilderFactory.restClient(project.deploygate.endpoint).
+//                    get(path: '/cli/credential', query: [key: key], contentType: ContentType.TEXT).data.text
         } catch (e) {
             logger.error('failed to retrieve credential: ' + e.message)
             return null

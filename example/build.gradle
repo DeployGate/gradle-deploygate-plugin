@@ -37,8 +37,8 @@ buildscript {
         }
 
         // Use one of the following calls which what you would to use.
-        useReleaseVersion.call()
-//        useCurrentHEAD.call()
+//        useReleaseVersion.call()
+        useCurrentHEAD.call()
 //        useBranchSnapshot.call()
 //        useCommitSnapshot.call()
 
