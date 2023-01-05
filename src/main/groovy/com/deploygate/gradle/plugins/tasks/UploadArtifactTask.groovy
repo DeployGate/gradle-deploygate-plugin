@@ -97,7 +97,7 @@ abstract class UploadArtifactTask extends DefaultTask {
         this.configuration = configuration
     }
 
-    void setpackageApplicationTaskProvider(packageApplicationTaskProvider) {
+    void setPackageApplicationTaskProvider(packageApplicationTaskProvider) {
         this.packageApplicationTaskProvider = packageApplicationTaskProvider
     }
 
