@@ -44,7 +44,7 @@ class VersionStringSpec extends Specification {
     }
 
     @Unroll
-    def "compareTo. Unrolled #version"() {
+    def "compareTo. Unrolled #leftVersion and #rightVersion"() {
         given:
         def lhs = VersionString.tryParse(leftVersion)
         def rhs = VersionString.tryParse(rightVersion)
