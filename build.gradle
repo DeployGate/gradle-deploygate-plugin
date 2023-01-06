@@ -180,13 +180,6 @@ dependencies {
     testRuntimeOnly files(createClasspathManifest)
 }
 
-test {
-    useJUnitPlatform()
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-
 tasks.create("testUnrollAcceptanceTest", Test) {
     testClassesDirs = sourceSets.unrollAcceptanceTest.output.classesDirs
     classpath = sourceSets.unrollAcceptanceTest.runtimeClasspath
@@ -200,6 +193,8 @@ tasks.create("testPluginAcceptanceTest", Test) {
 }
 
 project.tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
