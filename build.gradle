@@ -158,14 +158,14 @@ dependencies {
     implementation 'com.google.guava:guava-annotations:r03'
 
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.10'
     implementation 'javax.annotation:javax.annotation-api:1.3.2' // for jdk 11 or over
 
     testImplementation gradleTestKit()
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.1'
 
     // 2.21.0 will break behaviors of multipart requests :thinking_face:
-    testImplementation "com.github.tomakehurst:wiremock:2.20.0"
+    testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
 
     if (requireJava11) {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
