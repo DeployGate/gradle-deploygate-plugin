@@ -169,7 +169,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         expect:
         buildResult.task(":uploadDeployGateFlavor1Flavor3Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         missingPart(request, "message")
         missingPart(request, "distribution_key")
@@ -201,7 +201,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         expect:
         buildResult.task(":uploadDeployGateAabFlavor1Flavor3Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         missingPart(request, "message")
         missingPart(request, "distribution_key")
@@ -233,7 +233,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         expect:
         buildResult.task(":uploadDeployGateFlavor2Flavor3Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         request.getPart("message").body.asString() == "flavor2Flavor3Debug"
         missingPart(request, "distribution_key")
@@ -265,7 +265,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         expect:
         buildResult.task(":uploadDeployGateAabFlavor2Flavor3Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         request.getPart("message").body.asString() == "flavor2Flavor3Debug"
         missingPart(request, "distribution_key")
@@ -297,7 +297,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         expect:
         buildResult.task(":uploadDeployGateFlavor1Flavor4Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         request.getPart("message").body.asString() == "flavor1Flavor4Debug"
         missingPart(request, "distribution_key")
@@ -329,7 +329,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         expect:
         buildResult.task(":uploadDeployGateAabFlavor1Flavor4Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         request.getPart("message").body.asString() == "flavor1Flavor4Debug"
         missingPart(request, "distribution_key")
@@ -417,7 +417,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         assembleBuildResult.task(":assembleFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
         uploadBuildResult.task(":uploadDeployGateFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         request.getPart("message").body.asString() == "flavor2Flavor4Debug"
         missingPart(request, "distribution_key")
@@ -459,7 +459,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         assembleBuildResult.task(":bundleFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
         uploadBuildResult.task(":uploadDeployGateAabFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         request.getPart("message").body.asString() == "flavor2Flavor4Debug"
         missingPart(request, "distribution_key")
@@ -491,7 +491,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         expect:
         buildResult.task(":uploadDeployGateCustomApk").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         request.getPart("message").body.asString() == "custom message"
         request.getPart("distribution_key").body.asString() == "custom distributionKey"
@@ -523,7 +523,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         expect:
         buildResult.task(":uploadDeployGateAabCustomApk").outcome == TaskOutcome.SUCCESS
         result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
+        request.header("Authorization").firstValue() == "Bearer api token"
         request.getPart("file").body.present
         request.getPart("message").body.asString() == "custom message"
         request.getPart("distribution_key").body.asString() == "custom distributionKey"

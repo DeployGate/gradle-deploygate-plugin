@@ -13,7 +13,9 @@ class UploadAabTask extends UploadArtifactTask {
                 artifactFile: deployment.sourceFile ?: aabInfo.aabFile,
                 isSigningReady: false,
                 isUniversalApk: false,
-                uploadParams: createUploadParams(deployment)
+                message: deployment.message,
+                distributionKey: deployment.distribution.key,
+                releaseNote: deployment.distribution.releaseNote
         )
     }
 

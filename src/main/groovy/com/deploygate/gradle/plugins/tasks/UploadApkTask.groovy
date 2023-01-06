@@ -13,7 +13,9 @@ class UploadApkTask extends UploadArtifactTask {
                 artifactFile: deployment.sourceFile ?: apkInfo.apkFile,
                 isSigningReady: apkInfo.isSigningReady(),
                 isUniversalApk: apkInfo.isUniversalApk(),
-                uploadParams: createUploadParams(deployment)
+                message: deployment.message,
+                distributionKey: deployment.distribution.key,
+                releaseNote: deployment.distribution.releaseNote
         )
     }
 
