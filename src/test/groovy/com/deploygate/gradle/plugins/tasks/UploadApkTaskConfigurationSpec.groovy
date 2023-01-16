@@ -26,9 +26,9 @@ class UploadApkTaskConfigurationSpec extends Specification {
         def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
 
         expect:
-        configuration.uploadParams.message == message
-        configuration.uploadParams.distributionKey == distributionKey
-        configuration.uploadParams.releaseNote == distributionReleaseNote
+        configuration.message == message
+        configuration.distributionKey == distributionKey
+        configuration.releaseNote == distributionReleaseNote
         configuration.isSigningReady == signingReady
         configuration.isUniversalApk == universalApk
 

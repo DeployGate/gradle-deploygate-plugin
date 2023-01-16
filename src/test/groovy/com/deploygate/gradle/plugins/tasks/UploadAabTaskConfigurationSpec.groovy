@@ -26,9 +26,9 @@ class UploadAabTaskConfigurationSpec extends Specification {
         def configuration = UploadAabTask.createConfiguration(deployment, aabInfo)
 
         expect:
-        configuration.uploadParams.message == message
-        configuration.uploadParams.distributionKey == distributionKey
-        configuration.uploadParams.releaseNote == distributionReleaseNote
+        configuration.message == message
+        configuration.distributionKey == distributionKey
+        configuration.releaseNote == distributionReleaseNote
 
         where:
         message   | distributionKey   | distributionReleaseNote   | skipAssemble

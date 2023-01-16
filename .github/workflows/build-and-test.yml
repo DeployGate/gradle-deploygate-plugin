@@ -38,9 +38,6 @@ jobs:
     services:
       app:
         image: ghcr.io/deploygate/gradle-plugin-mock-server
-        credentials:
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
         ports:
           - 3000/tcp
     steps:
@@ -67,9 +64,6 @@ jobs:
     services:
       app:
         image: ghcr.io/deploygate/gradle-plugin-mock-server
-        credentials:
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
         ports:
           - 3000/tcp
     strategy:
