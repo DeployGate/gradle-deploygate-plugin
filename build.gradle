@@ -16,7 +16,7 @@ class VersionString implements Comparable<VersionString> {
 
         int major = Integer.parseInt(versions[0])
         int minor = Integer.parseInt(versions[1])
-        int patch = Integer.parseInt(versions[2])
+        int patch = versions.length > 2 ? Integer.parseInt(versions[2]) : 0
         String channel = null
         String channelVersion = null
 
@@ -98,8 +98,11 @@ ext {
     releaseVersion = version
     // Be careful to set androidGradleVersion's default. Bytecode compatibility needs to drop backward compatibility.
     androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "3.3.2")
+    gradleVersion = VersionString.parse(gradle.gradleVersion)
 
+    requireJava8 = VersionString.parse("4.2.0") <= androidGradleVersion
     requireJava11 = VersionString.parse("8.0.0-alpha09") <= androidGradleVersion
+    requireGroovy3 = VersionString.parse("7.0") <= gradleVersion
 }
 
 sourceSets {
@@ -146,9 +149,12 @@ if (requireJava11) {
     // We need to change target compatibility only for testing.
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
-} else {
+} else if (requireJava8) {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+} else {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
 }
 
 dependencies {
@@ -169,7 +175,7 @@ dependencies {
     testImplementation 'org.objenesis:objenesis:3.3'
     implementation 'net.bytebuddy:byte-buddy:1.12.21'
 
-    if (requireJava11) {
+    if (requireGroovy3) {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
         testImplementation 'org.spockframework:spock-junit4:2.3-groovy-3.0'
     } else {
