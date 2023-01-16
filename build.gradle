@@ -97,7 +97,7 @@ repositories {
 ext {
     releaseVersion = version
     // Be careful to set androidGradleVersion's default. Bytecode compatibility needs to drop backward compatibility.
-    androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "4.2.0")
+    androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "3.3.2")
 
     requireJava11 = VersionString.parse("8.0.0-alpha09") <= androidGradleVersion
 }
@@ -180,13 +180,6 @@ dependencies {
     // for ApplyPluginSpec
     testRuntimeOnly "com.android.tools.build:gradle:$androidGradleVersion"
     testRuntimeOnly files(createClasspathManifest)
-
-//    def toolingApiBuildersJar = services.get(ModuleRegistry.class)
-//            .getModule("gradle-tooling-api-builders")
-//            .classpath
-//            .asFiles
-//            .first()
-//    testRuntimeOnly(files(toolingApiBuildersJar))
 }
 
 tasks.create("testUnrollAcceptanceTest", Test) {
