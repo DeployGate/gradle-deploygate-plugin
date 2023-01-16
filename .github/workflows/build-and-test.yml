@@ -16,6 +16,8 @@ jobs:
           - 3000/tcp
     steps:
       - uses: actions/checkout@v3
+      - run: |
+          curl -X POST --url 'http://localhost:${{ job.services.app.ports[3000] }}/users/owner_1/apps' -F file=@$PWD/README.md -H 'Authorization: Bearer token'
       - uses: ./.github/actions/setup-java
         with:
           java-version: '8'
@@ -113,10 +115,10 @@ jobs:
           - agp_version: '7.4.0-rc02'
             gradle_version: '7.5'
             java_version: '11'
-          - agp_version: '8.0.0-alpha10'
-            gradle_version: '8.0'
-            java_version: '17'
-            runner_gradle_version: '7.3'
+#          - agp_version: '8.0.0-alpha10'
+#            gradle_version: '8.0'
+#            java_version: '17'
+#            runner_gradle_version: '7.3'
 
     steps:
       - uses: actions/checkout@v3

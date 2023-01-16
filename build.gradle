@@ -1,3 +1,5 @@
+import org.gradle.api.internal.classpath.ModuleRegistry
+
 import java.util.regex.Pattern
 
 buildscript {
@@ -178,6 +180,13 @@ dependencies {
     // for ApplyPluginSpec
     testRuntimeOnly "com.android.tools.build:gradle:$androidGradleVersion"
     testRuntimeOnly files(createClasspathManifest)
+
+//    def toolingApiBuildersJar = services.get(ModuleRegistry.class)
+//            .getModule("gradle-tooling-api-builders")
+//            .classpath
+//            .asFiles
+//            .first()
+//    testRuntimeOnly(files(toolingApiBuildersJar))
 }
 
 tasks.create("testUnrollAcceptanceTest", Test) {
