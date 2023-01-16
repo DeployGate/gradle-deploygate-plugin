@@ -1,4 +1,4 @@
-FROM ruby:3.2.0
+FROM ruby:3.2.0 as dev
 
 ENV RAILS_ENV development
 
@@ -11,7 +11,12 @@ COPY Gemfile.lock /usr/src/app/Gemfile.lock
 
 RUN bundle install
 
-COPY entrypoint.sh /usr/bin/
+COPY ./entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 
-ENTRYPOINT ["entrypoint.sh"]
+CMD ["/usr/bin/entrypoint.sh"]
+
+FROM dev as ghcr
+
+ADD . .
+

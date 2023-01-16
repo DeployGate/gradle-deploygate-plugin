@@ -36,6 +36,7 @@ jobs:
       - uses: docker/build-push-action@v3.3.0
         with:
           context: ./docker/mock-server
+          target: ghcr
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
