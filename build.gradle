@@ -158,14 +158,14 @@ dependencies {
     implementation 'com.google.guava:guava-annotations:r03'
 
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'javax.annotation:javax.annotation-api:1.3.2' // for jdk 11 or over
 
     testImplementation gradleTestKit()
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
 
-    // 2.21.0 will break behaviors of multipart requests :thinking_face:
-    testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
+    testImplementation 'org.objenesis:objenesis:3.3'
+    implementation 'net.bytebuddy:byte-buddy:1.12.21'
 
     if (requireJava11) {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
@@ -203,7 +203,8 @@ project.tasks.withType(Test).configureEach {
     environment([
             "ANDROID_HOME": System.getenv("ANDROID_HOME"),
             "TEST_AGP_VERSION": System.getenv("TEST_AGP_VERSION"),
-            "TEST_GRADLE_VERSION": System.getenv("TEST_GRADLE_VERSION")
+            "TEST_GRADLE_VERSION": System.getenv("TEST_GRADLE_VERSION"),
+            "TEST_SERVER_URL": System.getenv("TEST_SERVER_URL") ?: "http://localhost:3000",
     ])
 }
 

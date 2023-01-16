@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
+import com.deploygate.gradle.plugins.internal.http.ApiClient
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import com.sun.net.httpserver.HttpExchange
@@ -141,22 +142,15 @@ class LoginTask extends DefaultTask {
     }
 
     boolean retrieveCredentialFromKey(String key) {
-        def jsonStr = getCredentialJsonFromKey(key)
-        if (jsonStr) {
-            if (localCredential.saveLocalCredentialFile(jsonStr)) {
+        try {
+            def response = ApiClient.instance.getCredentials(key)
+
+            if (localCredential.saveLocalCredentialFile(response.rawResponse)) {
                 localCredential.load()
                 saved = true
             }
-        }
-    }
-
-    String getCredentialJsonFromKey(key) {
-        try {
-//            HTTPBuilderFactory.restClient(project.deploygate.endpoint).
-//                    get(path: '/cli/credential', query: [key: key], contentType: ContentType.TEXT).data.text
-        } catch (e) {
-            logger.error('failed to retrieve credential: ' + e.message)
-            return null
+        } catch (Throwable th) {
+            logger.error('failed to retrieve credential', th)
         }
     }
 }

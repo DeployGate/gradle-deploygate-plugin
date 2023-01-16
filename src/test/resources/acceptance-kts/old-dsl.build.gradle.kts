@@ -7,9 +7,9 @@ apply(from = "android_block.gradle")
 
 deploygate {
     // for testing
-    endpoint = "http://localhost:8888"
+    endpoint = System.getenv("TEST_SERVER_URL")
 
-    userName = "appOwner"
+    userName = "owner_1"
     token = "api token"
 
     apks {

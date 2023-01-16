@@ -8,8 +8,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+
+import static org.apache.hc.client5.http.entity.mime.HttpMultipartMode.EXTENDED;
 
 public class UploadAppRequest {
+    private static final ContentType UTF8_PLAIN_TEXT = ContentType.create(
+            "text/plain",
+            StandardCharsets.UTF_8
+    );
+
     @NotNull
     private final File appFile;
 
@@ -20,8 +28,16 @@ public class UploadAppRequest {
     @Nullable
     private String releaseNote;
 
+    @Nullable
+    private MultipartEntityBuilder builder;
+
     public UploadAppRequest(@NotNull File appFile) {
+        this(appFile, null);
+    }
+
+    UploadAppRequest(@NotNull File appFile, @Nullable MultipartEntityBuilder builder) {
         this.appFile = appFile;
+        this.builder = builder;
     }
 
     public void setMessage(@Nullable String message) {
@@ -38,20 +54,27 @@ public class UploadAppRequest {
 
     @NotNull
     HttpEntity toEntity() {
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setStrictMode();
+        MultipartEntityBuilder builder;
 
-        builder.addBinaryBody("file", appFile, ContentType.MULTIPART_FORM_DATA, appFile.getName());
+        if (this.builder != null) {
+            builder = this.builder;
+        } else {
+            builder = MultipartEntityBuilder.create();
+        }
+
+        builder.setMode(EXTENDED);
+        builder.setCharset(StandardCharsets.UTF_8);
+        builder.addBinaryBody("file", appFile);
 
         if (message != null) {
-            builder.addPart("message", new StringBody(message, ContentType.MULTIPART_FORM_DATA));
+            builder.addPart("message", new StringBody(message, UTF8_PLAIN_TEXT));
         }
 
         if (distributionKey != null) {
-            builder.addPart("distribution_key", new StringBody(distributionKey, ContentType.MULTIPART_FORM_DATA));
+            builder.addPart("distribution_key", new StringBody(distributionKey, UTF8_PLAIN_TEXT));
 
             if (releaseNote != null) {
-                builder.addPart("release_note", new StringBody(releaseNote, ContentType.MULTIPART_FORM_DATA));
+                builder.addPart("release_note", new StringBody(releaseNote, UTF8_PLAIN_TEXT));
             }
         }
 

@@ -6,6 +6,7 @@ import com.deploygate.gradle.plugins.internal.http.NetworkFailure
 import com.deploygate.gradle.plugins.internal.http.UploadAppRequest
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.google.common.annotations.VisibleForTesting
+import org.apache.hc.client5.http.HttpResponseException
 import org.apache.hc.core5.http.HttpException
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -115,13 +116,13 @@ abstract class UploadArtifactTask extends DefaultTask {
             if (!sent && (Config.shouldOpenAppDetailAfterUpload() || response.typedResponse.application.revision == 1)) {
                 BrowserUtils.openBrowser "${project.deploygate.endpoint}${response.typedResponse.application.path}"
             }
-        } catch (HttpException e) {
+        } catch (HttpResponseException e) {
             logger.debug(e.message, e)
             project.deploygate.notifyServer 'upload_finished', ['error': true, message: e.message]
-            throw new GradleException("${variantName} failed due to ${e.message}")
+            throw new GradleException("${variantName} failed due to: ${e.message}", e)
         } catch (NetworkFailure e) {
             logger.debug(e.message, e)
-            throw new GradleException("${variantName} failed due to ${e.message}")
+            throw new GradleException("${variantName} failed due to ${e.message}", e)
         }
     }
 
