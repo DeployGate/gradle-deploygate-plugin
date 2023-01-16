@@ -1,18 +1,13 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.internal.http.ApiClient
+import com.deploygate.gradle.plugins.internal.http.NetworkFailure
+import com.deploygate.gradle.plugins.internal.http.UploadAppRequest
 import com.deploygate.gradle.plugins.utils.BrowserUtils
-import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
 import com.google.common.annotations.VisibleForTesting
-import com.google.gson.Gson
-import groovyx.net.http.ContentType
-import groovyx.net.http.HttpResponseDecorator
-import groovyx.net.http.HttpResponseException
-import groovyx.net.http.Method
-import org.apache.http.entity.mime.MultipartEntity
-import org.apache.http.entity.mime.content.FileBody
-import org.apache.http.entity.mime.content.StringBody
+import org.apache.hc.client5.http.HttpResponseException
+import org.apache.hc.core5.http.HttpException
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Internal
@@ -20,7 +15,6 @@ import org.gradle.api.tasks.OutputFile
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
-import java.nio.charset.Charset
 
 abstract class UploadArtifactTask extends DefaultTask {
     static class Configuration {
@@ -29,35 +23,9 @@ abstract class UploadArtifactTask extends DefaultTask {
 
         File artifactFile
 
-        UploadParams uploadParams
-    }
-
-    static class UploadParams {
         String message
         String distributionKey
         String releaseNote
-
-        HashMap<String, String> toMap() {
-            HashMap<String, String> params = new HashMap<String, String>()
-            if (message != null) {
-                params.put("message", message)
-            }
-            if (distributionKey != null) {
-                params.put("distribution_key", distributionKey)
-            }
-            if (releaseNote != null) {
-                params.put("release_note", releaseNote)
-            }
-            return params
-        }
-    }
-
-    static UploadParams createUploadParams(@Nonnull NamedDeployment deployment) {
-        return new UploadParams(
-                message: deployment.message,
-                distributionKey: deployment.distribution.key,
-                releaseNote: deployment.distribution.releaseNote
-        )
     }
 
     @Internal
@@ -97,7 +65,7 @@ abstract class UploadArtifactTask extends DefaultTask {
         this.configuration = configuration
     }
 
-    void setpackageApplicationTaskProvider(packageApplicationTaskProvider) {
+    void setPackageApplicationTaskProvider(packageApplicationTaskProvider) {
         this.packageApplicationTaskProvider = packageApplicationTaskProvider
     }
 
@@ -134,18 +102,35 @@ abstract class UploadArtifactTask extends DefaultTask {
 
         onBeforeUpload()
 
-        def response = postRequestToUpload(appOwnerName, apiToken, configuration.artifactFile, configuration.uploadParams)
+        def request = new UploadAppRequest(configuration.artifactFile).tap {
+            it.message = configuration.message
+            it.distributionKey = configuration.distributionKey
+            it.releaseNote = configuration.releaseNote
+        }
 
-        writeUploadResponse(response.data)
+        try {
+            def response = ApiClient.getInstance().uploadApp(appOwnerName, apiToken, request)
+            writeUploadResponse(response.rawResponse)
+            def sent = project.deploygate.notifyServer 'upload_finished', ['path': response.typedResponse.application.path]
 
-        handleResponse(response, response.data)
+            if (!sent && (Config.shouldOpenAppDetailAfterUpload() || response.typedResponse.application.revision == 1)) {
+                BrowserUtils.openBrowser "${project.deploygate.endpoint}${response.typedResponse.application.path}"
+            }
+        } catch (HttpResponseException e) {
+            logger.debug(e.message, e)
+            project.deploygate.notifyServer 'upload_finished', ['error': true, message: e.message]
+            throw new GradleException("${variantName} failed due to: ${e.message}", e)
+        } catch (NetworkFailure e) {
+            logger.debug(e.message, e)
+            throw new GradleException("${variantName} failed due to ${e.message}", e)
+        }
     }
 
     private void onBeforeUpload() {
         project.deploygate.notifyServer 'start_upload', ['length': Long.toString(configuration.artifactFile.length())]
     }
 
-    private void writeUploadResponse(data) {
+    private void writeUploadResponse(String rawResponse) {
         if (!response.parentFile.exists()) {
             response.parentFile.mkdirs()
         }
@@ -153,23 +138,7 @@ abstract class UploadArtifactTask extends DefaultTask {
         if (response.exists()) {
             response.delete()
         }
-        response.write(new Gson().toJson(data))
-    }
-
-    private void handleResponse(HttpResponseDecorator response, data) {
-        if (!(200 <= response.status && response.status < 300) || data.error) {
-            throw new GradleException("${variantName} failed due to ${data.message}")
-        }
-
-        if (data.error)
-            project.deploygate.notifyServer 'upload_finished', ['error': true, message: data.message]
-        else {
-            def sent = project.deploygate.notifyServer 'upload_finished', ['path': data.results.path]
-
-            if (!sent && (Config.shouldOpenAppDetailAfterUpload() || data.results.revision == 1)) {
-                BrowserUtils.openBrowser "${project.deploygate.endpoint}${data.results.path}"
-            }
-        }
+        response.write(rawResponse)
     }
 
     @Nonnull
@@ -196,28 +165,5 @@ abstract class UploadArtifactTask extends DefaultTask {
         }
 
         appOwnerName.trim()
-    }
-
-    private HttpResponseDecorator postRequestToUpload(String appOwnerName, String apiToken, File artifactFile, UploadParams uploadParams) {
-        MultipartEntity entity = new MultipartEntity()
-        Charset charset = Charset.forName('UTF-8')
-
-        entity.addPart("file", new FileBody(artifactFile.getAbsoluteFile()))
-        entity.addPart("token", new StringBody(apiToken, charset))
-
-        def params = uploadParams.toMap()
-
-        for (String key : params.keySet()) {
-            entity.addPart(key, new StringBody(params.get(key), charset))
-        }
-
-        try {
-            HTTPBuilderFactory.restClient(project.deploygate.endpoint).request(Method.POST, ContentType.JSON) { req ->
-                uri.path = "/api/users/${appOwnerName}/apps"
-                req.entity = entity
-            } as HttpResponseDecorator
-        } catch (HttpResponseException e) {
-            e.response
-        }
     }
 }

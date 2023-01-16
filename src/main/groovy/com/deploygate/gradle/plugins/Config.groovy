@@ -3,10 +3,10 @@ package com.deploygate.gradle.plugins
 import com.deploygate.gradle.plugins.internal.VersionString
 
 class Config {
-    static final def DEPLOYGATE_ROOT = 'https://deploygate.com'
-    static final def VERSION
-    static final def VERSION_CODE
-    static final def VERSION_NAME
+    static final String DEPLOYGATE_ROOT = 'https://deploygate.com'
+    static final String VERSION
+    static final String VERSION_CODE
+    static final String VERSION_NAME
 
     static {
         VERSION = Config.class.getResourceAsStream("/VERSION").text.trim()

@@ -1,6 +1,82 @@
+import org.gradle.api.internal.classpath.ModuleRegistry
+
+import java.util.regex.Pattern
+
 buildscript {
     repositories {
         mavenCentral()
+    }
+}
+
+class VersionString implements Comparable<VersionString> {
+    static VersionString parse(String value) {
+        def parts = value.split("-", 2)
+
+        def versions = parts[0].split("\\.")
+
+        int major = Integer.parseInt(versions[0])
+        int minor = Integer.parseInt(versions[1])
+        int patch = Integer.parseInt(versions[2])
+        String channel = null
+        String channelVersion = null
+
+        if (parts.length > 1) {
+            def pattern = Pattern.compile("([a-zA-Z]+)(\\d+)");
+            def m = pattern.matcher(parts[1])
+
+            if (m.matches()) {
+                channel = m.group(1)
+                channelVersion = m.group(2)
+            }
+        }
+
+        return new VersionString(major, minor, patch, channel, channelVersion)
+    }
+
+    private final int major
+    private final int minor
+    private final int patch
+    private final String channel
+    private final String channelVersion
+
+    VersionString(int major, int minor, int patch, String channel, String channelVersion) {
+        this.major = major
+        this.minor = minor
+        this.patch = patch
+        this.channel = channel
+        this.channelVersion = channelVersion
+    }
+
+    @Override
+    int compareTo(VersionString o) {
+        return versionInt() <=> o.versionInt()
+    }
+
+    int versionInt() {
+        def base = 100 * 100 * 100 * major + 100 * 100 * minor + 100 * patch // padding is 1-99
+
+        // 3.0.0 vs 3.0.0-alpha10 -> 3.0.0 is greater
+        switch (channel) {
+            case "alpha":
+                base -= 33
+            case "beta":
+                base -= 33
+            case "rc":
+                base -= 34
+                base += Integer.parseInt(channelVersion)
+                break
+        }
+
+        return base
+    }
+
+    @Override
+    String toString() {
+        if (channel) {
+            return "${major}.${minor}.${patch}-${channel}${channelVersion}"
+        } else {
+            return "${major}.${minor}.${patch}"
+        }
     }
 }
 
@@ -12,9 +88,6 @@ group = 'com.deploygate'
 archivesBaseName = 'gradle'
 version = new File(rootProject.projectDir, 'src/main/resources/VERSION').text.trim()
 
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
-
 repositories {
     google()
     mavenCentral()
@@ -22,9 +95,11 @@ repositories {
 }
 
 ext {
-    agpVersion = '3.3.2'
-    unstableAgpVersion = '4.2.0-beta04'
     releaseVersion = version
+    // Be careful to set androidGradleVersion's default. Bytecode compatibility needs to drop backward compatibility.
+    androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "3.3.2")
+
+    requireJava11 = VersionString.parse("8.0.0-alpha09") <= androidGradleVersion
 }
 
 sourceSets {
@@ -66,26 +141,44 @@ task createClasspathManifest {
     }
 }
 
+if (requireJava11) {
+    // since this version, android gradle plugin artifact is targeting Java 11 and we are using it in testing dependencies.
+    // We need to change target compatibility only for testing.
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+} else {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 dependencies {
     compileOnly gradleApi()
     compileOnly localGroovy()
-    compileOnly "com.android.tools.build:gradle:$unstableAgpVersion"
+    // Don't enable this on the repository because this artifact may include bytecode incompatibility.
+//    compileOnly "com.android.tools.build:gradle:$androidGradleVersion"
+    implementation 'org.jetbrains:annotations:23.1.0'
+    implementation 'com.google.guava:guava-annotations:r03'
 
-    implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
-    implementation 'org.apache.httpcomponents:httpmime:4.2.5'
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'javax.annotation:javax.annotation-api:1.3.2' // for jdk 11 or over
 
     testImplementation gradleTestKit()
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 
-    // 2.21.0 will break behaviors of multipart requests :thinking_face:
-    testImplementation "com.github.tomakehurst:wiremock:2.20.0"
+    testImplementation 'org.objenesis:objenesis:3.3'
+    implementation 'net.bytebuddy:byte-buddy:1.12.21'
 
-    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
+    if (requireJava11) {
+        testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
+        testImplementation 'org.spockframework:spock-junit4:2.3-groovy-3.0'
+    } else {
+        testImplementation 'org.spockframework:spock-core:2.3-groovy-2.5'
+        testImplementation 'org.spockframework:spock-junit4:2.3-groovy-2.5'
+    }
 
     // for ApplyPluginSpec
-    testRuntimeOnly "com.android.tools.build:gradle:$agpVersion"
+    testRuntimeOnly "com.android.tools.build:gradle:$androidGradleVersion"
     testRuntimeOnly files(createClasspathManifest)
 }
 
@@ -102,6 +195,8 @@ tasks.create("testPluginAcceptanceTest", Test) {
 }
 
 project.tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
@@ -111,8 +206,7 @@ project.tasks.withType(Test).configureEach {
             "ANDROID_HOME": System.getenv("ANDROID_HOME"),
             "TEST_AGP_VERSION": System.getenv("TEST_AGP_VERSION"),
             "TEST_GRADLE_VERSION": System.getenv("TEST_GRADLE_VERSION"),
-            "NO_AAB_SUPPORT": false, // TODO Remove this
-            "NO_KTS_SUPPORT": false // TODO Remove this
+            "TEST_SERVER_URL": System.getenv("TEST_SERVER_URL") ?: "http://localhost:3000",
     ])
 }
 

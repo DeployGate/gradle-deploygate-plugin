@@ -1,29 +1,17 @@
 package com.deploygate.gradle.plugins
 
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
-import com.github.tomakehurst.wiremock.junit.WireMockRule
-import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 import javax.annotation.Nonnull
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 
 abstract class AcceptanceTestBaseSpec extends Specification {
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
-
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(
-            options().port(8888)
-    )
 
     @Nonnull
     TestAndroidProject testAndroidProject
@@ -43,18 +31,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         testDeployGatePlugin = new TestDeployGatePlugin()
 
         useProperResource()
-
-        wireMockRule.stubFor(
-                post(urlPathEqualTo("/api/users/appOwner/apps")).willReturn(
-                        ResponseDefinitionBuilder.okForJson([
-                                "error"  : false,
-                                "results": [
-                                        "path"    : "",
-                                        "revision": 2
-                                ]
-                        ])
-                )
-        )
     }
 
     def "check tasks' existence #agpVersion"() {
@@ -160,21 +136,13 @@ abstract class AcceptanceTestBaseSpec extends Specification {
                 .withProjectDir(testProjectDir.root)
                 .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
                 .withGradleVersion(gradleVersion)
-                .withArguments("uploadDeployGateFlavor1Flavor3Debug", "--stacktrace")
+                .withArguments("uploadDeployGateFlavor1Flavor3Debug" /*, "--stacktrace" */)
 
         and:
         def buildResult = runner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         buildResult.task(":uploadDeployGateFlavor1Flavor3Debug").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        missingPart(request, "message")
-        missingPart(request, "distribution_key")
-        missingPart(request, "release_note")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateFlavor1Flavor3Debug/response.json").size() > 0
 
         where:
@@ -182,7 +150,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor1Flavor3Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -197,17 +164,9 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
         and:
         def buildResult = runner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         buildResult.task(":uploadDeployGateAabFlavor1Flavor3Debug").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        missingPart(request, "message")
-        missingPart(request, "distribution_key")
-        missingPart(request, "release_note")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabFlavor1Flavor3Debug/response.json").size() > 0
 
         where:
@@ -229,17 +188,9 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
         and:
         def buildResult = runner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         buildResult.task(":uploadDeployGateFlavor2Flavor3Debug").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        request.getPart("message").body.asString() == "flavor2Flavor3Debug"
-        missingPart(request, "distribution_key")
-        missingPart(request, "release_note")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateFlavor2Flavor3Debug/response.json").size() > 0
 
         where:
@@ -247,7 +198,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor3Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -262,17 +212,9 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
         and:
         def buildResult = runner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         buildResult.task(":uploadDeployGateAabFlavor2Flavor3Debug").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        request.getPart("message").body.asString() == "flavor2Flavor3Debug"
-        missingPart(request, "distribution_key")
-        missingPart(request, "release_note")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabFlavor2Flavor3Debug/response.json").size() > 0
 
         where:
@@ -294,17 +236,9 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
         and:
         def buildResult = runner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         buildResult.task(":uploadDeployGateFlavor1Flavor4Debug").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        request.getPart("message").body.asString() == "flavor1Flavor4Debug"
-        missingPart(request, "distribution_key")
-        missingPart(request, "release_note")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateFlavor1Flavor4Debug/response.json").size() > 0
 
         where:
@@ -312,7 +246,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor1Flavor4Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -323,21 +256,13 @@ abstract class AcceptanceTestBaseSpec extends Specification {
                 .withProjectDir(testProjectDir.root)
                 .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
                 .withGradleVersion(gradleVersion)
-                .withArguments("uploadDeployGateAabFlavor1Flavor4Debug" /*, "--stacktrace" */)
+                .withArguments("uploadDeployGateAabFlavor1Flavor4Debug", "--stacktrace")
 
         and:
         def buildResult = runner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         buildResult.task(":uploadDeployGateAabFlavor1Flavor4Debug").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        request.getPart("message").body.asString() == "flavor1Flavor4Debug"
-        missingPart(request, "distribution_key")
-        missingPart(request, "release_note")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabFlavor1Flavor4Debug/response.json").size() > 0
 
         where:
@@ -368,7 +293,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor4Debug aab should fail unless bundling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -415,18 +339,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
         and:
         def uploadBuildResult = uploadRunner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         assembleBuildResult.task(":assembleFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
         uploadBuildResult.task(":uploadDeployGateFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        request.getPart("message").body.asString() == "flavor2Flavor4Debug"
-        missingPart(request, "distribution_key")
-        missingPart(request, "release_note")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateFlavor2Flavor4Debug/response.json").size() > 0
 
         where:
@@ -434,7 +350,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "flavor2Flavor4Debug aab require bundling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -458,18 +373,10 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
         and:
         def uploadBuildResult = uploadRunner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         assembleBuildResult.task(":bundleFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
         uploadBuildResult.task(":uploadDeployGateAabFlavor2Flavor4Debug").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        request.getPart("message").body.asString() == "flavor2Flavor4Debug"
-        missingPart(request, "distribution_key")
-        missingPart(request, "release_note")
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabFlavor2Flavor4Debug/response.json").size() > 0
 
         where:
@@ -487,21 +394,13 @@ abstract class AcceptanceTestBaseSpec extends Specification {
                 .withProjectDir(testProjectDir.root)
                 .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
                 .withGradleVersion(gradleVersion)
-                .withArguments("uploadDeployGateCustomApk" /*, "--stacktrace" */)
+                .withArguments("uploadDeployGateCustomApk", "--stacktrace")
 
         and:
         def buildResult = runner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         buildResult.task(":uploadDeployGateCustomApk").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        request.getPart("message").body.asString() == "custom message"
-        request.getPart("distribution_key").body.asString() == "custom distributionKey"
-        request.getPart("release_note").body.asString() == "custom releaseNote"
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateCustomApk/response.json").size() > 0
 
         where:
@@ -509,7 +408,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
     }
 
-    @IgnoreIf({ Boolean.valueOf(env["NO_AAB_SUPPORT"]) })
     def "customApk aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
@@ -520,29 +418,17 @@ abstract class AcceptanceTestBaseSpec extends Specification {
                 .withProjectDir(testProjectDir.root)
                 .withPluginClasspath(testDeployGatePlugin.loadPluginClasspath())
                 .withGradleVersion(gradleVersion)
-                .withArguments("uploadDeployGateAabCustomApk" /*, "--stacktrace" */)
+                .withArguments("uploadDeployGateAabCustomApk", "--stacktrace")
 
         and:
         def buildResult = runner.build()
-        def result = wireMockRule.findRequestsMatching(postRequestedFor(urlPathEqualTo("/api/users/appOwner/apps")).build())
-        def request = result.requests.first()
 
         expect:
         buildResult.task(":uploadDeployGateAabCustomApk").outcome == TaskOutcome.SUCCESS
-        result.requests.size() == 1
-        request.getPart("token").body.asString() == "api token"
-        request.getPart("file").body.present
-        request.getPart("message").body.asString() == "custom message"
-        request.getPart("distribution_key").body.asString() == "custom distributionKey"
-        request.getPart("release_note").body.asString() == "custom releaseNote"
         new File(testProjectDir.root, "build/deploygate/uploadDeployGateAabCustomApk/response.json").size() > 0
 
         where:
         agpVersion = System.getenv("TEST_AGP_VERSION")
         gradleVersion = System.getenv("TEST_GRADLE_VERSION")
-    }
-
-    private static boolean missingPart(LoggedRequest request, String name) {
-        return request.parts.isEmpty() || !request.parts.any { it.name == name }
     }
 }

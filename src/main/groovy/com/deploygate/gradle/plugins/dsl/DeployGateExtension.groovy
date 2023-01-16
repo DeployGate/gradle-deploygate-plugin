@@ -3,9 +3,10 @@ package com.deploygate.gradle.plugins.dsl
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
-import com.deploygate.gradle.plugins.utils.HTTPBuilderFactory
+import com.deploygate.gradle.plugins.internal.annotation.Internal
+import com.deploygate.gradle.plugins.internal.http.ApiClient
+import com.deploygate.gradle.plugins.internal.http.NotifyActionRequest
 import com.google.common.annotations.VisibleForTesting
-import groovyx.net.http.ContentType
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
@@ -16,9 +17,6 @@ class DeployGateExtension implements ExtensionSyntax {
     String apiToken
 
     String appOwnerName
-
-    @Deprecated
-    String endpoint = Config.DEPLOYGATE_ROOT
 
     @Deprecated
     String notifyKey = null
@@ -105,6 +103,18 @@ class DeployGateExtension implements ExtensionSyntax {
         return result
     }
 
+    @Internal
+    @Deprecated
+    String getEndpoint() {
+        return ApiClient.endpoint
+    }
+
+    @Internal
+    @Deprecated
+    void setEndpoint(String value) {
+        ApiClient.endpoint = value
+    }
+
     @VisibleForTesting
     static void mergeDeployments(@Nonnull NamedDeployment base, @Nullable NamedDeployment other) {
         base.sourceFile = base.sourceFile ?: other.sourceFile
@@ -145,16 +155,17 @@ class DeployGateExtension implements ExtensionSyntax {
             return
         }
 
-        def query = ['key': notifyKey, 'command_action': action]
+        def request = new NotifyActionRequest(notifyKey, action)
 
         if (data) {
-            query = query + data
+            data.each {
+                request.setParameter(it.key, it.value)
+            }
         }
 
         try {
-            HTTPBuilderFactory.httpBuilder(endpoint).post path: "/cli/notify",
-                    body: query, requestContentType: ContentType.URLENC
-        } catch (ignored) {
+            ApiClient.getInstance().notify(request)
+        } catch (Throwable ignore) {
         }
     }
 }

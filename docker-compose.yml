@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: ./docker/mock-server
+      target: dev
+    tty: true
+    volumes:
+      - app-bundle:/usr/src/app/vendor/bundle
+      - app-pid-data:/usr/src/app/tmp/pids
+      - ./docker/mock-server:/usr/src/app
+    ports:
+      - '3000:3000'
+
+volumes:
+  app-pid-data:
+    driver: local
+  app-bundle:
+    driver: local
