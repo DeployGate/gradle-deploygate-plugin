@@ -9,12 +9,19 @@ on:
 jobs:
   unit-test:
     runs-on: ubuntu-latest
+    services:
+      app:
+        image: ghcr.io/deploygate/gradle-plugin-mock-server
+        ports:
+          - 3000/tcp
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-java
         with:
           java-version: '8'
       - run: ./gradlew publishToMavenLocal test
+        env:
+          TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
       - uses: actions/upload-artifact@v3
         if: always()
         with:
@@ -28,12 +35,19 @@ jobs:
 
   acceptance-test:
     runs-on: ubuntu-latest
+    services:
+      app:
+        image: ghcr.io/deploygate/gradle-plugin-mock-server
+        ports:
+          - 3000/tcp
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-java
         with:
           java-version: '8'
       - run: ./gradlew testUnrollAcceptanceTest
+        env:
+          TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
       - uses: actions/upload-artifact@v2
         if: always()
         with:
@@ -47,6 +61,11 @@ jobs:
 
   acceptance-test-runtime-env:
     runs-on: ubuntu-latest
+    services:
+      app:
+        image: ghcr.io/deploygate/gradle-plugin-mock-server
+        ports:
+          - 3000/tcp
     strategy:
       fail-fast: false
       matrix:
@@ -111,6 +130,7 @@ jobs:
         env:
           TEST_AGP_VERSION: ${{ matrix.agp_version }}
           TEST_GRADLE_VERSION: ${{ matrix.gradle_version }}
+          TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
       - uses: actions/upload-artifact@v2
         if: always()
         with:
