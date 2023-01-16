@@ -81,6 +81,16 @@ Android Gradle Plugin | Gradle DeployGate Plugin
 7.1.x (Bumblebee) | 2.4.0から
 7.2.x (Chipmunk) | 2.4.0から
 7.3.x (Dolphin) | 2.4.0から
+7.4.x (Electric Eel) | 2.4.0から
+
+### Canary/Beta サポート情報
+
+ [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) を参考にしてください
+
+| JRE | Android Gradle Plugin    | Gradle DeployGate Plugin |
+|:----|:-------------------------|:-------------------------|
+| 11  | 8.0.x-alpha06 (Flamingo) | 2.5.0 is OK              |
+| 17  | 8.0.x-alpha10 (Flamingo) | 2.5.0 is OK              |
 
 ## Usage
 
