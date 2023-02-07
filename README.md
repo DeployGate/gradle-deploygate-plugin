@@ -281,6 +281,10 @@ You can try this plugin locally by following the steps below.
 And also, please make sure your changes pass unit tests and acceptance tests.  
 
 ```bash
+# please make sure the mock server has been launched 
+docker compose build
+docker compose up -d
+
 ./gradlew test acceptanceTest
 ```
 

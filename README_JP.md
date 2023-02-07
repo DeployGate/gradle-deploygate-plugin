@@ -275,6 +275,10 @@ jitpack.io は初回のリクエストを受けてからスナップショット
 また変更したあとはユニットテストと受け入れテストが通ることを確認してください。
 
 ```bash
+# Mock サーバーを起動させてください 
+docker compose build
+docker compose up -d
+
 ./gradlew test acceptanceTest
 ```
 
