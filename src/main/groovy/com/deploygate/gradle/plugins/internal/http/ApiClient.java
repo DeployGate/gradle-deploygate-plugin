@@ -116,6 +116,16 @@ public class ApiClient {
                 build();
     }
 
+    /**
+     * Upload the application file to the app owner space
+     *
+     * @param appOwnerName an app owner name
+     * @param apiToken an authorization token
+     * @param request a request to the server that must contain a file
+     * @return a successful response that contains a typed json.
+     * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
+     * @throws NetworkFailure is thrown if a network trouble happens
+     */
     @SuppressWarnings("RedundantThrows")
     @NotNull
     public Response<UploadAppResponse> uploadApp(@NotNull String appOwnerName, @NotNull String apiToken, @NotNull UploadAppRequest request) throws HttpResponseException, NetworkFailure {
@@ -132,6 +142,13 @@ public class ApiClient {
         }
     }
 
+    /**
+     * Notify the plugin event to the server
+     *
+     * @param request a request to the server that must contain an action name
+     * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
+     * @throws NetworkFailure is thrown if a network trouble happens
+     */
     @SuppressWarnings("RedundantThrows")
     public void notify(@NotNull NotifyActionRequest request) throws HttpResponseException, NetworkFailure {
         HttpPost httpPost = new HttpPost(endpoint + "/cli/notify");
@@ -146,6 +163,13 @@ public class ApiClient {
         }
     }
 
+    /**
+     * Get the credentials from the server
+     *
+     * @param notifyKey a notification key. In general, this is generated in the authentication flow.
+     * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
+     * @throws NetworkFailure is thrown if a network trouble happens
+     */
     @NotNull
     public Response<GetCredentialsResponse> getCredentials(@NotNull String notifyKey) throws HttpResponseException, NetworkFailure {
         URI uri;

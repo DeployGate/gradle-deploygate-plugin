@@ -61,10 +61,6 @@ class DeployGatePlugin implements Plugin<Project> {
     }
 
     private void onProjectEvaluated(Project project) {
-        project.gradle.buildFinished { buildResult ->
-            project.deploygate.notifyServer('finished', [result: Boolean.toString(buildResult.failure == null)])
-        }
-
         processor.registerLoginTask()
         processor.registerLogoutTask()
 

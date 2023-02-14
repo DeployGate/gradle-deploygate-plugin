@@ -116,12 +116,9 @@ abstract class UploadArtifactTask extends DefaultTask {
             if (!sent && (Config.shouldOpenAppDetailAfterUpload() || response.typedResponse.application.revision == 1)) {
                 BrowserUtils.openBrowser "${project.deploygate.endpoint}${response.typedResponse.application.path}"
             }
-        } catch (HttpResponseException e) {
+        } catch (Throwable e) {
             logger.debug(e.message, e)
             project.deploygate.notifyServer 'upload_finished', ['error': true, message: e.message]
-            throw new GradleException("${variantName} failed due to: ${e.message}", e)
-        } catch (NetworkFailure e) {
-            logger.debug(e.message, e)
             throw new GradleException("${variantName} failed due to ${e.message}", e)
         }
     }

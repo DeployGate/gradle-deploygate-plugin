@@ -150,9 +150,16 @@ class DeployGateExtension implements ExtensionSyntax {
         return deployment
     }
 
-    def notifyServer(String action, HashMap<String, String> data = null) {
+    /**
+     * Notify the plugin's action to the server. Never throw any exception.
+     *
+     * @param action an action name in plugin lifecycle.
+     * @param data a map of key-values
+     * @return true if the request has been processed regardless of its result, otherwise false.
+     */
+    boolean notifyServer(String action, HashMap<String, String> data = null) {
         if (!notifyKey) {
-            return
+            return false
         }
 
         def request = new NotifyActionRequest(notifyKey, action)
@@ -167,5 +174,7 @@ class DeployGateExtension implements ExtensionSyntax {
             ApiClient.getInstance().notify(request)
         } catch (Throwable ignore) {
         }
+
+        return true
     }
 }
