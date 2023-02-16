@@ -2,13 +2,22 @@ package com.deploygate.gradle.plugins.credentials
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import org.jetbrains.annotations.VisibleForTesting
 
 class CliCredentialStore {
     def store
     String name
     String token
 
+    private final File baseDir
+
     CliCredentialStore() {
+        this(new File(System.getProperty('user.home'), '.dg'))
+    }
+
+    @VisibleForTesting
+    CliCredentialStore(File baseDir) {
+        this.baseDir = baseDir
         load()
     }
 
@@ -52,15 +61,10 @@ class CliCredentialStore {
     }
 
     private boolean ensureDirectoryWritable() {
-        File dir = baseDir()
-        dir.exists() || dir.mkdirs()
+        baseDir.exists() || baseDir.mkdirs()
     }
 
     def localCredentialFile() {
-        new File(baseDir(), 'credentials')
-    }
-
-    def baseDir() {
-        new File(System.getProperty('user.home'), '.dg')
+        new File(baseDir, 'credentials')
     }
 }

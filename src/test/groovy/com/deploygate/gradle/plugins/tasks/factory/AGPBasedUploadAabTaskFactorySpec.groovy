@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.artifacts.DirectAabInfo
 import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
+import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
@@ -32,7 +33,7 @@ class AGPBasedUploadAabTaskFactorySpec extends Specification {
         GradleCompat.init(project)
         deployments = project.container(NamedDeployment)
 
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
     }
 
     def "registerAggregatedUploadApkTask should not be supported"() {

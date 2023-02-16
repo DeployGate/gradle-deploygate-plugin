@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.tasks.factory
 
+import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
@@ -97,7 +98,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         given:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         deployments.create("dep1")
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
 
         and:
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
@@ -118,7 +119,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         given:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         deployments.create("dep1")
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
 
         and:
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)
@@ -140,7 +141,7 @@ class DSLBasedUploadApkTaskFactorySpec extends Specification {
         given:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         deployments.create("dep1")
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
 
         and:
         dslBasedUploadApkTaskFactory = new DSLBasedUploadApkTaskFactory(project)

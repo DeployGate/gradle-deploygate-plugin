@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins.dsl
 
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.TestSystemEnv
+import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -46,7 +47,7 @@ class DeployGateExtensionSpec extends Specification {
 
         and:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
         project.evaluate()
 
         when:
@@ -101,7 +102,7 @@ class DeployGateExtensionSpec extends Specification {
 
         and:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
         project.evaluate()
 
         when:
@@ -161,7 +162,7 @@ class DeployGateExtensionSpec extends Specification {
 
         and:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
         project.evaluate()
 
         when:
@@ -212,7 +213,7 @@ class DeployGateExtensionSpec extends Specification {
 
         and:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments))
+        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
         project.evaluate()
 
         when:
