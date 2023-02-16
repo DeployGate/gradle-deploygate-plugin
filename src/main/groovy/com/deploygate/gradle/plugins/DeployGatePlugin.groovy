@@ -51,12 +51,16 @@ class DeployGatePlugin implements Plugin<Project> {
         initProcessor(project)
 
         project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) {
+            it.description = "Check the configured credentials and launch the authentication flow if they are not enough."
+
             it.group = Constants.TASK_GROUP_NAME
             it.deployGateExtension = extension
             it.credentialStore = credentialStore
         }
 
         project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) {
+            it.description = "Remove the local persisted credentials"
+
             it.group = Constants.TASK_GROUP_NAME
             it.credentialStore = credentialStore
         }

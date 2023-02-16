@@ -13,5 +13,6 @@ class LogoutTask extends DefaultTask {
     @TaskAction
     def remove() {
         credentialStore.delete()
+        logger.info("The local credentials have been removed.")
     }
 }
