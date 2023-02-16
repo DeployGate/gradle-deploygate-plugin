@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins
 
+import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.DeprecationLogger
@@ -8,10 +9,12 @@ import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.tasks.Constants
 import com.deploygate.gradle.plugins.tasks.LoginTask
+import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.factory.DeployGateTaskFactory
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.annotations.NotNull
 
 import javax.annotation.Nonnull
 
@@ -40,15 +43,22 @@ class DeployGatePlugin implements Plugin<Project> {
     void apply(Project project) {
         DeprecationLogger.reset()
 
-        def extension = setupExtension(project)
+        def credentialStore = new CliCredentialStore()
+        def extension = setupExtension(project, credentialStore)
 
         GradleCompat.init(project)
         AndroidGradlePlugin.init(project)
         initProcessor(project)
 
         project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) {
-            group = Constants.TASK_GROUP_NAME
-            deployGateExtension = extension
+            it.group = Constants.TASK_GROUP_NAME
+            it.deployGateExtension = extension
+            it.credentialStore = credentialStore
+        }
+
+        project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) {
+            it.group = Constants.TASK_GROUP_NAME
+            it.credentialStore = credentialStore
         }
 
         project.afterEvaluate { Project evaluatedProject ->
@@ -56,9 +66,9 @@ class DeployGatePlugin implements Plugin<Project> {
         }
     }
 
-    private static DeployGateExtension setupExtension(Project project) {
+    private static DeployGateExtension setupExtension(@NotNull Project project, @NotNull CliCredentialStore credentialStore) {
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        DeployGateExtension extension = new DeployGateExtension(project, deployments)
+        DeployGateExtension extension = new DeployGateExtension(project, deployments, credentialStore)
         project.extensions.add(EXTENSION_NAME, extension)
         return extension
     }
@@ -72,8 +82,6 @@ class DeployGatePlugin implements Plugin<Project> {
     }
 
     private void onProjectEvaluated(Project project) {
-        processor.registerLogoutTask()
-
         processor.declaredNames.forEach { variantOrCustomName ->
             processor.registerDeclarationAwareUploadApkTask(variantOrCustomName)
             processor.registerDeclarationAwareUploadAabTask(variantOrCustomName)

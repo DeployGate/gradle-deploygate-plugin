@@ -28,10 +28,17 @@ class DeployGateExtension implements ExtensionSyntax {
     @Nonnull
     private final NamedDomainObjectContainer<NamedDeployment> deployments
 
-    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments) {
+    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments, @Nonnull CliCredentialStore credentialStore) {
         this.project = project
         this.deployments = deployments
-        configureDefaultValues()
+
+        this.appOwnerName = [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1), credentialStore.name].find {
+            it != null
+        }
+
+        this.apiToken = [System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN), credentialStore.token].find {
+            it != null
+        }
     }
 
     // backward compatibility
@@ -179,17 +186,5 @@ class DeployGateExtension implements ExtensionSyntax {
         }
 
         return true
-    }
-
-    private void configureDefaultValues() {
-        def credentialStore = new CliCredentialStore()
-
-        this.appOwnerName = [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1), credentialStore.name].find {
-            it != null
-        }
-
-        this.apiToken = [System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN), credentialStore.token].find {
-            it != null
-        }
     }
 }

@@ -12,7 +12,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
 import java.util.concurrent.CountDownLatch
@@ -23,38 +22,36 @@ class LoginTask extends DefaultTask {
 
     @Internal
     DeployGateExtension deployGateExtension
+    
+    @Internal
+    CliCredentialStore credentialStore
 
     private CountDownLatch latch
-
-    @NotNull
-    private CliCredentialStore localCredential
 
     @Nullable
     private String onetimeKey
 
     @TaskAction
     def setup() {
-        localCredential = new CliCredentialStore()
-
         if (!(deployGateExtension.appOwnerName && deployGateExtension.apiToken)) {
             if (!setupCredential()) {
                 throw new RuntimeException('We could not retrieve DeployGate credentials. Please make sure you have configured app owner name and api token or any browser application is available to launch the authentication flow.')
             }
 
-            println "Welcome ${localCredential.name}!"
+            println "Welcome ${credentialStore.name}!"
 
-            logger.info("The authentication has succeeded. The application owner name is ${localCredential.name}.")
+            logger.info("The authentication has succeeded. The application owner name is ${credentialStore.name}.")
 
             // We should be carefully handling these values to avoid the inconsistent credentials and non-idempotency.
-            if (deployGateExtension.appOwnerName && deployGateExtension.appOwnerName != localCredential.name) {
+            if (deployGateExtension.appOwnerName && deployGateExtension.appOwnerName != credentialStore.name) {
                 logger.error("Another application owner name (${deployGateExtension.appOwnerName}) has already been configured")
                 throw new GradleException("The authentication has succeeded but the configured application owner name conflicts with the credentials that currently retrieved.")
-            } else if (deployGateExtension.apiToken && deployGateExtension.apiToken != localCredential.token) {
+            } else if (deployGateExtension.apiToken && deployGateExtension.apiToken != credentialStore.token) {
                 throw new GradleException("The authentication has succeeded but the configured api token doesn't match with the credentials that currently retrieved")
             }
 
-            deployGateExtension.setAppOwnerName(localCredential.name)
-            deployGateExtension.setApiToken(localCredential.token)
+            deployGateExtension.setAppOwnerName(credentialStore.name)
+            deployGateExtension.setApiToken(credentialStore.token)
         }
     }
 
@@ -161,10 +158,10 @@ class LoginTask extends DefaultTask {
             return false
         }
 
-        if (!localCredential.saveLocalCredentialFile(response.rawResponse)) {
+        if (!credentialStore.savecredentialStoreFile(response.rawResponse)) {
             throw new GradleException("failed to save the fetched credentials")
         }
 
-        return localCredential.load()
+        return credentialStore.load()
     }
 }

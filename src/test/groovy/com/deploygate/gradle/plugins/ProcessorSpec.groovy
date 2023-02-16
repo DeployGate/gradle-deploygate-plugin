@@ -3,7 +3,6 @@ package com.deploygate.gradle.plugins
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
 
-import com.deploygate.gradle.plugins.tasks.factory.LogoutTaskFactory
 import com.deploygate.gradle.plugins.tasks.factory.UploadArtifactTaskFactory
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder

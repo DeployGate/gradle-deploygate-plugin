@@ -20,9 +20,6 @@ class Processor {
     private final Project project
 
     @Nonnull
-    private final LogoutTaskFactory logoutTaskFactory
-
-    @Nonnull
     private final UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory
 
     @Nonnull
@@ -39,7 +36,6 @@ class Processor {
     Processor(@Nonnull Project project) {
         this(
                 project,
-                new LogoutTaskFactoryImpl(project),
                 new AGPBasedUploadApkTaskFactory(project),
                 new AGPBasedUploadAabTaskFactory(project),
                 new DSLBasedUploadApkTaskFactory(project),
@@ -50,14 +46,12 @@ class Processor {
     @VisibleForTesting
     Processor(
             @Nonnull Project project,
-            @Nonnull LogoutTaskFactory logoutTaskFactory,
             @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory,
             @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadAabTaskFactory,
             @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadApkTaskFactory,
             @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadAabTaskFactory
     ) {
         this.project = project
-        this.logoutTaskFactory = logoutTaskFactory
         this.applicationVariantBasedUploadApkTaskFactory = applicationVariantBasedUploadApkTaskFactory
         this.applicationVariantBasedUploadAabTaskFactory = applicationVariantBasedUploadAabTaskFactory
         this.stringBasedUploadApkTaskFactory = stringBasedUploadApkTaskFactory
@@ -75,10 +69,6 @@ class Processor {
         } else {
             project.logger.warn("the given argument was empty")
         }
-    }
-
-    def registerLogoutTask() {
-        logoutTaskFactory.registerLogoutTask()
     }
 
     def registerDeclarationAwareUploadApkTask(String variantOrCustomName) {

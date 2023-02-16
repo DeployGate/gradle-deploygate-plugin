@@ -4,4 +4,6 @@ public class Constants {
     public static final String TASK_GROUP_NAME = "DeployGate";
 
     public static final String LOGIN_TASK_NAME = "loginDeployGate";
+    public static final String LOGOUT_TASK_NAME = "logoutDeployGate";
+
 }
