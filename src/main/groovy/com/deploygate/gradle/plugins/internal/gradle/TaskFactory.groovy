@@ -35,13 +35,4 @@ class TaskFactory {
             return project.tasks.register(taskName, klass)
         }
     }
-
-    final boolean exists(@Nonnull String taskName) {
-        return findByName(taskName)
-    }
-
-    @Nullable
-    private Task findByName(@Nonnull String taskName) {
-        return project.tasks.findByName(taskName)
-    }
 }

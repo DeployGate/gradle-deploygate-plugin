@@ -6,6 +6,9 @@ import com.deploygate.gradle.plugins.internal.DeprecationLogger
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
+import com.deploygate.gradle.plugins.tasks.Constants
+import com.deploygate.gradle.plugins.tasks.LoginTask
+import com.deploygate.gradle.plugins.tasks.factory.DeployGateTaskFactory
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -37,19 +40,27 @@ class DeployGatePlugin implements Plugin<Project> {
     void apply(Project project) {
         DeprecationLogger.reset()
 
-        setupExtension(project)
+        def extension = setupExtension(project)
+
         GradleCompat.init(project)
         AndroidGradlePlugin.init(project)
         initProcessor(project)
+
+        project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) {
+            group = Constants.TASK_GROUP_NAME
+            deployGateExtension = extension
+        }
 
         project.afterEvaluate { Project evaluatedProject ->
             onProjectEvaluated(evaluatedProject)
         }
     }
 
-    private static void setupExtension(Project project) {
+    private static DeployGateExtension setupExtension(Project project) {
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add(EXTENSION_NAME, new DeployGateExtension(project, deployments))
+        DeployGateExtension extension = new DeployGateExtension(project, deployments)
+        project.extensions.add(EXTENSION_NAME, extension)
+        return extension
     }
 
     private void initProcessor(@Nonnull Project project) {
@@ -61,7 +72,6 @@ class DeployGatePlugin implements Plugin<Project> {
     }
 
     private void onProjectEvaluated(Project project) {
-        processor.registerLoginTask()
         processor.registerLogoutTask()
 
         processor.declaredNames.forEach { variantOrCustomName ->
