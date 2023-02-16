@@ -59,7 +59,7 @@ class DeployGatePlugin implements Plugin<Project> {
         }
 
         project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) {
-            it.description = "Remove the local persisted credentials"
+            it.description = "Remove the local persisted credentials."
 
             it.group = Constants.TASK_GROUP_NAME
             it.credentialStore = credentialStore
@@ -72,9 +72,8 @@ class DeployGatePlugin implements Plugin<Project> {
 
     private static DeployGateExtension setupExtension(@NotNull Project project, @NotNull CliCredentialStore credentialStore) {
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        DeployGateExtension extension = new DeployGateExtension(project, deployments, credentialStore)
-        project.extensions.add(EXTENSION_NAME, extension)
-        return extension
+        // TODO we should use ExtensionSyntax as the 1st argument but we need to investigate the expected side effects first.
+        return project.extensions.add(DeployGateExtension, EXTENSION_NAME, new DeployGateExtension(project, deployments, credentialStore))
     }
 
     private void initProcessor(@Nonnull Project project) {

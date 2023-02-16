@@ -12,7 +12,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.annotations.Nullable
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -22,14 +21,15 @@ class LoginTask extends DefaultTask {
 
     @Internal
     DeployGateExtension deployGateExtension
-    
+
     @Internal
     CliCredentialStore credentialStore
 
-    private CountDownLatch latch
+    @Internal
+    String onetimeKey
 
-    @Nullable
-    private String onetimeKey
+    @Internal
+    CountDownLatch countDownLatch
 
     @TaskAction
     def setup() {
@@ -42,16 +42,15 @@ class LoginTask extends DefaultTask {
 
             logger.info("The authentication has succeeded. The application owner name is ${credentialStore.name}.")
 
-            // We should be carefully handling these values to avoid the inconsistent credentials and non-idempotency.
-            if (deployGateExtension.appOwnerName && deployGateExtension.appOwnerName != credentialStore.name) {
-                logger.error("Another application owner name (${deployGateExtension.appOwnerName}) has already been configured")
-                throw new GradleException("The authentication has succeeded but the configured application owner name conflicts with the credentials that currently retrieved.")
-            } else if (deployGateExtension.apiToken && deployGateExtension.apiToken != credentialStore.token) {
-                throw new GradleException("The authentication has succeeded but the configured api token doesn't match with the credentials that currently retrieved")
+            // We can set the values iff it's not set yet because of the idempotency.
+
+            if (!deployGateExtension.appOwnerName) {
+                deployGateExtension.setAppOwnerName(credentialStore.name)
             }
 
-            deployGateExtension.setAppOwnerName(credentialStore.name)
-            deployGateExtension.setApiToken(credentialStore.token)
+            if (!deployGateExtension.apiToken) {
+                deployGateExtension.setApiToken(credentialStore.token)
+            }
         }
     }
 
@@ -111,36 +110,38 @@ class LoginTask extends DefaultTask {
     }
 
     def startLocalServer() {
-        latch = new CountDownLatch(1)
+        countDownLatch = new CountDownLatch(1)
 
         def address = new InetSocketAddress("localhost", 0)
         def httpServer = HttpServer.create(address, 0)
 
-        httpServer.createContext "/token", { HttpExchange httpExchange ->
-            try {
-                httpExchange.sendResponseHeaders(204, -1)
-                httpExchange.close()
+        httpServer.createContext("/token", { HttpExchange httpExchange ->
+            httpExchange.sendResponseHeaders(204, -1)
+            httpExchange.close()
 
+            logger.info("Got a response: ${httpExchange.requestURI.query}")
+
+            try {
                 def query = UrlUtils.parseQueryString(httpExchange.requestURI.query)
 
                 if (!query.containsKey('cancel')) {
                     onetimeKey = query.key
                 }
             } finally {
-                latch.countDown()
+                countDownLatch.countDown()
             }
-        }
+        })
         httpServer.start()
         httpServer
     }
 
 
     def waitForResponse() {
-        def timeout = 180 * 1000
+        def timeout = TimeUnit.MINUTES.toMillis(3)
         def start = System.currentTimeMillis()
 
-        while (!latch.await(5, TimeUnit.SECONDS)) {
-            print "."
+        while (!countDownLatch.await(5, TimeUnit.SECONDS)) {
+            logger.info(".")
 
             if (System.currentTimeMillis() - start > timeout) {
                 throw new TimeoutException('Timeout while waiting for browser response')
@@ -158,7 +159,7 @@ class LoginTask extends DefaultTask {
             return false
         }
 
-        if (!credentialStore.savecredentialStoreFile(response.rawResponse)) {
+        if (!credentialStore.saveLocalCredentialFile(response.rawResponse)) {
             throw new GradleException("failed to save the fetched credentials")
         }
 
