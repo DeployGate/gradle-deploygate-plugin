@@ -42,8 +42,7 @@ class DeployGatePlugin implements Plugin<Project> {
     void apply(Project project) {
         DeprecationLogger.reset()
 
-        def credentialStore = new CliCredentialStore()
-        setupExtension(project, credentialStore)
+        setupExtension(project)
 
         GradleCompat.init(project)
         AndroidGradlePlugin.init(project)
@@ -54,14 +53,13 @@ class DeployGatePlugin implements Plugin<Project> {
 
             it.group = Constants.TASK_GROUP_NAME
             it.deployGateExtension = project.deploygate
-            it.credentialStore = credentialStore
         }
 
         project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) {
             it.description = "Remove the local persisted credentials."
 
             it.group = Constants.TASK_GROUP_NAME
-            it.credentialStore = credentialStore
+            it.credentialStore = project.deploygate.credentialStore
         }
 
         project.afterEvaluate { Project evaluatedProject ->
@@ -69,7 +67,8 @@ class DeployGatePlugin implements Plugin<Project> {
         }
     }
 
-    private static void setupExtension(@NotNull Project project, @NotNull CliCredentialStore credentialStore) {
+    private static void setupExtension(@NotNull Project project) {
+        CliCredentialStore credentialStore = new CliCredentialStore()
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         // TODO we should use ExtensionSyntax as the 1st argument but we need to investigate the expected side effects first.
         project.extensions.create(DeployGateExtension, EXTENSION_NAME, DeployGateExtension, project, deployments, credentialStore)

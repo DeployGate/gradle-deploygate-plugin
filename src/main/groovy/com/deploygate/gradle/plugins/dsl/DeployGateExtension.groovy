@@ -27,9 +27,13 @@ class DeployGateExtension implements ExtensionSyntax {
     @Nonnull
     private final NamedDomainObjectContainer<NamedDeployment> deployments
 
+    @Nonnull
+    private final CliCredentialStore credentialStore;
+
     DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments, @Nonnull CliCredentialStore credentialStore) {
         this.project = project
         this.deployments = deployments
+        this.credentialStore = credentialStore
 
         this.appOwnerName = [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1), credentialStore.name].find {
             it != null
@@ -185,5 +189,11 @@ class DeployGateExtension implements ExtensionSyntax {
         }
 
         return true
+    }
+
+    @Internal
+    @Nonnull
+    CliCredentialStore getCredentialStore() {
+        return credentialStore
     }
 }

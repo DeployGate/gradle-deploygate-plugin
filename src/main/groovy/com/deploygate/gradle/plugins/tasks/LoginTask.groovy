@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins.tasks
 
-import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.internal.http.ApiClient
 import com.deploygate.gradle.plugins.internal.http.GetCredentialsResponse
@@ -23,9 +22,6 @@ class LoginTask extends DefaultTask {
     DeployGateExtension deployGateExtension
 
     @Internal
-    CliCredentialStore credentialStore
-
-    @Internal
     String onetimeKey
 
     @Internal
@@ -38,18 +34,20 @@ class LoginTask extends DefaultTask {
                 throw new RuntimeException('We could not retrieve DeployGate credentials. Please make sure you have configured app owner name and api token or any browser application is available to launch the authentication flow.')
             }
 
-            println "Welcome ${credentialStore.name}!"
+            def store = deployGateExtension.credentialStore
 
-            logger.info("The authentication has succeeded. The application owner name is ${credentialStore.name}.")
+            println "Welcome ${store.name}!"
+
+            logger.info("The authentication has succeeded. The application owner name is ${store.name}.")
 
             // We can set the values iff it's not set yet because of the idempotency.
 
             if (!deployGateExtension.appOwnerName) {
-                deployGateExtension.setAppOwnerName(credentialStore.name)
+                deployGateExtension.setAppOwnerName(store.name)
             }
 
             if (!deployGateExtension.apiToken) {
-                deployGateExtension.setApiToken(credentialStore.token)
+                deployGateExtension.setApiToken(store.token)
             }
         }
     }
@@ -159,10 +157,12 @@ class LoginTask extends DefaultTask {
             return false
         }
 
-        if (!credentialStore.saveLocalCredentialFile(response.rawResponse)) {
+        def store = deployGateExtension.credentialStore
+
+        if (!store.saveLocalCredentialFile(response.rawResponse)) {
             throw new GradleException("failed to save the fetched credentials")
         }
 
-        return credentialStore.load()
+        return store.load()
     }
 }
