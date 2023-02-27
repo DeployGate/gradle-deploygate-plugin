@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins.dsl
 
-import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax

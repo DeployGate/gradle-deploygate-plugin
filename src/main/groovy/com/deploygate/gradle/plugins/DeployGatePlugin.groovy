@@ -43,7 +43,7 @@ class DeployGatePlugin implements Plugin<Project> {
         DeprecationLogger.reset()
 
         def credentialStore = new CliCredentialStore()
-        def extension = setupExtension(project, credentialStore)
+        setupExtension(project, credentialStore)
 
         GradleCompat.init(project)
         AndroidGradlePlugin.init(project)
@@ -53,7 +53,7 @@ class DeployGatePlugin implements Plugin<Project> {
             it.description = "Check the configured credentials and launch the authentication flow if they are not enough."
 
             it.group = Constants.TASK_GROUP_NAME
-            it.deployGateExtension = extension
+            it.deployGateExtension = project.deploygate
             it.credentialStore = credentialStore
         }
 
@@ -69,10 +69,10 @@ class DeployGatePlugin implements Plugin<Project> {
         }
     }
 
-    private static DeployGateExtension setupExtension(@NotNull Project project, @NotNull CliCredentialStore credentialStore) {
+    private static void setupExtension(@NotNull Project project, @NotNull CliCredentialStore credentialStore) {
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         // TODO we should use ExtensionSyntax as the 1st argument but we need to investigate the expected side effects first.
-        return project.extensions.add(DeployGateExtension, EXTENSION_NAME, new DeployGateExtension(project, deployments, credentialStore))
+        project.extensions.create(DeployGateExtension, EXTENSION_NAME, DeployGateExtension, project, deployments, credentialStore)
     }
 
     private void initProcessor(@Nonnull Project project) {
