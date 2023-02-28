@@ -1,14 +1,19 @@
 package com.deploygate.gradle.plugins
 
+import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.DeprecationLogger
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
+import com.deploygate.gradle.plugins.tasks.Constants
+import com.deploygate.gradle.plugins.tasks.LoginTask
+import com.deploygate.gradle.plugins.tasks.LogoutTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.annotations.NotNull
 
 import javax.annotation.Nonnull
 
@@ -38,18 +43,35 @@ class DeployGatePlugin implements Plugin<Project> {
         DeprecationLogger.reset()
 
         setupExtension(project)
+
         GradleCompat.init(project)
         AndroidGradlePlugin.init(project)
         initProcessor(project)
+
+        project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) {
+            it.description = "Check the configured credentials and launch the authentication flow if they are not enough."
+
+            it.group = Constants.TASK_GROUP_NAME
+            it.deployGateExtension = project.deploygate
+        }
+
+        project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) {
+            it.description = "Remove the local persisted credentials."
+
+            it.group = Constants.TASK_GROUP_NAME
+            it.credentialStore = project.deploygate.credentialStore
+        }
 
         project.afterEvaluate { Project evaluatedProject ->
             onProjectEvaluated(evaluatedProject)
         }
     }
 
-    private static void setupExtension(Project project) {
+    private static void setupExtension(@NotNull Project project) {
+        CliCredentialStore credentialStore = new CliCredentialStore()
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add(EXTENSION_NAME, new DeployGateExtension(project, deployments))
+        // TODO we should use ExtensionSyntax as the 1st argument but we need to investigate the expected side effects first.
+        project.extensions.create(DeployGateExtension, EXTENSION_NAME, DeployGateExtension, project, deployments, credentialStore)
     }
 
     private void initProcessor(@Nonnull Project project) {
@@ -61,9 +83,6 @@ class DeployGatePlugin implements Plugin<Project> {
     }
 
     private void onProjectEvaluated(Project project) {
-        processor.registerLoginTask()
-        processor.registerLogoutTask()
-
         processor.declaredNames.forEach { variantOrCustomName ->
             processor.registerDeclarationAwareUploadApkTask(variantOrCustomName)
             processor.registerDeclarationAwareUploadAabTask(variantOrCustomName)

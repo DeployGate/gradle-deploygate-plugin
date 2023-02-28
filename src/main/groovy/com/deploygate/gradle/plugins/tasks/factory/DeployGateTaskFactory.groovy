@@ -2,12 +2,13 @@ package com.deploygate.gradle.plugins.tasks.factory
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.internal.gradle.TaskFactory
+import com.deploygate.gradle.plugins.tasks.Constants
 import org.gradle.api.Project
 
 import javax.annotation.Nonnull
 
 abstract class DeployGateTaskFactory {
-    public static final String GROUP_NAME = 'DeployGate'
+    public static final String GROUP_NAME = Constants.TASK_GROUP_NAME
     public static String SUFFIX_APK_TASK_NAME = "uploadDeployGate"
     public static String SUFFIX_AAB_TASK_NAME = "uploadDeployGateAab"
 

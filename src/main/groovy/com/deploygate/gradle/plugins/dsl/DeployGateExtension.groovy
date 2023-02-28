@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.dsl
 
-import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.DeployGatePlugin
+import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
 import com.deploygate.gradle.plugins.internal.annotation.Internal
 import com.deploygate.gradle.plugins.internal.http.ApiClient
@@ -27,9 +27,21 @@ class DeployGateExtension implements ExtensionSyntax {
     @Nonnull
     private final NamedDomainObjectContainer<NamedDeployment> deployments
 
-    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments) {
+    @Nonnull
+    private final CliCredentialStore credentialStore;
+
+    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments, @Nonnull CliCredentialStore credentialStore) {
         this.project = project
         this.deployments = deployments
+        this.credentialStore = credentialStore
+
+        this.appOwnerName = [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1), credentialStore.name].find {
+            it != null
+        }
+
+        this.apiToken = [System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN), credentialStore.token].find {
+            it != null
+        }
     }
 
     // backward compatibility
@@ -157,6 +169,7 @@ class DeployGateExtension implements ExtensionSyntax {
      * @param data a map of key-values
      * @return true if the request has been processed regardless of its result, otherwise false.
      */
+    @Internal
     boolean notifyServer(String action, HashMap<String, String> data = null) {
         if (!notifyKey) {
             return false
@@ -176,5 +189,11 @@ class DeployGateExtension implements ExtensionSyntax {
         }
 
         return true
+    }
+
+    @Internal
+    @Nonnull
+    CliCredentialStore getCredentialStore() {
+        return credentialStore
     }
 }

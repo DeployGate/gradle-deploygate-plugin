@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
+import com.deploygate.gradle.plugins.tasks.Constants
 import com.deploygate.gradle.plugins.tasks.factory.*
 import com.google.common.annotations.VisibleForTesting
 import org.gradle.api.Project
@@ -17,12 +18,6 @@ class Processor {
 
     @Nonnull
     private final Project project
-
-    @Nonnull
-    private final LoginTaskFactory loginTaskFactory
-
-    @Nonnull
-    private final LogoutTaskFactory logoutTaskFactory
 
     @Nonnull
     private final UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory
@@ -41,8 +36,6 @@ class Processor {
     Processor(@Nonnull Project project) {
         this(
                 project,
-                new LoginTaskFactoryImpl(project),
-                new LogoutTaskFactoryImpl(project),
                 new AGPBasedUploadApkTaskFactory(project),
                 new AGPBasedUploadAabTaskFactory(project),
                 new DSLBasedUploadApkTaskFactory(project),
@@ -53,16 +46,12 @@ class Processor {
     @VisibleForTesting
     Processor(
             @Nonnull Project project,
-            @Nonnull LoginTaskFactory loginTaskFactory,
-            @Nonnull LogoutTaskFactory logoutTaskFactory,
             @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory,
             @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadAabTaskFactory,
             @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadApkTaskFactory,
             @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadAabTaskFactory
     ) {
         this.project = project
-        this.loginTaskFactory = loginTaskFactory
-        this.logoutTaskFactory = logoutTaskFactory
         this.applicationVariantBasedUploadApkTaskFactory = applicationVariantBasedUploadApkTaskFactory
         this.applicationVariantBasedUploadAabTaskFactory = applicationVariantBasedUploadAabTaskFactory
         this.stringBasedUploadApkTaskFactory = stringBasedUploadApkTaskFactory
@@ -80,14 +69,6 @@ class Processor {
         } else {
             project.logger.warn("the given argument was empty")
         }
-    }
-
-    def registerLoginTask() {
-        loginTaskFactory.registerLoginTask()
-    }
-
-    def registerLogoutTask() {
-        logoutTaskFactory.registerLogoutTask()
     }
 
     def registerDeclarationAwareUploadApkTask(String variantOrCustomName) {
@@ -130,6 +111,6 @@ class Processor {
 
     @VisibleForTesting
     static String[] getDependencyAncestorOfUploadTaskNames() {
-        return [LoginTaskFactory.TASK_NAME]
+        return [Constants.LOGIN_TASK_NAME]
     }
 }

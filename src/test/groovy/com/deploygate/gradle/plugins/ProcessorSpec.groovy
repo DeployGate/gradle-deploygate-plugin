@@ -2,8 +2,7 @@ package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariant
-import com.deploygate.gradle.plugins.tasks.factory.LoginTaskFactory
-import com.deploygate.gradle.plugins.tasks.factory.LogoutTaskFactory
+import com.deploygate.gradle.plugins.tasks.Constants
 import com.deploygate.gradle.plugins.tasks.factory.UploadArtifactTaskFactory
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -16,12 +15,6 @@ import javax.annotation.Nonnull
 class ProcessorSpec extends Specification {
     @Nonnull
     private Project project
-
-    @Nonnull
-    private LoginTaskFactory loginTaskFactory
-
-    @Nonnull
-    private LogoutTaskFactory logoutTaskFactory
 
     @Nonnull
     private UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory
@@ -40,8 +33,6 @@ class ProcessorSpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().build()
-        loginTaskFactory = Mock()
-        logoutTaskFactory = Mock()
         applicationVariantBasedUploadApkTaskFactory = Mock()
         applicationVariantBasedUploadAabTaskFactory = Mock()
         stringBasedUploadApkTaskFactory = Mock()
@@ -50,7 +41,7 @@ class ProcessorSpec extends Specification {
 
     def "addVariantOrCustomName should store given names except empty"() {
         given:
-        processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
+        processor = new Processor(project, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
 
         when:
         processor.addVariantOrCustomName("")
@@ -72,46 +63,6 @@ class ProcessorSpec extends Specification {
         processor.declaredNames.contains("dep2")
 
         and:
-        0 * loginTaskFactory._
-        0 * logoutTaskFactory._
-        0 * applicationVariantBasedUploadApkTaskFactory._
-        0 * applicationVariantBasedUploadAabTaskFactory._
-        0 * stringBasedUploadApkTaskFactory._
-        0 * stringBasedUploadAabTaskFactory._
-    }
-
-    def "registerLoginTask should manipulate LoginTaskFactory"() {
-        given:
-        processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
-
-        when:
-        processor.registerLoginTask()
-
-        then:
-        1 * loginTaskFactory.registerLoginTask()
-
-        and:
-        0 * loginTaskFactory._
-        0 * logoutTaskFactory._
-        0 * applicationVariantBasedUploadApkTaskFactory._
-        0 * applicationVariantBasedUploadAabTaskFactory._
-        0 * stringBasedUploadApkTaskFactory._
-        0 * stringBasedUploadAabTaskFactory._
-    }
-
-    def "registerLogoutTask should manipulate LogoutTaskFactory"() {
-        given:
-        processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
-
-        when:
-        processor.registerLogoutTask()
-
-        then:
-        1 * logoutTaskFactory.registerLogoutTask()
-
-        and:
-        0 * loginTaskFactory._
-        0 * logoutTaskFactory._
         0 * applicationVariantBasedUploadApkTaskFactory._
         0 * applicationVariantBasedUploadAabTaskFactory._
         0 * stringBasedUploadApkTaskFactory._
@@ -120,17 +71,15 @@ class ProcessorSpec extends Specification {
 
     def "registerDeclarationAwareUploadApkTask should manipulate String-based UploadApkTaskFactory"() {
         given:
-        processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
+        processor = new Processor(project, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
 
         when:
         processor.registerDeclarationAwareUploadApkTask("dep1")
 
         then:
-        1 * stringBasedUploadApkTaskFactory.registerUploadArtifactTask("dep1", LoginTaskFactory.TASK_NAME)
+        1 * stringBasedUploadApkTaskFactory.registerUploadArtifactTask("dep1", Constants.LOGIN_TASK_NAME)
 
         and:
-        0 * loginTaskFactory._
-        0 * logoutTaskFactory._
         0 * applicationVariantBasedUploadApkTaskFactory._
         0 * applicationVariantBasedUploadAabTaskFactory._
         0 * stringBasedUploadApkTaskFactory._
@@ -139,7 +88,7 @@ class ProcessorSpec extends Specification {
 
     def "registerAggregatedDeclarationAwareUploadApkTask should collect upload tasks"() {
         given:
-        processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
+        processor = new Processor(project, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
 
         when:
         processor.registerAggregatedDeclarationAwareUploadApkTask(["dep1", "dep2", "dep3"])
@@ -148,8 +97,6 @@ class ProcessorSpec extends Specification {
         1 * stringBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask(["uploadDeployGateDep1", "uploadDeployGateDep2", "uploadDeployGateDep3"])
 
         and:
-        0 * loginTaskFactory._
-        0 * logoutTaskFactory._
         0 * applicationVariantBasedUploadApkTaskFactory._
         0 * applicationVariantBasedUploadAabTaskFactory._
         0 * stringBasedUploadApkTaskFactory._
@@ -159,7 +106,7 @@ class ProcessorSpec extends Specification {
     @ConfineMetaClassChanges([AndroidGradlePlugin])
     def "registerVariantAwareUploadApkTask should not do nothing unless AndroidGradlePlugin is applied"() {
         given:
-        processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
+        processor = new Processor(project, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
         IApplicationVariant applicationVariant = Mock()
 
         and:
@@ -171,8 +118,6 @@ class ProcessorSpec extends Specification {
         processor.registerVariantAwareUploadApkTask(applicationVariant)
 
         then:
-        0 * loginTaskFactory._
-        0 * logoutTaskFactory._
         0 * applicationVariantBasedUploadApkTaskFactory._
         0 * applicationVariantBasedUploadAabTaskFactory._
         0 * stringBasedUploadApkTaskFactory._
@@ -182,7 +127,7 @@ class ProcessorSpec extends Specification {
     @ConfineMetaClassChanges([AndroidGradlePlugin])
     def "registerVariantAwareUploadApkTask should manipulate IApplicationVariant-based UploadApkTaskFactory if AndroidGradlePlugin is applied"() {
         given:
-        processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
+        processor = new Processor(project, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
         IApplicationVariant applicationVariant = Mock()
 
         and:
@@ -194,11 +139,9 @@ class ProcessorSpec extends Specification {
         processor.registerVariantAwareUploadApkTask(applicationVariant)
 
         then:
-        1 * applicationVariantBasedUploadApkTaskFactory.registerUploadArtifactTask(applicationVariant, LoginTaskFactory.TASK_NAME)
+        1 * applicationVariantBasedUploadApkTaskFactory.registerUploadArtifactTask(applicationVariant, Constants.LOGIN_TASK_NAME)
 
         and:
-        0 * loginTaskFactory._
-        0 * logoutTaskFactory._
         0 * applicationVariantBasedUploadApkTaskFactory._
         0 * applicationVariantBasedUploadAabTaskFactory._
         0 * stringBasedUploadApkTaskFactory._
@@ -210,14 +153,14 @@ class ProcessorSpec extends Specification {
         "do nothing"
 
         then:
-        Processor.getDependencyAncestorOfUploadTaskNames().toList().sort() == [LoginTaskFactory.TASK_NAME].sort()
+        Processor.getDependencyAncestorOfUploadTaskNames().toList().sort() == [Constants.LOGIN_TASK_NAME].sort()
     }
 
     @ConfineMetaClassChanges([AndroidGradlePlugin])
     @Unroll
     def "canProcessVariantAware should depend on AndroidGradlePlugin.isApplied (#isAGPApplied)"() {
         setup:
-        processor = new Processor(project, loginTaskFactory, logoutTaskFactory, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
+        processor = new Processor(project, applicationVariantBasedUploadApkTaskFactory, applicationVariantBasedUploadAabTaskFactory, stringBasedUploadApkTaskFactory, stringBasedUploadAabTaskFactory)
 
         and:
         AndroidGradlePlugin.metaClass.static.isApplied = { Project _ ->
