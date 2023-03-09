@@ -53,63 +53,63 @@ class DeployGatePlugin implements Plugin<Project> {
 
         processor = new Processor(project)
 
-        project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) {
-            it.description = "Check the configured credentials and launch the authentication flow if they are not enough."
+        project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
+            task.description = "Check the configured credentials and launch the authentication flow if they are not enough."
 
-            it.group = Constants.TASK_GROUP_NAME
-            it.deployGateExtension = project.deploygate
+            task.group = Constants.TASK_GROUP_NAME
+            task.deployGateExtension = project.deploygate
         }
 
-        project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) {
-            it.description = "Remove the local persisted credentials."
+        project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) { task ->
+            task.description = "Remove the local persisted credentials."
 
-            it.group = Constants.TASK_GROUP_NAME
-            it.credentialStore = project.deploygate.credentialStore
+            task.group = Constants.TASK_GROUP_NAME
+            task.credentialStore = project.deploygate.credentialStore
         }
 
-        project.tasks.register(DeployGateTaskFactory.SUFFIX_APK_TASK_NAME, DefaultTask).configure {
-            it.group = DeployGateTaskFactory.GROUP_NAME
+        project.tasks.register(DeployGateTaskFactory.SUFFIX_APK_TASK_NAME, DefaultTask).configure { task ->
+            task.group = DeployGateTaskFactory.GROUP_NAME
         }
 
-        project.tasks.register(DeployGateTaskFactory.SUFFIX_AAB_TASK_NAME, DefaultTask).configure {
-            it.group = DeployGateTaskFactory.GROUP_NAME
+        project.tasks.register(DeployGateTaskFactory.SUFFIX_AAB_TASK_NAME, DefaultTask).configure { task ->
+            task.group = DeployGateTaskFactory.GROUP_NAME
         }
 
         project.deploygate.deployments.configureEach { d ->
-            project.tasks.named(DeployGateTaskFactory.SUFFIX_APK_TASK_NAME) {
-                it.dependsOn(DeployGateTaskFactory.uploadApkTaskName(d.name))
+            project.tasks.named(DeployGateTaskFactory.SUFFIX_APK_TASK_NAME).configure { task ->
+                task.dependsOn(DeployGateTaskFactory.uploadApkTaskName(d.name))
             }
 
-            project.tasks.named(DeployGateTaskFactory.SUFFIX_APK_TASK_NAME) {
-                it.dependsOn(DeployGateTaskFactory.uploadAabTaskName(d.name))
+            project.tasks.named(DeployGateTaskFactory.SUFFIX_AAB_TASK_NAME).configure { task ->
+                task.dependsOn(DeployGateTaskFactory.uploadAabTaskName(d.name))
             }
 
-            project.tasks.register(DeployGateTaskFactory.uploadApkTaskName(d.name), UploadApkTask) {
+            project.tasks.register(DeployGateTaskFactory.uploadApkTaskName(d.name), UploadApkTask) { task ->
                 final NamedDeployment deployment = project.deploygate.findDeploymentByName(d.name)
 
                 if (!deployment.skipAssemble) {
-                    project.logger.debug("${d.name} required assmble but ignored")
+                    task.logger.debug("${d.name} required assmble but ignored")
                 }
 
-                it.variantName = d.name
-                it.dependsOn(Constants.LOGIN_TASK_NAME)
+                task.variantName = d.name
+                task.dependsOn(Constants.LOGIN_TASK_NAME)
 
-                it.configuration = UploadApkTask.createConfiguration(deployment, new DefaultPresetApkInfo(d.name))
-                it.applyTaskProfile()
+                task.configuration = UploadApkTask.createConfiguration(deployment, new DefaultPresetApkInfo(d.name))
+                task.applyTaskProfile()
             }
 
-            project.tasks.register(DeployGateTaskFactory.uploadAabTaskName(d.name), UploadAabTask) {
+            project.tasks.register(DeployGateTaskFactory.uploadAabTaskName(d.name), UploadAabTask) { task ->
                 final NamedDeployment deployment = project.deploygate.findDeploymentByName(d.name)
 
                 if (!deployment.skipAssemble) {
-                    project.logger.debug("${d.name} required assmble but ignored")
+                    task.logger.debug("${d.name} required assmble but ignored")
                 }
 
-                it.variantName = d.name
-                it.dependsOn(Constants.LOGIN_TASK_NAME)
+                task.variantName = d.name
+                task.dependsOn(Constants.LOGIN_TASK_NAME)
 
-                it.configuration = UploadAabTask.createConfiguration(deployment, new DefaultPresetAabInfo(d.name))
-                it.applyTaskProfile()
+                task.configuration = UploadAabTask.createConfiguration(deployment, new DefaultPresetAabInfo(d.name))
+                task.applyTaskProfile()
             }
         }
 
