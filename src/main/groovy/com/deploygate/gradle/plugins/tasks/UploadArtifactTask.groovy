@@ -65,21 +65,8 @@ abstract class UploadArtifactTask extends DefaultTask {
         this.configuration = configuration
     }
 
-    void setPackageApplicationTaskProvider(packageApplicationTaskProvider) {
-        this.packageApplicationTaskProvider = packageApplicationTaskProvider
-    }
-
     // Add TaskAction annotation in overrider classes
     void doUpload() {
-        if (packageApplicationTaskProvider) {
-            // evaluate surely
-            // ref: https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
-            packageApplicationTaskProvider.get()
-            logger.debug("$variantName's package application task has been evaluated")
-        } else {
-            logger.debug("$variantName's package application task is not found")
-        }
-
         runArtifactSpecificVerification()
         uploadArtifactToServer()
     }

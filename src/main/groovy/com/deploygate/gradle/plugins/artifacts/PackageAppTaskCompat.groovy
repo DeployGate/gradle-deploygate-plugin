@@ -27,7 +27,7 @@ class PackageAppTaskCompat {
     }
 
     @Nonnull
-    static AabInfo getAabInfo(@Nonnull /* PackageApplication */ packageAppTask, @Nonnull String variantName, @Nonnull Project project) {
+    static AabInfo getAabInfo(@Nonnull /* PackageApplication */ packageAppTask, @Nonnull String variantName, @Nonnull File buildDir) {
         final String aabName
 
         // TODO Use Artifact API
@@ -35,7 +35,7 @@ class PackageAppTaskCompat {
         Collection<String> apkNames = getApkNames(packageAppTask)
         aabName = ((String) apkNames[0]).replaceFirst("\\.apk\$", ".aab")
 
-        def outputDir = new File(project.buildDir, "outputs/bundle/${variantName}")
+        def outputDir = new File(buildDir, "outputs/bundle/${variantName}")
 
         return new DirectAabInfo(
                 variantName,

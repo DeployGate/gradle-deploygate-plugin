@@ -24,12 +24,4 @@ class GradleCompat {
 
         return GRADLE_VERSION
     }
-
-    static void configureEach(@Nonnull any, @Nonnull Closure closure) {
-        if (version.major > 4 || version.major == 4 && version.minor >= 9) {
-            any.configureEach(closure)
-        } else {
-            any.all(closure)
-        }
-    }
 }
