@@ -15,7 +15,7 @@ jobs:
         ports:
           - 3000/tcp
         options: >-
-          --health-cmd "curl -fI http://localhost:${{ job.services.app.ports[3000] }}"
+          --health-cmd "curl -fI http://localhost:3000"
           --health-interval 15s
           --health-timeout 5s
           --health-retries 5
@@ -47,7 +47,7 @@ jobs:
         ports:
           - 3000/tcp
         options: >-
-          --health-cmd "curl -fI http://localhost:${{ job.services.app.ports[3000] }}"
+          --health-cmd "curl -fI http://localhost:3000"
           --health-interval 15s
           --health-timeout 5s
           --health-retries 5
@@ -59,7 +59,7 @@ jobs:
           java-version: '8'
       - run: ./gradlew testUnrollAcceptanceTest
         env:
-          TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
+          TEST_SERVER_URL: http://localhost:3000
       - uses: actions/upload-artifact@v2
         if: always()
         with:
@@ -79,7 +79,7 @@ jobs:
         ports:
           - 3000/tcp
         options: >-
-          --health-cmd "curl -fI http://localhost:${{ job.services.app.ports[3000] }}"
+          --health-cmd "curl -fI http://localhost:3000"
           --health-interval 15s
           --health-timeout 5s
           --health-retries 5
