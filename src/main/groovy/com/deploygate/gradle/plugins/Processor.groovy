@@ -25,21 +25,13 @@ class Processor {
     @Nonnull
     private final UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadAabTaskFactory
 
-    @Nonnull
-    private final UploadArtifactTaskFactory<String> stringBasedUploadApkTaskFactory
-
-    @Nonnull
-    private final UploadArtifactTaskFactory<String> stringBasedUploadAabTaskFactory
-
     def declaredNames = new HashSet<String>()
 
     Processor(@Nonnull Project project) {
         this(
                 project,
                 new AGPBasedUploadApkTaskFactory(project),
-                new AGPBasedUploadAabTaskFactory(project),
-                new DSLBasedUploadApkTaskFactory(project),
-                new DSLBasedUploadAabTaskFactory(project)
+                new AGPBasedUploadAabTaskFactory(project)
         )
     }
 
@@ -47,48 +39,15 @@ class Processor {
     Processor(
             @Nonnull Project project,
             @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadApkTaskFactory,
-            @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadAabTaskFactory,
-            @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadApkTaskFactory,
-            @Nonnull UploadArtifactTaskFactory<String> stringBasedUploadAabTaskFactory
+            @Nonnull UploadArtifactTaskFactory<IApplicationVariant> applicationVariantBasedUploadAabTaskFactory
     ) {
         this.project = project
         this.applicationVariantBasedUploadApkTaskFactory = applicationVariantBasedUploadApkTaskFactory
         this.applicationVariantBasedUploadAabTaskFactory = applicationVariantBasedUploadAabTaskFactory
-        this.stringBasedUploadApkTaskFactory = stringBasedUploadApkTaskFactory
-        this.stringBasedUploadAabTaskFactory = stringBasedUploadAabTaskFactory
     }
 
     boolean canProcessVariantAware() {
         return AndroidGradlePlugin.isApplied(project)
-    }
-
-    def addVariantOrCustomName(@Nonnull String variantOrCustomName) {
-        if (variantOrCustomName) {
-            project.logger.debug("${variantOrCustomName} is declared")
-            declaredNames.add(variantOrCustomName)
-        } else {
-            project.logger.warn("the given argument was empty")
-        }
-    }
-
-    def registerDeclarationAwareUploadApkTask(String variantOrCustomName) {
-        stringBasedUploadApkTaskFactory.registerUploadArtifactTask(variantOrCustomName, *dependencyAncestorOfUploadTaskNames)
-    }
-
-    def registerDeclarationAwareUploadAabTask(String variantOrCustomName) {
-        stringBasedUploadAabTaskFactory.registerUploadArtifactTask(variantOrCustomName, *dependencyAncestorOfUploadTaskNames)
-    }
-
-    def registerAggregatedDeclarationAwareUploadApkTask(Collection<String> variantOrCustomNames) {
-        stringBasedUploadApkTaskFactory.registerAggregatedUploadArtifactTask(variantOrCustomNames.collect {
-            DeployGateTaskFactory.uploadApkTaskName(it)
-        })
-    }
-
-    def registerAggregatedDeclarationAwareUploadAabTask(Collection<String> variantOrCustomNames) {
-        stringBasedUploadAabTaskFactory.registerAggregatedUploadArtifactTask(variantOrCustomNames.collect {
-            DeployGateTaskFactory.uploadApkTaskName(it)
-        })
     }
 
     def registerVariantAwareUploadApkTask(@Nonnull IApplicationVariant variant) {
