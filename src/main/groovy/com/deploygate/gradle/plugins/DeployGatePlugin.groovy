@@ -2,7 +2,6 @@ package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
-import com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
@@ -24,6 +23,8 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.annotations.NotNull
 
+import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getAabInfo
+import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getApkInfo
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidBundleTaskName
 
@@ -54,30 +55,28 @@ class DeployGatePlugin implements Plugin<Project> {
 
         GradleCompat.init(project)
 
-        project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
-            task.description = "Check the configured credentials and launch the authentication flow if they are not enough."
+        def loginTask = project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
+            DeployGateExtension deploygate = project.deploygate
 
-            task.group = Constants.TASK_GROUP_NAME
-            task.deployGateExtension = project.deploygate
+            task.deployGateExtension = deploygate
+            task.credentials.appOwnerName = deploygate.appOwnerName
+            task.credentials.apiToken = deploygate.apiToken
         }
 
         project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) { task ->
-            task.description = "Remove the local persisted credentials."
-
-            task.group = Constants.TASK_GROUP_NAME
             task.credentialStore = project.deploygate.credentialStore
         }
 
         project.tasks.register(DeployGateTaskFactory.SUFFIX_APK_TASK_NAME, DefaultTask).configure { task ->
             task.description = "Execute all custom upload-apk tasks"
 
-            task.group = DeployGateTaskFactory.GROUP_NAME
+            task.group = Constants.TASK_GROUP_NAME
         }
 
         project.tasks.register(DeployGateTaskFactory.SUFFIX_AAB_TASK_NAME, DefaultTask).configure { task ->
             task.description = "Execute all custom upload-aab tasks"
 
-            task.group = DeployGateTaskFactory.GROUP_NAME
+            task.group = Constants.TASK_GROUP_NAME
         }
 
         project.deploygate.deployments.configureEach { NamedDeployment d ->
@@ -96,11 +95,10 @@ class DeployGatePlugin implements Plugin<Project> {
                     task.logger.debug("${d.name} required assmble but ignored")
                 }
 
-                task.variantName = d.name
-                task.dependsOn(Constants.LOGIN_TASK_NAME)
-
-                task.configuration = UploadApkTask.createConfiguration(deployment, new DefaultPresetApkInfo(d.name))
-                task.applyTaskProfile()
+                task.credentials.set(loginTask.map { it.credentials })
+                task.deployment.set(deployment)
+                task.apkInfo.set(new DefaultPresetApkInfo(d.name))
+                task.dependsOn(loginTask)
             }
 
             project.tasks.register(DeployGateTaskFactory.uploadAabTaskName(d.name), UploadAabTask) { task ->
@@ -110,11 +108,10 @@ class DeployGatePlugin implements Plugin<Project> {
                     task.logger.debug("${d.name} required assmble but ignored")
                 }
 
-                task.variantName = d.name
-                task.dependsOn(Constants.LOGIN_TASK_NAME)
-
-                task.configuration = UploadAabTask.createConfiguration(deployment, new DefaultPresetAabInfo(d.name))
-                task.applyTaskProfile()
+                task.credentials.set(loginTask.map { it.credentials })
+                task.deployment.set(deployment)
+                task.aabInfo.set(new DefaultPresetAabInfo(d.name))
+                task.dependsOn(loginTask)
             }
         }
 
@@ -125,37 +122,32 @@ class DeployGatePlugin implements Plugin<Project> {
                 namedOrRegister(project, DeployGateTaskFactory.uploadApkTaskName(variantProxy.name), UploadApkTask).configure { task ->
                     final NamedDeployment deployment = project.deploygate.findDeploymentByName(variantProxy.name)
 
-                    task.variantName = variantProxy.name
+                    task.credentials.set(loginTask.map { it.credentials })
+                    task.deployment.set(deployment)
 
+                    task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
+
+                    loginTask.map { it }
                     if (deployment?.skipAssemble) {
-                        task.dependsOn(Constants.LOGIN_TASK_NAME)
+                        task.dependsOn(loginTask)
                     } else {
-                        task.dependsOn(androidAssembleTaskName(variantProxy.name), Constants.LOGIN_TASK_NAME)
+                        task.dependsOn(androidAssembleTaskName(variantProxy.name), loginTask)
                     }
-
-                    // evaluate the provider here to fix https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
-                    def packageAppTask = variantProxy.packageApplicationTaskProvider().get()
-
-                    task.configuration =  UploadApkTask.createConfiguration(deployment, PackageAppTaskCompat.getApkInfo(packageAppTask, variantProxy.name))
-                    task.applyTaskProfile()
                 }
 
                 namedOrRegister(project, DeployGateTaskFactory.uploadAabTaskName(variantProxy.name), UploadAabTask).configure { task ->
                     final NamedDeployment deployment = project.deploygate.findDeploymentByName(variantProxy.name)
 
-                    task.variantName = variantProxy.name
+                    task.credentials.set(loginTask.map { it.credentials })
+                    task.deployment.set(deployment)
+
+                    task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.buildDir) })
 
                     if (deployment?.skipAssemble) {
-                        task.dependsOn(Constants.LOGIN_TASK_NAME)
+                        task.dependsOn(loginTask)
                     } else {
-                        task.dependsOn(androidBundleTaskName(variantProxy.name), Constants.LOGIN_TASK_NAME)
+                        task.dependsOn(androidBundleTaskName(variantProxy.name), loginTask)
                     }
-
-                    // evaluate the provider here to fix https://github.com/DeployGate/gradle-deploygate-plugin/issues/86
-                    def packageAppTask = variantProxy.packageApplicationTaskProvider().get()
-
-                    task.configuration =  UploadAabTask.createConfiguration(deployment, PackageAppTaskCompat.getAabInfo(packageAppTask, variantProxy.name, project.buildDir))
-                    task.applyTaskProfile()
                 }
             }
         }

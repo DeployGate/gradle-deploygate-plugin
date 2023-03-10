@@ -3,26 +3,35 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.internal.annotation.Internal
+import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.testfixtures.ProjectBuilder
+import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 
 class UploadArtifactTaskSpec extends Specification {
     static class UploadArtifactTaskStub extends UploadArtifactTask {
+        @Internal
+        final InputParams inputParams
 
-        @Override
-        void applyTaskProfile() {
-
-        }
-
-        @Override
-        void runArtifactSpecificVerification() {
-
+        @Inject
+        UploadArtifactTaskStub(@NotNull ObjectFactory objectFactory, @NotNull InputParams inputParams) {
+            super(objectFactory)
+            this.inputParams = inputParams
         }
     }
 
@@ -36,16 +45,19 @@ class UploadArtifactTaskSpec extends Specification {
         project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
     }
 
-    def "getApiToken should get from an extension"() {
+    def "getApiToken should get from credentials"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment), new CliCredentialStore(File.createTempDir()))
-        project.extensions.add("deploygate", deploygate)
+        def inputParams = new UploadArtifactTask.InputParams(
+                variantName: "dep1",
+                artifactFilePath: new File(project.buildDir, "not_found").absolutePath
+        )
+        def task = project.tasks.create("UploadArtifactTask", UploadArtifactTaskStub, inputParams)
 
         and:
-        def task = project.tasks.create("UploadArtifactTaskStub", UploadArtifactTaskStub)
+        task.credentials.set(project.objects.newInstance(Credentials))
 
         and:
-        deploygate.apiToken = null
+        task.credentials.get().apiToken = null
 
         when:
         task.apiToken
@@ -54,7 +66,7 @@ class UploadArtifactTaskSpec extends Specification {
         thrown(GradleException)
 
         when:
-        deploygate.apiToken = "  "
+        task.credentials.get().apiToken = "  "
 
         and:
         task.apiToken
@@ -63,7 +75,7 @@ class UploadArtifactTaskSpec extends Specification {
         thrown(GradleException)
 
         when:
-        deploygate.apiToken = "token"
+        task.credentials.get().apiToken = "token"
 
         and:
         def token = task.apiToken
@@ -72,7 +84,7 @@ class UploadArtifactTaskSpec extends Specification {
         token == "token"
 
         when:
-        deploygate.apiToken = " token2  "
+        task.credentials.get().apiToken = " token2  "
 
         and:
         def token2 = task.apiToken
@@ -81,16 +93,19 @@ class UploadArtifactTaskSpec extends Specification {
         token2 == "token2"
     }
 
-    def "getAppOwnerName should get from an extension"() {
+    def "getAppOwnerName should get from credentials"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment), new CliCredentialStore(File.createTempDir()))
-        project.extensions.add("deploygate", deploygate)
+        def inputParams = new UploadArtifactTask.InputParams(
+                variantName: "dep1",
+                artifactFilePath: new File(project.buildDir, "not_found").absolutePath
+        )
+        def task = project.tasks.create("UploadArtifactTask", UploadArtifactTaskStub, inputParams)
 
         and:
-        def task = project.tasks.create("UploadArtifactTaskStub", UploadArtifactTaskStub)
+        task.credentials.set(project.objects.newInstance(Credentials))
 
         and:
-        deploygate.appOwnerName = null
+        task.credentials.get().appOwnerName = null
 
         when:
         task.appOwnerName
@@ -99,7 +114,7 @@ class UploadArtifactTaskSpec extends Specification {
         thrown(GradleException)
 
         when:
-        deploygate.appOwnerName = "  "
+        task.credentials.get().appOwnerName = "  "
 
         and:
         task.appOwnerName
@@ -108,7 +123,7 @@ class UploadArtifactTaskSpec extends Specification {
         thrown(GradleException)
 
         when:
-        deploygate.appOwnerName = "appOwnerName"
+        task.credentials.get().appOwnerName = "appOwnerName"
 
         and:
         def token = task.appOwnerName
@@ -117,7 +132,7 @@ class UploadArtifactTaskSpec extends Specification {
         token == "appOwnerName"
 
         when:
-        deploygate.appOwnerName = " appOwnerName2  "
+        task.credentials.get().appOwnerName = " appOwnerName2  "
 
         and:
         def token2 = task.appOwnerName
@@ -126,55 +141,19 @@ class UploadArtifactTaskSpec extends Specification {
         token2 == "appOwnerName2"
     }
 
-    def "setVariantName cannot be called with different names"() {
-        setup:
-        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment), new CliCredentialStore(File.createTempDir()))
-        project.extensions.add("deploygate", deploygate)
-
-        and:
-        def task = project.tasks.create("UploadArtifactTaskStub", UploadArtifactTaskStub)
-
-        when:
-        task.variantName = "dep1"
-
-        then:
-        task.variantName == "dep1"
-
-        when: "try to change the variant name"
-        task.variantName = "dep2"
-
-        then: "but the change was ignored"
-        thrown(IllegalStateException)
-        task.variantName == "dep1"
-
-        when:
-        task.variantName = "dep1"
-
-        then: "no exception was thrown"
-        noExceptionThrown()
-        task.variantName == "dep1"
-    }
-
     def "doUpload should reject illegal states before processing"() {
         setup:
         def deploygate = new DeployGateExtension(project, project.container(NamedDeployment), new CliCredentialStore(File.createTempDir()))
         project.extensions.add("deploygate", deploygate)
 
         and:
-        def task = project.tasks.create("UploadArtifactTaskStub", UploadArtifactTaskStub)
-        task.variantName = "dep1"
-
-        when: "apkFile is required"
-        task.configuration = new UploadArtifactTask.Configuration(artifactFile: null, isSigningReady: true)
-
-        and:
-        task.doUpload()
-
-        then:
-        thrown(IllegalStateException)
+        def inputParams = new UploadArtifactTask.InputParams(
+                variantName: "dep1",
+                artifactFilePath: new File(project.buildDir, "not_found").absolutePath
+        )
 
         when: "apkFile must exist"
-        task.configuration = new UploadArtifactTask.Configuration(artifactFile: new File("not found"), isSigningReady: true)
+        def task = project.tasks.create("UploadArtifactTaskStub2", UploadArtifactTaskStub, inputParams)
 
         and:
         task.doUpload()

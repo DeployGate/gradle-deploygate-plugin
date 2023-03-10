@@ -6,10 +6,10 @@ import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class UploadApkTaskConfigurationSpec extends Specification {
+class UploadApkTaskInputParamsSpec extends Specification {
 
     @Unroll
-    def "create a configuration"() {
+    def "create a inputParams"() {
         setup:
         def deployment = new NamedDeployment("dep1")
         deployment.message = message
@@ -20,26 +20,26 @@ class UploadApkTaskConfigurationSpec extends Specification {
         deployment.skipAssemble = skipAssemble
 
         and:
-        def apkInfo = new DirectApkInfo("dep1", null, signingReady, universalApk)
+        def apkInfo = new DirectApkInfo("dep1", apkFile, signingReady, universalApk)
 
         and:
-        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
+        def inputParams = UploadApkTask.createInputParams(deployment, apkInfo)
 
         expect:
-        configuration.message == message
-        configuration.distributionKey == distributionKey
-        configuration.releaseNote == distributionReleaseNote
-        configuration.isSigningReady == signingReady
-        configuration.isUniversalApk == universalApk
+        inputParams.message == message
+        inputParams.distributionKey == distributionKey
+        inputParams.releaseNote == distributionReleaseNote
+        inputParams.isSigningReady == signingReady
+        inputParams.isUniversalApk == universalApk
 
         where:
-        message   | distributionKey   | distributionReleaseNote   | skipAssemble | signingReady | universalApk
-        null            | null              | null                      | false        | false        | false
-        "message" | "distributionKey" | "distributionReleaseNote" | true         | true         | true
+        message   | distributionKey   | distributionReleaseNote   | skipAssemble | signingReady | universalApk | apkFile
+        null      | null              | null                      | false        | false        | false        | new File("build.gradle")
+        "message" | "distributionKey" | "distributionReleaseNote" | true         | true         | true         | new File("build.gradle")
     }
 
     @Unroll
-    def "create a configuration for apk file handling"() {
+    def "create a inputParams for apk file handling"() {
         setup:
         def deployment = new NamedDeployment("dep1")
         deployment.sourceFile = sourceFile
@@ -48,14 +48,13 @@ class UploadApkTaskConfigurationSpec extends Specification {
         def apkInfo = new DirectApkInfo("dep1", apkFile, false, false)
 
         and:
-        def configuration = UploadApkTask.createConfiguration(deployment, apkInfo)
+        def inputParams = UploadApkTask.createInputParams(deployment, apkInfo)
 
         expect:
-        configuration.artifactFile == sourceFile ?: apkFile
+        inputParams.artifactFilePath == (sourceFile ?: apkFile).absolutePath
 
         where:
         sourceFile               | apkFile
-        null                     | null
         null                     | new File("build.gradle")
         new File("build.gradle") | null
         new File("build.gradle") | new File("build.gradle")
