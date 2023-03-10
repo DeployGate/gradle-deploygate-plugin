@@ -10,10 +10,10 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0'
+        classpath 'com.android.tools.build:gradle:4.2.0'
 
         def useReleaseVersion = {
-            def version = "2.0.0"
+            def version = "2.5.0"
             println("VERSION $version")
             classpath "com.deploygate:gradle:$version"
         }
