@@ -85,8 +85,9 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 group = 'com.deploygate'
-archivesBaseName = 'gradle'
 version = new File(rootProject.projectDir, 'src/main/resources/VERSION').text.trim()
+
+def archivesBaseName = 'gradle'
 
 repositories {
     google()
@@ -217,13 +218,13 @@ project.tasks.withType(Test).configureEach {
 }
 
 task javadocJar(type: Jar, dependsOn: groovydoc) {
-    classifier = 'javadoc'
+    archiveClassifier.set('javadoc')
     from "${buildDir}/javadoc"
 }
 
 task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
     from sourceSets.main.allSource
-    classifier = 'sources'
 }
 
 def getRepositoryUsername() {
@@ -257,7 +258,7 @@ afterEvaluate {
                 artifact sourcesJar
                 artifact javadocJar
                 groupId = project.group
-                artifactId = project.archivesBaseName
+                artifactId = archivesBaseName
                 version = project.version
                 pom {
                     name = "Gradle DeployGate Plugin"
