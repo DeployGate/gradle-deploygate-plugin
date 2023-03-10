@@ -1,20 +1,17 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.AabInfo
-import com.deploygate.gradle.plugins.artifacts.ApkInfo
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.annotation.Internal
-import com.deploygate.gradle.plugins.tasks.factory.DeployGateTaskFactory
+
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.VisibleForTesting
 
-import javax.annotation.Nonnull
 import javax.inject.Inject
 
 abstract class UploadAabTask extends UploadArtifactTask {

@@ -14,7 +14,7 @@ import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.UploadAabTask
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
-import com.deploygate.gradle.plugins.tasks.factory.DeployGateTaskFactory
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
@@ -67,28 +67,28 @@ class DeployGatePlugin implements Plugin<Project> {
             task.credentialStore = project.deploygate.credentialStore
         }
 
-        project.tasks.register(DeployGateTaskFactory.SUFFIX_APK_TASK_NAME, DefaultTask).configure { task ->
+        project.tasks.register(Constants.SUFFIX_APK_TASK_NAME, DefaultTask).configure { task ->
             task.description = "Execute all custom upload-apk tasks"
 
             task.group = Constants.TASK_GROUP_NAME
         }
 
-        project.tasks.register(DeployGateTaskFactory.SUFFIX_AAB_TASK_NAME, DefaultTask).configure { task ->
+        project.tasks.register(Constants.SUFFIX_AAB_TASK_NAME, DefaultTask).configure { task ->
             task.description = "Execute all custom upload-aab tasks"
 
             task.group = Constants.TASK_GROUP_NAME
         }
 
         project.deploygate.deployments.configureEach { NamedDeployment d ->
-            project.tasks.named(DeployGateTaskFactory.SUFFIX_APK_TASK_NAME).configure { task ->
-                task.dependsOn(DeployGateTaskFactory.uploadApkTaskName(d.name))
+            project.tasks.named(Constants.SUFFIX_APK_TASK_NAME).configure { task ->
+                task.dependsOn(Constants.uploadApkTaskName(d.name))
             }
 
-            project.tasks.named(DeployGateTaskFactory.SUFFIX_AAB_TASK_NAME).configure { task ->
-                task.dependsOn(DeployGateTaskFactory.uploadAabTaskName(d.name))
+            project.tasks.named(Constants.SUFFIX_AAB_TASK_NAME).configure { task ->
+                task.dependsOn(Constants.uploadAabTaskName(d.name))
             }
 
-            project.tasks.register(DeployGateTaskFactory.uploadApkTaskName(d.name), UploadApkTask) { task ->
+            project.tasks.register(Constants.uploadApkTaskName(d.name), UploadApkTask) { task ->
                 final NamedDeployment deployment = project.deploygate.findDeploymentByName(d.name)
 
                 if (!deployment.skipAssemble) {
@@ -101,7 +101,7 @@ class DeployGatePlugin implements Plugin<Project> {
                 task.dependsOn(loginTask)
             }
 
-            project.tasks.register(DeployGateTaskFactory.uploadAabTaskName(d.name), UploadAabTask) { task ->
+            project.tasks.register(Constants.uploadAabTaskName(d.name), UploadAabTask) { task ->
                 final NamedDeployment deployment = project.deploygate.findDeploymentByName(d.name)
 
                 if (!deployment.skipAssemble) {
