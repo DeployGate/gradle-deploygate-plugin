@@ -74,16 +74,16 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | Android Gradle Plugin | Gradle DeployGate Plugin     |
 |:----------------------|:-----------------------------|
 | < 3.0.0               | 1.1.5 (No longer maintained) |
-| 3.3.x, 3.4.x, 3.5.x   | since 2.0.0                  |
-| 3.6.x                 | since 2.1.0                  |
-| 4.0.x                 | since 2.2.0                  |
-| 4.1.x                 | since 2.3.0                  |
-| 4.2.x                 | since 2.4.0                  |
-| 7.0.x (Arctic Fox)    | since 2.4.0                  |
-| 7.1.x (Bumblebee)     | since 2.4.0                  |
-| 7.2.x (Chipmunk)      | since 2.4.0                  |
-| 7.3.x (Dolphin)       | since 2.4.0                  |
-| 7.4.x (Electric Eel)  | since 2.4.0                  |
+| 3.3.x, 3.4.x, 3.5.x   | \>=2.0.0,\<2.6               |
+| 3.6.x                 | \>=2.1.0,\<2.6               |
+| 4.0.x                 | \>=2.2.0,\<2.6               |
+| 4.1.x                 | \>=2.3.0,\<2.6               |
+| 4.2.x                 | \>=2.4.0                     |
+| 7.0.x (Arctic Fox)    | \>=2.4.0                     |
+| 7.1.x (Bumblebee)     | \>=2.4.0                     |
+| 7.2.x (Chipmunk)      | \>=2.4.0                     |
+| 7.3.x (Dolphin)       | \>=2.4.0                     |
+| 7.4.x (Electric Eel)  | \>=2.4.0                     |
 
 ### Canary/Beta support table
 
@@ -93,6 +93,13 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 |:----|:-------------------------|:-------------------------|
 | 11  | 8.0.x-alpha06 (Flamingo) | 2.5.0 is OK              |
 | 17  | 8.0.x-alpha10 (Flamingo) | 2.5.0 is OK              |
+
+### Gradle compatibility
+
+| Gradle DeployGate Plugin | Minimum Gradle version |
+|:-------------------------|:-----------------------|
+| \<2.6                    | 5.4                    |
+ | \>=2.6.0                 | 6.7.1                  |
 
 ## Usage
 
