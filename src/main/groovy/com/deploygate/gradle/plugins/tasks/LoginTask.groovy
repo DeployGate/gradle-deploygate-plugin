@@ -3,29 +3,47 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.internal.http.ApiClient
 import com.deploygate.gradle.plugins.internal.http.GetCredentialsResponse
+import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.annotations.NotNull
 
+import javax.inject.Inject
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class LoginTask extends DefaultTask {
+abstract class LoginTask extends DefaultTask {
 
     @Internal
     DeployGateExtension deployGateExtension
 
     @Internal
-    String onetimeKey
+    Property<String> onetimeKey
 
     @Internal
     CountDownLatch countDownLatch
+
+    @Nested
+    Credentials credentials
+
+    @Inject
+    LoginTask(@NotNull ObjectFactory objectFactory) {
+        credentials = objectFactory.newInstance(Credentials)
+        onetimeKey = objectFactory.property(String)
+
+        description = "Check the configured credentials and launch the authentication flow if they are not enough."
+        group = Constants.TASK_GROUP_NAME
+    }
 
     @TaskAction
     def setup() {
@@ -43,11 +61,11 @@ class LoginTask extends DefaultTask {
             // We can set the values iff it's not set yet because of the idempotency.
 
             if (!deployGateExtension.appOwnerName) {
-                deployGateExtension.setAppOwnerName(store.name)
+                credentials.appOwnerName.set(store.name)
             }
 
             if (!deployGateExtension.apiToken) {
-                deployGateExtension.setApiToken(store.token)
+                credentials.apiToken.set(store.token)
             }
         }
     }
@@ -63,11 +81,11 @@ class LoginTask extends DefaultTask {
             setupTerminal()
         }
 
-        if (!onetimeKey || !retrieveCredentialFromKey(onetimeKey)) {
+        if (!onetimeKey.isPresent() || !retrieveCredentialFromKey(onetimeKey.get())) {
             return false
         }
 
-        deployGateExtension.notifyKey = onetimeKey
+        deployGateExtension.notifyKey = onetimeKey.get()
         deployGateExtension.notifyServer('credential_saved')
 
         return true
@@ -123,7 +141,7 @@ class LoginTask extends DefaultTask {
                 def query = UrlUtils.parseQueryString(httpExchange.requestURI.query)
 
                 if (!query.containsKey('cancel')) {
-                    onetimeKey = query.key
+                    onetimeKey.set(query.key)
                 }
             } finally {
                 countDownLatch.countDown()
