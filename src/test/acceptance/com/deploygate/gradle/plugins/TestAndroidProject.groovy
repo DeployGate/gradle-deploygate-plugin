@@ -38,14 +38,6 @@ ndk.dir=${androidSdk}/ndk-bundle
         useGradleKtsResource()
     }
 
-    void useGradleCompatResource() {
-        def classLoader = getClass().getClassLoader()
-        def dir = classLoader.getResource("acceptance").file as File
-
-        buildGradle.exists() && buildGradle.delete() && buildGradle.createNewFile()
-        buildGradle << new File(dir, "gradle.compat.build.gradle").newInputStream()
-    }
-
     void useGradleKtsForBackwardCompatibilityResource() {
         def classLoader = getClass().getClassLoader()
         def dir = classLoader.getResource("acceptance-kts").file as File
