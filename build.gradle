@@ -183,6 +183,10 @@ dependencies {
     // for ApplyPluginSpec
     testRuntimeOnly "com.android.tools.build:gradle:$androidGradleVersion"
     testRuntimeOnly files(createClasspathManifest)
+
+    // We can remove this workaround when upgrading Gradle to 7.5
+    // https://github.com/gradle/gradle/issues/16774#issuecomment-853407822
+    testRuntimeOnly(files(services.get(ModuleRegistry).getModule("gradle-tooling-api-builders").classpath.asFiles.first()))
 }
 
 tasks.create("testUnrollAcceptanceTest", Test) {
