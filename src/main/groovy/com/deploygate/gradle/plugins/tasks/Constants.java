@@ -14,12 +14,12 @@ public class Constants {
 
     @Nonnull
     public static String uploadApkTaskName(@Nonnull String variantName) {
-        return String.format(Locale.US, SUFFIX_APK_TASK_NAME, capitalize(variantName));
+        return SUFFIX_APK_TASK_NAME + capitalize(variantName);
     }
 
     @Nonnull
     public static String uploadAabTaskName(@Nonnull String variantName) {
-        return String.format(Locale.US, SUFFIX_AAB_TASK_NAME, capitalize(variantName));
+        return SUFFIX_AAB_TASK_NAME + capitalize(variantName);
     }
 
     @Nonnull

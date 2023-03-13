@@ -119,7 +119,7 @@ class DeployGatePlugin implements Plugin<Project> {
             project.android.applicationVariants.configureEach { /* ApplicationVariant */ variant ->
                 def variantProxy = new IApplicationVariantImpl(variant)
 
-                namedOrRegister(project, DeployGateTaskFactory.uploadApkTaskName(variantProxy.name), UploadApkTask).configure { task ->
+                namedOrRegister(project, Constants.uploadApkTaskName(variantProxy.name), UploadApkTask).configure { task ->
                     final NamedDeployment deployment = project.deploygate.findDeploymentByName(variantProxy.name)
 
                     task.credentials.set(loginTask.map { it.credentials })
@@ -135,7 +135,7 @@ class DeployGatePlugin implements Plugin<Project> {
                     }
                 }
 
-                namedOrRegister(project, DeployGateTaskFactory.uploadAabTaskName(variantProxy.name), UploadAabTask).configure { task ->
+                namedOrRegister(project, Constants.uploadAabTaskName(variantProxy.name), UploadAabTask).configure { task ->
                     final NamedDeployment deployment = project.deploygate.findDeploymentByName(variantProxy.name)
 
                     task.credentials.set(loginTask.map { it.credentials })
