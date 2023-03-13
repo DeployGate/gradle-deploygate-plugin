@@ -10,8 +10,6 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.PathSensitive;
-import org.gradle.api.tasks.PathSensitivity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,9 +18,12 @@ import javax.inject.Inject;
 import static com.deploygate.gradle.plugins.internal.gradle.GradleCompat.forUseAtConfigurationTime;
 
 public abstract class DeploymentConfiguration {
+
+    /**
+     * must be an absolute path
+     */
     @Input
     @Optional
-    @PathSensitive(PathSensitivity.ABSOLUTE)
     @NotNull
     public abstract Property<String> getSourceFilePath();
 

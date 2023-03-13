@@ -120,7 +120,7 @@ class DeployGatePlugin implements Plugin<Project> {
 
                     task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
 
-                    if (deployment?.skipAssemble) {
+                    if (deployment.skipAssemble.get()) {
                         task.dependsOn(loginTask)
                     } else {
                         task.dependsOn(androidAssembleTaskName(variantProxy.name), loginTask)
@@ -132,7 +132,7 @@ class DeployGatePlugin implements Plugin<Project> {
 
                     task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.buildDir) })
 
-                    if (deployment?.skipAssemble) {
+                    if (deployment.skipAssemble.get()) {
                         task.dependsOn(loginTask)
                     } else {
                         task.dependsOn(androidBundleTaskName(variantProxy.name), loginTask)

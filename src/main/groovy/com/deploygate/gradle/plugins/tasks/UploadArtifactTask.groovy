@@ -36,8 +36,10 @@ abstract class UploadArtifactTask extends DefaultTask {
             f.exists() ? f : null
         }
 
+        /**
+         * must be an absolute path
+         */
         @Input
-        @PathSensitive(PathSensitivity.ABSOLUTE)
         String artifactFilePath
 
         @Input
