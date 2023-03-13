@@ -41,26 +41,6 @@ class AndroidGradlePlugin {
         return AGP_VERSION
     }
 
-    static boolean isSigningConfigProviderSupported() {
-        return getVersion() >= VersionString.tryParse("3.6.0-alpha1")
-    }
-
-    static boolean isOutputDirectoryProviderSupported() {
-        return getVersion() >= VersionString.tryParse("3.6.0-alpha1")
-    }
-
-    static boolean isOutputFilenameDesignChanged() {
-        return getVersion() >= VersionString.tryParse("4.0.0-alpha1")
-    }
-
-    static boolean isNewTransformArtifactAPI() {
-        return getVersion() >= VersionString.tryParse("4.1.0-alpha1")
-    }
-
-    static boolean isResolvableSigningConfigProviderSupported() {
-        return getVersion() >= VersionString.tryParse("4.2.0-alpha14")
-    }
-
     @Nonnull
     static String androidAssembleTaskName(@Nonnull String variantName) {
         return "assemble${variantName.capitalize()}"
@@ -80,18 +60,6 @@ class AndroidGradlePlugin {
     private static String getVersionString(ClassLoader classLoader) {
         try {
             return classLoader.loadClass("com.android.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
-        } catch (Throwable ignored) {
-        }
-
-        // before 4.1 or lower
-        try {
-            return classLoader.loadClass("com.android.builder.model.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
-        } catch (Throwable ignored) {
-        }
-
-        // before 3.1
-        try {
-            return classLoader.loadClass("com.android.builder.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
         } catch (Throwable ignored) {
         }
 

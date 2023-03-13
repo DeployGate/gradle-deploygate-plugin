@@ -98,10 +98,9 @@ repositories {
 ext {
     releaseVersion = version
     // Be careful to set androidGradleVersion's default. Bytecode compatibility needs to drop backward compatibility.
-    androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "3.3.2")
+    androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "4.2.0")
     gradleVersion = VersionString.parse(gradle.gradleVersion)
 
-    requireJava8 = VersionString.parse("4.2.0") <= androidGradleVersion
     requireJava11 = VersionString.parse("8.0.0-alpha09") <= androidGradleVersion
     requireGroovy3 = VersionString.parse("7.0") <= gradleVersion
 }
@@ -150,12 +149,9 @@ if (requireJava11) {
     // We need to change target compatibility only for testing.
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
-} else if (requireJava8) {
+} else {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-} else {
-    sourceCompatibility = JavaVersion.VERSION_1_7
-    targetCompatibility = JavaVersion.VERSION_1_7
 }
 
 dependencies {
@@ -187,6 +183,10 @@ dependencies {
     // for ApplyPluginSpec
     testRuntimeOnly "com.android.tools.build:gradle:$androidGradleVersion"
     testRuntimeOnly files(createClasspathManifest)
+
+    // We can remove this workaround when upgrading Gradle to 7.5
+    // https://github.com/gradle/gradle/issues/16774#issuecomment-853407822
+    testRuntimeOnly(files(services.get(ModuleRegistry).getModule("gradle-tooling-api-builders").classpath.asFiles.first()))
 }
 
 tasks.create("testUnrollAcceptanceTest", Test) {
