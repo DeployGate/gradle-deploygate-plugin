@@ -28,11 +28,11 @@ abstract class LoginTask extends DefaultTask {
 
     @Input
     @Optional
-    Property<String> appOwnerName
+    final Property<String> appOwnerName
 
     @Input
     @Optional
-    Property<String> apiToken
+    final Property<String> apiToken
 
     @Internal
     DeployGateExtension deployGateExtension // TODO remove this reference

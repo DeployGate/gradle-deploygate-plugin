@@ -1,8 +1,6 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.DeployGatePlugin
-import com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils
 import com.deploygate.gradle.plugins.internal.http.ApiClient
 import com.deploygate.gradle.plugins.internal.http.UploadAppRequest
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials
@@ -15,7 +13,6 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
@@ -63,10 +60,10 @@ abstract class UploadArtifactTask extends DefaultTask {
     }
 
     @Nested
-    Property<Credentials> credentials
+    final Property<Credentials> credentials
 
     @Nested
-    DeploymentConfiguration deployment
+    final DeploymentConfiguration deployment
 
     @OutputFile
     final Provider<RegularFile> response

@@ -32,7 +32,7 @@ abstract class UploadApkTask extends UploadArtifactTask {
     }
 
     @Internal
-    Property<ApkInfo> apkInfo
+    final Property<ApkInfo> apkInfo
 
     @Inject
     UploadApkTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {

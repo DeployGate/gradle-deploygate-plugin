@@ -32,7 +32,7 @@ abstract class UploadAabTask extends UploadArtifactTask {
     }
 
     @Internal
-    Property<AabInfo> aabInfo
+    final Property<AabInfo> aabInfo
 
     @Inject
     UploadAabTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
