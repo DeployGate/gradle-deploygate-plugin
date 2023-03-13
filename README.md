@@ -99,7 +99,7 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 | Gradle DeployGate Plugin | Minimum Gradle version |
 |:-------------------------|:-----------------------|
 | \<2.6                    | 5.4                    |
- | \>=2.6.0                 | 6.7.1                  |
+| \>=2.6.0                 | 6.7.1                  |
 
 ## Usage
 
