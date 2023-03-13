@@ -104,7 +104,7 @@ abstract class UploadArtifactTask extends DefaultTask {
         }
 
         try {
-            def response = HttpClient.getInstance().uploadApp(appOwnerName, apiToken, request)
+            def response = HttpClient.getInstance().getApiClient(apiToken).uploadApp(appOwnerName, request)
             writeUploadResponse(response.rawResponse)
             def sent = project.deploygate.notifyServer 'upload_finished', ['path': response.typedResponse.application.path]
 

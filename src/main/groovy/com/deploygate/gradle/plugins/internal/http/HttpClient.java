@@ -10,6 +10,8 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -28,7 +30,9 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class HttpClient {
@@ -110,80 +114,43 @@ public class HttpClient {
                 build();
     }
 
-    /**
-     * Upload the application file to the app owner space
-     *
-     * @param appOwnerName an app owner name
-     * @param apiToken an authorization token
-     * @param request a request to the server that must contain a file
-     * @return a successful response that contains a typed json.
-     * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
-     * @throws NetworkFailure is thrown if a network trouble happens
-     */
-    @SuppressWarnings("RedundantThrows")
     @NotNull
-    public Response<UploadAppResponse> uploadApp(@NotNull String appOwnerName, @NotNull String apiToken, @NotNull UploadAppRequest request) throws HttpResponseException, NetworkFailure {
-        HttpPost httpPost = new HttpPost(endpoint + "/api/users/" + appOwnerName + "/apps");
-        httpPost.setHeader("Authorization", "Bearer " + apiToken);
-        httpPost.setEntity(request.toEntity());
+    public ApiClient getApiClient(@NotNull String apiToken) {
+        return new ApiClient(this, apiToken);
+    }
 
+    @NotNull
+    public LifecycleNotificationClient getLifecycleNotificationClient(@NotNull String notifyKey) {
+        return new LifecycleNotificationClient(this, notifyKey);
+    }
+
+    @NotNull
+    HttpUriRequestBase buildRequest(@NotNull String method, @NotNull String... fragments) {
+        return buildRequest(method, Collections.emptyMap(), fragments);
+    }
+
+    @NotNull
+    HttpUriRequestBase buildRequest(@NotNull String method, @NotNull Map<@NotNull String, @NotNull String> queryParams, @NotNull String... fragments) {
         try {
-            return httpClient.execute(httpPost, new ResponseSerializer<>(UploadAppResponse.class));
+            URIBuilder builder = new URIBuilder(endpoint).appendPathSegments(fragments);
+
+            for (Map.Entry<String, String> entry: queryParams.entrySet()) {
+                builder.addParameter(entry.getKey(), entry.getValue());
+            }
+
+            return new HttpUriRequestBase(method, builder.build());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @NotNull <T> Response<T> execute(@NotNull HttpUriRequest request, @NotNull Class<T> klass) throws HttpResponseException, NetworkFailure {
+        try {
+            return httpClient.execute(request, new ResponseSerializer<>(klass));
         } catch (HttpResponseException e) {
             throw e;
         } catch (IOException e) {
             throw new NetworkFailure("internet connection had trouble while uploading apps", e);
-        }
-    }
-
-    /**
-     * Notify the plugin event to the server
-     *
-     * @param request a request to the server that must contain an action name
-     * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
-     * @throws NetworkFailure is thrown if a network trouble happens
-     */
-    @SuppressWarnings("RedundantThrows")
-    public void notify(@NotNull NotifyActionRequest request) throws HttpResponseException, NetworkFailure {
-        HttpPost httpPost = new HttpPost(endpoint + "/cli/notify");
-        httpPost.setEntity(request.toEntity());
-
-        try {
-            httpClient.execute(httpPost, new ResponseSerializer<>(Object.class));
-        } catch (HttpResponseException e) {
-            throw e;
-        } catch (IOException e) {
-            throw new NetworkFailure("internet connection had trouble while notifying the action to the server", e);
-        }
-    }
-
-    /**
-     * Get the credentials from the server
-     *
-     * @param notifyKey a notification key. In general, this is generated in the authentication flow.
-     * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
-     * @throws NetworkFailure is thrown if a network trouble happens
-     */
-    @NotNull
-    public Response<GetCredentialsResponse> getCredentials(@NotNull String notifyKey) throws HttpResponseException, NetworkFailure {
-        URI uri;
-
-        try {
-            uri = new URIBuilder(endpoint + "/cli/credential")
-                    .addParameter("key", notifyKey)
-                    .build();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-
-        HttpGet httpGet = new HttpGet(uri);
-
-        try {
-            return httpClient.execute(httpGet, new ResponseSerializer<>(GetCredentialsResponse.class));
-        } catch (HttpResponseException e) {
-            throw e;
-        } catch (IOException e) {
-            throw new NetworkFailure("internet connection had trouble while notifying the action to the server", e);
         }
     }
 

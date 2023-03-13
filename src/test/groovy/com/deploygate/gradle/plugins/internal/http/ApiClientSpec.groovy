@@ -4,11 +4,11 @@ import org.apache.hc.client5.http.HttpResponseException
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class HttpClientSpec extends Specification {
+class ApiClientSpec extends Specification {
     @Unroll
     def "uploadApp should be #fail"() {
         setup:
-        def client = new HttpClient(System.getenv("TEST_SERVER_URL"))
+        def client = new HttpClient(System.getenv("TEST_SERVER_URL")).getApiClient(apiToken)
 
         and:
         def request = new UploadAppRequest(appFile)
@@ -21,7 +21,7 @@ class HttpClientSpec extends Specification {
         HttpResponseException e = null
 
         try {
-            response = client.uploadApp(appOwnerName, apiToken, request).typedResponse
+            response = client.uploadApp(appOwnerName, request).typedResponse
         } catch (HttpResponseException th) {
             e = th
         }

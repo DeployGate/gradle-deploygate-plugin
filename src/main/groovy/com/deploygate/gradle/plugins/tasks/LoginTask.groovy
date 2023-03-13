@@ -180,7 +180,7 @@ abstract class LoginTask extends DefaultTask {
         HttpClient.Response<GetCredentialsResponse> response
 
         try {
-            response = HttpClient.instance.getCredentials(key)
+            response = HttpClient.instance.getLifecycleNotificationClient(key).getCredentials()
         } catch (Throwable th) {
             logger.error('failed to retrieve credential', th)
             return false

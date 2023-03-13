@@ -125,7 +125,7 @@ class DeployGateExtension implements ExtensionSyntax {
             return false
         }
 
-        def request = new NotifyActionRequest(notifyKey, action)
+        def request = new NotifyActionRequest(action)
 
         if (data) {
             data.each {
@@ -134,7 +134,7 @@ class DeployGateExtension implements ExtensionSyntax {
         }
 
         try {
-            HttpClient.getInstance().notify(request)
+            HttpClient.getInstance().getLifecycleNotificationClient(notifyKey).notify(request)
         } catch (Throwable ignore) {
         }
 
