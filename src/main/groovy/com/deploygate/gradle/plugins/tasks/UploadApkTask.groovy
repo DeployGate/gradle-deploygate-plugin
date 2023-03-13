@@ -43,8 +43,8 @@ abstract class UploadApkTask extends UploadArtifactTask {
         return apkInfo.map { apk -> createInputParams(apk, deployment) }
     }
 
-    @Override
     @Internal
+    @Override
     String getDescription() {
         def inputParams = inputParamsProvider.get()
 

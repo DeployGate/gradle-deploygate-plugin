@@ -50,6 +50,7 @@ abstract class UploadAabTask extends UploadArtifactTask {
         doUpload(inputParams)
     }
 
+    @Internal
     @Override
     String getDescription() {
         return "Deploy bundled ${inputParamsProvider.get().variantName} to DeployGate"
