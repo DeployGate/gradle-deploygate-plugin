@@ -8,7 +8,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import org.apache.hc.client5.http.HttpResponseException;
-import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -32,9 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ApiClient {
+public class HttpClient {
     private static final Object LOCK = new Object();
-    private static ApiClient sInstance;
+    private static HttpClient sInstance;
 
     @VisibleForTesting
     static final Gson GSON = new GsonBuilder().create();
@@ -48,7 +47,7 @@ public class ApiClient {
             return;
         }
 
-        ApiClient.sEndpoint = endpoint != null ? endpoint : Config.getDEPLOYGATE_ROOT();
+        HttpClient.sEndpoint = endpoint != null ? endpoint : Config.getDEPLOYGATE_ROOT();
     }
 
     @NotNull
@@ -65,7 +64,7 @@ public class ApiClient {
     }
 
     @NotNull
-    public static ApiClient getInstance() {
+    public static HttpClient getInstance() {
         if (sInstance != null) {
             return sInstance;
         }
@@ -75,19 +74,19 @@ public class ApiClient {
                 return sInstance;
             }
 
-            sInstance = new ApiClient(sEndpoint);
+            sInstance = new HttpClient(sEndpoint);
         }
 
         return sInstance;
     }
 
     @NotNull
-    private final HttpClient httpClient;
+    private final org.apache.hc.client5.http.classic.HttpClient httpClient;
     @NotNull
     private final String endpoint;
 
     @VisibleForTesting
-    ApiClient(@NotNull String endpoint) {
+    HttpClient(@NotNull String endpoint) {
         this.endpoint = endpoint;
 
         List<BasicHeader> headers = new ArrayList<>();

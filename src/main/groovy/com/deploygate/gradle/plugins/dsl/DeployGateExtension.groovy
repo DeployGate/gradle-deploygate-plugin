@@ -4,7 +4,7 @@ import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
 import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal
-import com.deploygate.gradle.plugins.internal.http.ApiClient
+import com.deploygate.gradle.plugins.internal.http.HttpClient
 import com.deploygate.gradle.plugins.internal.http.NotifyActionRequest
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -103,13 +103,13 @@ class DeployGateExtension implements ExtensionSyntax {
     @DeployGateInternal
     @Deprecated
     String getEndpoint() {
-        return ApiClient.endpoint
+        return HttpClient.endpoint
     }
 
     @DeployGateInternal
     @Deprecated
     void setEndpoint(String value) {
-        ApiClient.endpoint = value
+        HttpClient.endpoint = value
     }
 
     /**
@@ -134,7 +134,7 @@ class DeployGateExtension implements ExtensionSyntax {
         }
 
         try {
-            ApiClient.getInstance().notify(request)
+            HttpClient.getInstance().notify(request)
         } catch (Throwable ignore) {
         }
 

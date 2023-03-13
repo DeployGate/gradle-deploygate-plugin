@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.internal.http.ApiClient
+import com.deploygate.gradle.plugins.internal.http.HttpClient
 import com.deploygate.gradle.plugins.internal.http.UploadAppRequest
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
@@ -104,7 +104,7 @@ abstract class UploadArtifactTask extends DefaultTask {
         }
 
         try {
-            def response = ApiClient.getInstance().uploadApp(appOwnerName, apiToken, request)
+            def response = HttpClient.getInstance().uploadApp(appOwnerName, apiToken, request)
             writeUploadResponse(response.rawResponse)
             def sent = project.deploygate.notifyServer 'upload_finished', ['path': response.typedResponse.application.path]
 

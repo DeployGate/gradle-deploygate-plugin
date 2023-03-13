@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
-import com.deploygate.gradle.plugins.internal.http.ApiClient
+import com.deploygate.gradle.plugins.internal.http.HttpClient
 import com.deploygate.gradle.plugins.internal.http.GetCredentialsResponse
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import com.deploygate.gradle.plugins.utils.BrowserUtils
@@ -177,10 +177,10 @@ abstract class LoginTask extends DefaultTask {
     }
 
     boolean retrieveCredentialFromKey(String key) {
-        ApiClient.Response<GetCredentialsResponse> response
+        HttpClient.Response<GetCredentialsResponse> response
 
         try {
-            response = ApiClient.instance.getCredentials(key)
+            response = HttpClient.instance.getCredentials(key)
         } catch (Throwable th) {
             logger.error('failed to retrieve credential', th)
             return false

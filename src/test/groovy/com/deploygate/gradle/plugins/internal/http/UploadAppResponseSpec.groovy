@@ -36,7 +36,7 @@ class UploadAppResponseSpec extends Specification {
 """
 
         when:
-        def response = ApiClient.GSON.fromJson(jsonStr, UploadAppResponse)
+        def response = HttpClient.GSON.fromJson(jsonStr, UploadAppResponse)
 
         then:
         response.application.revision == 18

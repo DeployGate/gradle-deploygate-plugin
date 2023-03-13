@@ -4,11 +4,11 @@ import org.apache.hc.client5.http.HttpResponseException
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class ApiClientSpec extends Specification {
+class HttpClientSpec extends Specification {
     @Unroll
     def "uploadApp should be #fail"() {
         setup:
-        def client = new ApiClient(System.getenv("TEST_SERVER_URL"))
+        def client = new HttpClient(System.getenv("TEST_SERVER_URL"))
 
         and:
         def request = new UploadAppRequest(appFile)
