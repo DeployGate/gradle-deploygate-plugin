@@ -16,6 +16,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.VisibleForTesting
 
 import javax.inject.Inject
 import java.util.concurrent.CountDownLatch
@@ -28,7 +29,7 @@ abstract class LoginTask extends DefaultTask {
     DeployGateExtension deployGateExtension
 
     @Internal
-    Property<String> onetimeKey
+    String onetimeKey
 
     @Internal
     CountDownLatch countDownLatch
@@ -39,7 +40,6 @@ abstract class LoginTask extends DefaultTask {
     @Inject
     LoginTask(@NotNull ObjectFactory objectFactory) {
         credentials = objectFactory.newInstance(Credentials)
-        onetimeKey = objectFactory.property(String)
 
         description = "Check the configured credentials and launch the authentication flow if they are not enough."
         group = Constants.TASK_GROUP_NAME
@@ -47,7 +47,7 @@ abstract class LoginTask extends DefaultTask {
 
     @TaskAction
     def setup() {
-        if (!(deployGateExtension.appOwnerName && deployGateExtension.apiToken)) {
+        if (!(credentials.appOwnerName.isPresent() && credentials.apiToken.isPresent())) {
             if (!setupCredential()) {
                 throw new RuntimeException('We could not retrieve DeployGate credentials. Please make sure you have configured app owner name and api token or any browser application is available to launch the authentication flow.')
             }
@@ -58,34 +58,37 @@ abstract class LoginTask extends DefaultTask {
 
             logger.info("The authentication has succeeded. The application owner name is ${store.name}.")
 
-            // We can set the values iff it's not set yet because of the idempotency.
+            // We can set the values unless they are found because of the idempotency.
 
-            if (!deployGateExtension.appOwnerName) {
+            if (!credentials.appOwnerName.isPresent()) {
                 credentials.appOwnerName.set(store.name)
             }
 
-            if (!deployGateExtension.apiToken) {
+            if (!credentials.apiToken.isPresent()) {
                 credentials.apiToken.set(store.token)
             }
         }
+
+        credentials.normalizeAndValidate()
     }
 
     /**
      * Launch the authentication flow and fetch the credentials if possible
      * @return true if the credentials are persisted, otherwise false.
      */
-    private boolean setupCredential() {
+    @VisibleForTesting
+    boolean setupCredential() {
         if (BrowserUtils.hasBrowser()) {
             setupBrowser()
         } else {
             setupTerminal()
         }
 
-        if (!onetimeKey.isPresent() || !retrieveCredentialFromKey(onetimeKey.get())) {
+        if (!onetimeKey || !retrieveCredentialFromKey(onetimeKey)) {
             return false
         }
 
-        deployGateExtension.notifyKey = onetimeKey.get()
+        deployGateExtension.notifyKey = onetimeKey
         deployGateExtension.notifyServer('credential_saved')
 
         return true
@@ -141,7 +144,7 @@ abstract class LoginTask extends DefaultTask {
                 def query = UrlUtils.parseQueryString(httpExchange.requestURI.query)
 
                 if (!query.containsKey('cancel')) {
-                    onetimeKey.set(query.key)
+                    onetimeKey = query.key
                 }
             } finally {
                 countDownLatch.countDown()

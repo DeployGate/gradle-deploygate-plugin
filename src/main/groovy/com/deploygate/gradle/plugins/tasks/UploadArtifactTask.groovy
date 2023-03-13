@@ -11,6 +11,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
@@ -37,7 +38,7 @@ abstract class UploadArtifactTask extends DefaultTask {
 
         @InputFile
         @Optional
-        final Closure<File> artifactFile = {
+        final Closure<File> artifactFileProvider = {
             // workaround of OptionalInputFile: https://github.com/gradle/gradle/issues/2016
             def f = new File(artifactFilePath)
             f.exists() ? f : null
@@ -58,13 +59,19 @@ abstract class UploadArtifactTask extends DefaultTask {
         @Input
         @Optional
         String releaseNote
+
+        @Internal
+        @Nullable
+        File getArtifactFile() {
+            return artifactFileProvider.call()
+        }
     }
 
     @Nested
     Property<Credentials> credentials
 
     @Nested
-    Property<NamedDeployment> deployment
+    Property<NamedDeployment> deployment // TODO create a deployment class specialized for inputs
 
     @OutputFile
     File response = new File(new File(new File(project.buildDir, "deploygate"), name), "response.json")
@@ -73,30 +80,26 @@ abstract class UploadArtifactTask extends DefaultTask {
         super()
         credentials = objectFactory.property(Credentials)
         deployment = objectFactory.property(NamedDeployment)
-
-        outputs.upToDateWhen { false } // disable caching by default
     }
 
-    abstract InputParams getInputParams();
+    @NotNull
+    abstract Provider<InputParams> getInputParamsProvider()
 
-    // Add TaskAction annotation in overrider classes
-    protected void doUpload() {
-        def artifactFile = inputParams.artifactFile.call()
-
-        if (!artifactFile) {
+    protected final void doUpload(@NotNull InputParams inputParams) {
+        if (!inputParams.artifactFile) {
             throw new IllegalStateException("An artifact file (${inputParams.artifactFilePath}) was not found.")
         }
 
-        def appOwnerName = getAppOwnerName()
-        def apiToken = getApiToken()
+        def appOwnerName = credentials.get().appOwnerName.get()
+        def apiToken = credentials.get().apiToken.get()
 
-        uploadArtifactToServer(appOwnerName, apiToken, artifactFile)
+        uploadArtifactToServer(appOwnerName, apiToken, inputParams)
     }
 
-    private void uploadArtifactToServer(@NotNull String appOwnerName, @NotNull String apiToken, @NotNull File artifactFile) {
-        onBeforeUpload(artifactFile)
+    private void uploadArtifactToServer(@NotNull String appOwnerName, @NotNull String apiToken, @NotNull InputParams inputParams) {
+        onBeforeUpload(inputParams.artifactFile)
 
-        def request = new UploadAppRequest(artifactFile).tap {
+        def request = new UploadAppRequest(inputParams.artifactFile).tap {
             it.message = inputParams.message
             it.distributionKey = inputParams.distributionKey
             it.releaseNote = inputParams.releaseNote
@@ -130,37 +133,5 @@ abstract class UploadArtifactTask extends DefaultTask {
             response.delete()
         }
         response.write(rawResponse)
-    }
-
-    @Nonnull
-    @VisibleForTesting
-    @Internal
-    String getApiToken() {
-        def apiToken = credentials.getOrNull()?.apiToken?.trim()
-
-        if (!apiToken) {
-            throw new GradleException('apiToken is missing. Please enter the token.')
-        }
-
-        apiToken
-    }
-
-    @Nonnull
-    @VisibleForTesting
-    @Internal
-    String getAppOwnerName() {
-        def appOwnerName = credentials.getOrNull()?.appOwnerName?.trim()
-
-        if (!appOwnerName) {
-            throw new GradleException('appOwnerName is missing. Please enter the token.')
-        }
-
-        appOwnerName
-    }
-
-    @Nullable
-    @Internal
-    File getArtifactFile() {
-        return inputParams.artifactFile.call()
     }
 }

@@ -32,11 +32,6 @@ abstract class UploadApkTask extends UploadArtifactTask {
     @Internal
     Property<ApkInfo> apkInfo
 
-    @Internal
-    private Provider<InputParams> inputParamsProvider = deployment.map { d ->
-        return createInputParams(d, apkInfo.get())
-    }
-
     @Inject
     UploadApkTask(@NotNull ObjectFactory objectFactory) {
         super(objectFactory)
@@ -44,14 +39,16 @@ abstract class UploadApkTask extends UploadArtifactTask {
         group = Constants.TASK_GROUP_NAME
     }
 
-    @Nested
+    @Internal
     @Override
-    InputParams getInputParams() {
-        return inputParamsProvider.get()
+    Provider<InputParams> getInputParamsProvider() {
+        return deployment.map { d -> createInputParams(d, apkInfo.get()) }
     }
 
     @Override
     String getDescription() {
+        def inputParams = inputParamsProvider.get()
+
         if (inputParams.isSigningReady) {
             return "Deploy assembled ${inputParams.variantName} to DeployGate"
         } else {
@@ -62,6 +59,8 @@ abstract class UploadApkTask extends UploadArtifactTask {
 
     @TaskAction
     void execute() {
+        def inputParams = inputParamsProvider.get()
+
         if (!inputParams.isSigningReady) {
             throw new IllegalStateException('Cannot upload a build without code signature to DeployGate')
         }
@@ -70,6 +69,6 @@ abstract class UploadApkTask extends UploadArtifactTask {
             throw new IllegalStateException('Cannot upload non-universal apk to DeployGate')
         }
 
-        doUpload()
+        doUpload(inputParams)
     }
 }

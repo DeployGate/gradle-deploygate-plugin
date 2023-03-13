@@ -37,7 +37,7 @@ class UploadApkTaskSpec extends Specification {
         task.apkInfo.set(new DirectApkInfo("dep1", null, false, true))
 
         and:
-        task.doUpload()
+        task.execute()
 
         then:
         thrown(IllegalStateException)
@@ -56,7 +56,7 @@ class UploadApkTaskSpec extends Specification {
         task.apkInfo.set(new DirectApkInfo("dep1", null, true, false))
 
         and:
-        task.doUpload()
+        task.execute()
 
         then:
         thrown(IllegalStateException)

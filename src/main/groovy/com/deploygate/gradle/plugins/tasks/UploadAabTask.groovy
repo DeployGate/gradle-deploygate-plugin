@@ -32,11 +32,6 @@ abstract class UploadAabTask extends UploadArtifactTask {
     @Internal
     Property<AabInfo> aabInfo
 
-    @Internal
-    private Provider<InputParams> inputParamsProvider = deployment.map { d ->
-        return createInputParams(d, aabInfo.get())
-    }
-
     @Inject
     UploadAabTask(@NotNull ObjectFactory objectFactory) {
         super(objectFactory)
@@ -44,19 +39,21 @@ abstract class UploadAabTask extends UploadArtifactTask {
         group = Constants.TASK_GROUP_NAME
     }
 
-    @Nested
+    @Internal
     @Override
-    InputParams getInputParams() {
-        return inputParamsProvider.get()
+    Provider<InputParams> getInputParamsProvider() {
+        return deployment.map { d -> createInputParams(d, aabInfo.get()) }
     }
 
     @TaskAction
     void execute() {
-        doUpload()
+        def inputParams = inputParamsProvider.get()
+
+        doUpload(inputParams)
     }
 
     @Override
     String getDescription() {
-        return "Deploy bundled ${inputParams.variantName} to DeployGate"
+        return "Deploy bundled ${inputParamsProvider.get().variantName} to DeployGate"
     }
 }
