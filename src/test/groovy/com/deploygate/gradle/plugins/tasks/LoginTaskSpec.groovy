@@ -81,7 +81,7 @@ class LoginTaskSpec extends Specification {
         loginTask3.deployGateExtension = extension
 
         and:
-        loginTask3.credentials.apiToken.set("ext.token")
+        loginTask3.apiToken.set("ext.token")
 
         and:
         loginTask3.stubApiToken = "stub.token"
@@ -97,8 +97,8 @@ class LoginTaskSpec extends Specification {
         loginTask4.deployGateExtension = extension
 
         and:
-        loginTask4.credentials.apiToken.set("ext.token")
-        loginTask4.credentials.appOwnerName.set("ext.appOwnerName")
+        loginTask4.apiToken.set("ext.token")
+        loginTask4.appOwnerName.set("ext.appOwnerName")
 
         and:
         loginTask4.stubApiToken = "stub.token"

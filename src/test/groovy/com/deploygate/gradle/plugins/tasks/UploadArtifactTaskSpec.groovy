@@ -4,9 +4,11 @@ import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.annotation.Internal
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -31,8 +33,8 @@ class UploadArtifactTaskSpec extends Specification {
         final Provider<InputParams> inputParamsProvider
 
         @Inject
-        UploadArtifactTaskStub(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory, @NotNull InputParams inputParams) {
-            super(objectFactory)
+        UploadArtifactTaskStub(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory, @NotNull ProjectLayout projectLayout, @NotNull InputParams inputParams) {
+            super(objectFactory, projectLayout)
             this.inputParamsProvider = providerFactory.provider { inputParams }
         }
     }
@@ -45,6 +47,7 @@ class UploadArtifactTaskSpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+        GradleCompat.init(project)
     }
 
     def "doUpload should reject illegal states before processing"() {

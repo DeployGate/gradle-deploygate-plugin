@@ -1,29 +1,24 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
-import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.DeployGatePlugin
+import com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils
 import com.deploygate.gradle.plugins.internal.http.ApiClient
 import com.deploygate.gradle.plugins.internal.http.UploadAppRequest
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials
+import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
 import com.deploygate.gradle.plugins.utils.BrowserUtils
-import com.google.common.annotations.VisibleForTesting
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
-
-import javax.annotation.Nonnull
 
 abstract class UploadArtifactTask extends DefaultTask {
     static class InputParams {
@@ -71,15 +66,19 @@ abstract class UploadArtifactTask extends DefaultTask {
     Property<Credentials> credentials
 
     @Nested
-    Property<NamedDeployment> deployment // TODO create a deployment class specialized for inputs
+    DeploymentConfiguration deployment
 
     @OutputFile
-    File response = new File(new File(new File(project.buildDir, "deploygate"), name), "response.json")
+    final Provider<RegularFile> response
 
-    UploadArtifactTask(@NotNull ObjectFactory objectFactory) {
+    UploadArtifactTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
         super()
+        group = Constants.TASK_GROUP_NAME
+
         credentials = objectFactory.property(Credentials)
-        deployment = objectFactory.property(NamedDeployment)
+        deployment = objectFactory.newInstance(DeploymentConfiguration)
+
+        response = projectLayout.buildDirectory.file(["deploygate", name, "response.json"].join(File.separator))
     }
 
     @NotNull
@@ -125,13 +124,14 @@ abstract class UploadArtifactTask extends DefaultTask {
     }
 
     private void writeUploadResponse(String rawResponse) {
-        if (!response.parentFile.exists()) {
-            response.parentFile.mkdirs()
+        def f = response.get().asFile
+        if (!f.parentFile.exists()) {
+            f.parentFile.mkdirs()
         }
 
-        if (response.exists()) {
-            response.delete()
+        if (f.exists()) {
+            f.delete()
         }
-        response.write(rawResponse)
+        f.write(rawResponse)
     }
 }

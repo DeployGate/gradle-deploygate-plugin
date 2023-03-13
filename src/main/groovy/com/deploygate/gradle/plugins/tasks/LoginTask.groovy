@@ -12,8 +12,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.VisibleForTesting
@@ -25,8 +26,16 @@ import java.util.concurrent.TimeoutException
 
 abstract class LoginTask extends DefaultTask {
 
+    @Input
+    @Optional
+    Property<String> appOwnerName
+
+    @Input
+    @Optional
+    Property<String> apiToken
+
     @Internal
-    DeployGateExtension deployGateExtension
+    DeployGateExtension deployGateExtension // TODO remove this reference
 
     @Internal
     String onetimeKey
@@ -34,12 +43,14 @@ abstract class LoginTask extends DefaultTask {
     @Internal
     CountDownLatch countDownLatch
 
-    @Nested
-    Credentials credentials
+    @Internal
+    final Credentials credentials
 
     @Inject
     LoginTask(@NotNull ObjectFactory objectFactory) {
         credentials = objectFactory.newInstance(Credentials)
+        appOwnerName = objectFactory.property(String)
+        apiToken = objectFactory.property(String)
 
         description = "Check the configured credentials and launch the authentication flow if they are not enough."
         group = Constants.TASK_GROUP_NAME
@@ -47,7 +58,7 @@ abstract class LoginTask extends DefaultTask {
 
     @TaskAction
     def setup() {
-        if (!(credentials.appOwnerName.isPresent() && credentials.apiToken.isPresent())) {
+        if (!(appOwnerName.isPresent() && apiToken.isPresent())) {
             if (!setupCredential()) {
                 throw new RuntimeException('We could not retrieve DeployGate credentials. Please make sure you have configured app owner name and api token or any browser application is available to launch the authentication flow.')
             }
@@ -59,14 +70,11 @@ abstract class LoginTask extends DefaultTask {
             logger.info("The authentication has succeeded. The application owner name is ${store.name}.")
 
             // We can set the values unless they are found because of the idempotency.
-
-            if (!credentials.appOwnerName.isPresent()) {
-                credentials.appOwnerName.set(store.name)
-            }
-
-            if (!credentials.apiToken.isPresent()) {
-                credentials.apiToken.set(store.token)
-            }
+            credentials.appOwnerName.set(appOwnerName.getOrElse(store.name))
+            credentials.apiToken.set(apiToken.getOrElse(store.token))
+        } else {
+            credentials.appOwnerName.set(appOwnerName)
+            credentials.apiToken.set(apiToken)
         }
 
         credentials.normalizeAndValidate()

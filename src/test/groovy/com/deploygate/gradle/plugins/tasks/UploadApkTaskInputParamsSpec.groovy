@@ -1,29 +1,44 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
-import com.deploygate.gradle.plugins.dsl.Distribution
-import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
+import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
+import org.gradle.api.Project
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.annotation.Nonnull
+
 class UploadApkTaskInputParamsSpec extends Specification {
+
+    @Rule
+    TemporaryFolder testProjectDir = new TemporaryFolder()
+
+    @Nonnull
+    private Project project
+
+    def setup() {
+        project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+        GradleCompat.init(project)
+    }
 
     @Unroll
     def "create a inputParams"() {
         setup:
-        def deployment = new NamedDeployment("dep1")
-        deployment.message = message
-        deployment.distribution { Distribution distribution ->
-            distribution.key = distributionKey
-            distribution.releaseNote = distributionReleaseNote
-        }
-        deployment.skipAssemble = skipAssemble
+        def deployment = project.objects.newInstance(DeploymentConfiguration)
+        deployment.message.set(message)
+        deployment.distributionKey.set(distributionKey)
+        deployment.distributionReleaseNote.set(distributionReleaseNote)
+        deployment.skipAssemble.set(skipAssemble)
 
         and:
         def apkInfo = new DirectApkInfo("dep1", apkFile, signingReady, universalApk)
 
         and:
-        def inputParams = UploadApkTask.createInputParams(deployment, apkInfo)
+        def inputParams = UploadApkTask.createInputParams(apkInfo, deployment)
 
         expect:
         inputParams.message == message
@@ -41,14 +56,14 @@ class UploadApkTaskInputParamsSpec extends Specification {
     @Unroll
     def "create a inputParams for apk file handling"() {
         setup:
-        def deployment = new NamedDeployment("dep1")
-        deployment.sourceFile = sourceFile
+        def deployment = project.objects.newInstance(DeploymentConfiguration)
+        deployment.sourceFilePath.set(sourceFile?.absolutePath)
 
         and:
         def apkInfo = new DirectApkInfo("dep1", apkFile, false, false)
 
         and:
-        def inputParams = UploadApkTask.createInputParams(deployment, apkInfo)
+        def inputParams = UploadApkTask.createInputParams(apkInfo, deployment)
 
         expect:
         inputParams.artifactFilePath == (sourceFile ?: apkFile).absolutePath
@@ -57,7 +72,7 @@ class UploadApkTaskInputParamsSpec extends Specification {
         sourceFile               | apkFile
         null                     | new File("build.gradle")
         new File("build.gradle") | null
-        new File("build.gradle") | new File("build.gradle")
+        new File("build.gradle") | new File("build2.gradle")
     }
 
 }

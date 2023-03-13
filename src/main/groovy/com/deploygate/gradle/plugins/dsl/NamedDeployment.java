@@ -5,7 +5,6 @@ import com.deploygate.gradle.plugins.internal.DeprecationLogger;
 import groovy.lang.Closure;
 import org.gradle.api.Action;
 import org.gradle.api.Named;
-import org.gradle.api.tasks.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,12 +44,10 @@ public class NamedDeployment implements Named, DeploymentSyntax {
 
     @Override
     @Nonnull
-    @Internal
     public String getName() {
         return name;
     }
 
-    @Input
     public boolean isSkipAssemble() {
         return skipAssemble;
     }
@@ -59,7 +56,6 @@ public class NamedDeployment implements Named, DeploymentSyntax {
      * for Kotlin properly access
      */
 
-    @Internal
     public boolean getSkipAssemble() {
         return skipAssemble;
     }
@@ -70,7 +66,6 @@ public class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     @Nullable
-    @Internal
     public File getSourceFile() {
         return sourceFile;
     }
@@ -81,8 +76,6 @@ public class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     @Nullable
-    @Input
-    @Optional
     public String getMessage() {
         return message;
     }
@@ -105,14 +98,11 @@ public class NamedDeployment implements Named, DeploymentSyntax {
         cl.call(distribution);
     }
 
-    @Internal
     public boolean hasDistribution() {
         return getDistribution().isPresent();
     }
 
     @Nonnull
-    @Nested
-    @Optional
     public Distribution getDistribution() {
         return optionalDistribution[0];
     }
@@ -127,7 +117,6 @@ public class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     @Deprecated
-    @Internal
     public String getVisibility() {
         DeprecationLogger.deprecation("NamedDeployment.getVisibility()", "2.5", "3.0", "This API has no effect and no alternative is available.");
         return _internalGetVisibility();
@@ -135,7 +124,6 @@ public class NamedDeployment implements Named, DeploymentSyntax {
 
     @Deprecated
     @Nullable
-    @Internal
     public String getDistributionKey() {
         DeprecationLogger.deprecation("NamedDeployment.getDistributionKey()", "2.0", "3.0", "Use distribution closure directly.");
         return hasDistribution() ? getDistribution().getKey() : null;
@@ -154,7 +142,6 @@ public class NamedDeployment implements Named, DeploymentSyntax {
 
     @Deprecated
     @Nullable
-    @Internal
     public String getReleaseNote() {
         DeprecationLogger.deprecation("NamedDeployment.getReleaseNote()", "2.0", "3.0", "Use distribution closure directly.");
         return hasDistribution() ? getDistribution().getReleaseNote() : null;
@@ -172,7 +159,6 @@ public class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     @Deprecated
-    @Internal
     public boolean getNoAssemble() {
         DeprecationLogger.deprecation("NamedDeployment.getNoAssemble()", "2.0", "3.0", "Use isSkipAssemble() instead.");
         return isSkipAssemble();

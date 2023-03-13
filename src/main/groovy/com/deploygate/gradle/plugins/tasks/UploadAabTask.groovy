@@ -3,10 +3,12 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.artifacts.AabInfo
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.annotation.Internal
-
+import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.annotations.NotNull
@@ -17,15 +19,15 @@ import javax.inject.Inject
 abstract class UploadAabTask extends UploadArtifactTask {
     @NotNull
     @VisibleForTesting
-    static InputParams createInputParams(@NotNull NamedDeployment deployment, @NotNull AabInfo aab) {
+    static InputParams createInputParams(@NotNull AabInfo aab, @NotNull DeploymentConfiguration deployment) {
         return new InputParams(
                 variantName: aab.variantName,
-                artifactFilePath: (deployment.sourceFile ?: aab.aabFile).absolutePath,
+                artifactFilePath: deployment.sourceFilePath.getOrElse(aab.aabFile?.absolutePath),
                 isSigningReady: false,
                 isUniversalApk: false,
-                message: deployment.message,
-                distributionKey: deployment.distribution.key,
-                releaseNote: deployment.distribution.releaseNote
+                message: deployment.message.getOrNull(),
+                distributionKey: deployment.distributionKey.getOrNull(),
+                releaseNote: deployment.distributionReleaseNote.getOrNull()
         )
     }
 
@@ -33,16 +35,15 @@ abstract class UploadAabTask extends UploadArtifactTask {
     Property<AabInfo> aabInfo
 
     @Inject
-    UploadAabTask(@NotNull ObjectFactory objectFactory) {
-        super(objectFactory)
+    UploadAabTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
+        super(objectFactory, projectLayout)
         aabInfo = objectFactory.property(AabInfo)
-        group = Constants.TASK_GROUP_NAME
     }
 
     @Internal
     @Override
     Provider<InputParams> getInputParamsProvider() {
-        return deployment.map { d -> createInputParams(d, aabInfo.get()) }
+        return aabInfo.map { aab -> createInputParams(aab, deployment) }
     }
 
     @TaskAction

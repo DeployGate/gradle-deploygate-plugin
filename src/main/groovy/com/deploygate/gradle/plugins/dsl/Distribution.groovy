@@ -1,9 +1,6 @@
 package com.deploygate.gradle.plugins.dsl
 
 import com.deploygate.gradle.plugins.dsl.syntax.DistributionSyntax
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
-import org.gradle.util.Configurable
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
@@ -11,13 +8,9 @@ import javax.annotation.Nullable
 class Distribution implements DistributionSyntax {
 
     @Nullable
-    @Input
-    @Optional
     String key
 
     @Nullable
-    @Input
-    @Optional
     String releaseNote
 
     boolean isPresent() {

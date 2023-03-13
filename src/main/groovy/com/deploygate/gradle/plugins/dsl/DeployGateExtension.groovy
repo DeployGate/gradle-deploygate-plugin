@@ -101,20 +101,6 @@ class DeployGateExtension implements ExtensionSyntax {
         return deployments.findByName(name)
     }
 
-    @Nonnull
-    NamedDeployment findDeploymentByName(@Nonnull String name) {
-        def result = new NamedDeployment(name)
-        NamedDeployment declaredTarget = deployments.findByName(name)
-
-        if (declaredTarget) {
-            mergeDeployments(result, declaredTarget)
-        }
-
-        mergeDeployments(result, getEnvironmentBasedDeployment(project))
-
-        return result
-    }
-
     @Internal
     @Deprecated
     String getEndpoint() {
@@ -125,41 +111,6 @@ class DeployGateExtension implements ExtensionSyntax {
     @Deprecated
     void setEndpoint(String value) {
         ApiClient.endpoint = value
-    }
-
-    @VisibleForTesting
-    static void mergeDeployments(@Nonnull NamedDeployment base, @Nullable NamedDeployment other) {
-        base.sourceFile = base.sourceFile ?: other.sourceFile
-        base.message = base.message ?: other.message
-        base._internalSetVisibility(base._internalGetVisibility() ?: other._internalGetVisibility())
-        base.skipAssemble = base.skipAssemble || other.skipAssemble
-        base.distribution.merge(other.distribution)
-    }
-
-    @VisibleForTesting
-    static NamedDeployment getEnvironmentBasedDeployment(Project project) {
-        File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { it -> project.file(it) }
-        String message = System.getenv(DeployGatePlugin.ENV_NAME_MESSAGE)
-        String distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
-        String distributionReleaseNote = [
-                System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE),
-                System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1)
-        ].find { it }
-        String visibility = System.getenv(DeployGatePlugin.ENV_NAME_APP_VISIBILITY)
-
-        def deployment = new NamedDeployment("environment-based")
-
-        deployment.sourceFile = sourceFile
-        deployment.message = message
-        deployment.distribution { Distribution distribution ->
-            distribution.key = distributionKey
-            distribution.releaseNote = distributionReleaseNote
-        }
-        if (visibility) {
-            deployment.visibility = visibility
-        }
-
-        return deployment
     }
 
     /**

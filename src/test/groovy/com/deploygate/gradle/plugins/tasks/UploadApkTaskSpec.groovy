@@ -4,6 +4,7 @@ import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
@@ -22,6 +23,7 @@ class UploadApkTaskSpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+        GradleCompat.init(project)
     }
 
     def "doUpload should reject unsigned apk"() {
@@ -31,7 +33,7 @@ class UploadApkTaskSpec extends Specification {
 
         and:
         def task = project.tasks.create("UploadApkTask", UploadApkTask)
-        task.deployment.set(new NamedDeployment("dep1").tap { it.sourceFile = new File(project.buildDir, "not_found") })
+        task.deployment.sourceFilePath.set(new File(project.buildDir, "not_found").absolutePath)
 
         when: "signing is required"
         task.apkInfo.set(new DirectApkInfo("dep1", null, false, true))
@@ -50,7 +52,7 @@ class UploadApkTaskSpec extends Specification {
 
         and:
         def task = project.tasks.create("UploadApkTask", UploadApkTask)
-        task.deployment.set(new NamedDeployment("dep1").tap { it.sourceFile = new File(project.buildDir, "not_found") })
+        task.deployment.sourceFilePath.set(new File(project.buildDir, "not_found").absolutePath)
 
         when: "universal apk is required"
         task.apkInfo.set(new DirectApkInfo("dep1", null, true, false))

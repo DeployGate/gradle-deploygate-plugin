@@ -59,8 +59,8 @@ class DeployGatePlugin implements Plugin<Project> {
             DeployGateExtension deploygate = project.deploygate
 
             task.deployGateExtension = deploygate
-            task.credentials.appOwnerName = deploygate.appOwnerName
-            task.credentials.apiToken = deploygate.apiToken
+            task.appOwnerName.set(deploygate.appOwnerName)
+            task.apiToken.set(deploygate.apiToken)
         }
 
         project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) { task ->
@@ -79,38 +79,34 @@ class DeployGatePlugin implements Plugin<Project> {
             task.group = Constants.TASK_GROUP_NAME
         }
 
-        project.deploygate.deployments.configureEach { NamedDeployment d ->
+        project.deploygate.deployments.configureEach { NamedDeployment deployment ->
             project.tasks.named(Constants.SUFFIX_APK_TASK_NAME).configure { task ->
-                task.dependsOn(Constants.uploadApkTaskName(d.name))
+                task.dependsOn(Constants.uploadApkTaskName(deployment.name))
             }
 
             project.tasks.named(Constants.SUFFIX_AAB_TASK_NAME).configure { task ->
-                task.dependsOn(Constants.uploadAabTaskName(d.name))
+                task.dependsOn(Constants.uploadAabTaskName(deployment.name))
             }
 
-            project.tasks.register(Constants.uploadApkTaskName(d.name), UploadApkTask) { task ->
-                final NamedDeployment deployment = project.deploygate.findDeploymentByName(d.name)
-
+            project.tasks.register(Constants.uploadApkTaskName(deployment.name), UploadApkTask) { task ->
                 if (!deployment.skipAssemble) {
-                    task.logger.debug("${d.name} required assmble but ignored")
+                    task.logger.debug("${deployment.name} required assmble but ignored")
                 }
 
                 task.credentials.set(loginTask.map { it.credentials })
-                task.deployment.set(deployment)
-                task.apkInfo.set(new DefaultPresetApkInfo(d.name))
+                task.deployment.copyFrom(deployment)
+                task.apkInfo.set(new DefaultPresetApkInfo(deployment.name))
                 task.dependsOn(loginTask)
             }
 
-            project.tasks.register(Constants.uploadAabTaskName(d.name), UploadAabTask) { task ->
-                final NamedDeployment deployment = project.deploygate.findDeploymentByName(d.name)
-
+            project.tasks.register(Constants.uploadAabTaskName(deployment.name), UploadAabTask) { task ->
                 if (!deployment.skipAssemble) {
-                    task.logger.debug("${d.name} required assmble but ignored")
+                    task.logger.debug("${deployment.name} required assmble but ignored")
                 }
 
                 task.credentials.set(loginTask.map { it.credentials })
-                task.deployment.set(deployment)
-                task.aabInfo.set(new DefaultPresetAabInfo(d.name))
+                task.deployment.copyFrom(deployment)
+                task.aabInfo.set(new DefaultPresetAabInfo(deployment.name))
                 task.dependsOn(loginTask)
             }
         }
@@ -120,14 +116,10 @@ class DeployGatePlugin implements Plugin<Project> {
                 def variantProxy = new IApplicationVariantImpl(variant)
 
                 namedOrRegister(project, Constants.uploadApkTaskName(variantProxy.name), UploadApkTask).configure { task ->
-                    final NamedDeployment deployment = project.deploygate.findDeploymentByName(variantProxy.name)
-
                     task.credentials.set(loginTask.map { it.credentials })
-                    task.deployment.set(deployment)
 
                     task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
 
-                    loginTask.map { it }
                     if (deployment?.skipAssemble) {
                         task.dependsOn(loginTask)
                     } else {
@@ -136,10 +128,7 @@ class DeployGatePlugin implements Plugin<Project> {
                 }
 
                 namedOrRegister(project, Constants.uploadAabTaskName(variantProxy.name), UploadAabTask).configure { task ->
-                    final NamedDeployment deployment = project.deploygate.findDeploymentByName(variantProxy.name)
-
                     task.credentials.set(loginTask.map { it.credentials })
-                    task.deployment.set(deployment)
 
                     task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.buildDir) })
 
