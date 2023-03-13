@@ -3,10 +3,9 @@ package com.deploygate.gradle.plugins.dsl
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
-import com.deploygate.gradle.plugins.internal.annotation.Internal
+import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal
 import com.deploygate.gradle.plugins.internal.http.ApiClient
 import com.deploygate.gradle.plugins.internal.http.NotifyActionRequest
-import com.google.common.annotations.VisibleForTesting
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
@@ -101,13 +100,13 @@ class DeployGateExtension implements ExtensionSyntax {
         return deployments.findByName(name)
     }
 
-    @Internal
+    @DeployGateInternal
     @Deprecated
     String getEndpoint() {
         return ApiClient.endpoint
     }
 
-    @Internal
+    @DeployGateInternal
     @Deprecated
     void setEndpoint(String value) {
         ApiClient.endpoint = value
@@ -120,7 +119,7 @@ class DeployGateExtension implements ExtensionSyntax {
      * @param data a map of key-values
      * @return true if the request has been processed regardless of its result, otherwise false.
      */
-    @Internal
+    @DeployGateInternal
     boolean notifyServer(String action, HashMap<String, String> data = null) {
         if (!notifyKey) {
             return false
@@ -142,7 +141,7 @@ class DeployGateExtension implements ExtensionSyntax {
         return true
     }
 
-    @Internal
+    @DeployGateInternal
     @Nonnull
     CliCredentialStore getCredentialStore() {
         return credentialStore

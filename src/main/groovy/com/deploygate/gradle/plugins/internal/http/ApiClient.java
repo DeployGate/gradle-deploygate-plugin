@@ -2,12 +2,11 @@ package com.deploygate.gradle.plugins.internal.http;
 
 import com.deploygate.gradle.plugins.Config;
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin;
-import com.deploygate.gradle.plugins.internal.annotation.Internal;
+import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -17,12 +16,8 @@ import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpException;
-import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.message.BasicHeader;
-import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.hc.core5.util.TimeValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -46,7 +41,7 @@ public class ApiClient {
 
     private static String sEndpoint = Config.getDEPLOYGATE_ROOT();
 
-    @Internal
+    @DeployGateInternal
     public static void setEndpoint(@Nullable String endpoint) {
         if (sInstance != null) {
             // too late
@@ -57,7 +52,7 @@ public class ApiClient {
     }
 
     @NotNull
-    @Internal
+    @DeployGateInternal
     @Deprecated
     public static String getEndpoint() {
         return sEndpoint;

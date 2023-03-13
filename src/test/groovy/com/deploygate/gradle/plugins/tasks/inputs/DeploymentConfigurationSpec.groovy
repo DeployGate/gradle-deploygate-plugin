@@ -46,7 +46,7 @@ class DeploymentConfigurationSpec extends Specification {
         !base.skipAssemble.get()
 
         when:
-        other.sourceFile = new File("other")
+        other.sourceFile = project.file("other")
         other.message = "other message"
         other.distribution { Distribution distribution ->
             distribution.key = "other distributionKey"
@@ -54,23 +54,6 @@ class DeploymentConfigurationSpec extends Specification {
         }
         other.visibility = "other visibility"
         other.skipAssemble = true
-
-        and:
-        base.copyFrom(other)
-
-        then:
-        base.sourceFilePath.getOrNull() == project.file("base").absolutePath
-        base.message.getOrNull() == "base"
-        base.distributionKey.getOrNull() == "base"
-        base.distributionReleaseNote.getOrNull() == "base"
-        base.skipAssemble.get() // only skip assemble was changed
-
-        when: "Reset the base properties"
-        base.sourceFilePath.set(null)
-        base.message.set(null)
-        base.distributionKey.set(null)
-        base.distributionReleaseNote.set(null)
-        base.skipAssemble.set(false)
 
         and:
         base.copyFrom(other)

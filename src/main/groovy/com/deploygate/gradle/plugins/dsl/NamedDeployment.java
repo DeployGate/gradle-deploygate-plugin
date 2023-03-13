@@ -55,7 +55,6 @@ public class NamedDeployment implements Named, DeploymentSyntax {
     /**
      * for Kotlin properly access
      */
-
     public boolean getSkipAssemble() {
         return skipAssemble;
     }
