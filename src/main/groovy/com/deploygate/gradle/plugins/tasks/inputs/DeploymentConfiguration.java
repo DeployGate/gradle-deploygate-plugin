@@ -85,5 +85,7 @@ public abstract class DeploymentConfiguration {
         if (distribution.getReleaseNote() != null) {
             getDistributionReleaseNote().set(distribution.getReleaseNote());
         }
+
+        getSkipAssemble().set(deployment.isSkipAssemble());
     }
 }
