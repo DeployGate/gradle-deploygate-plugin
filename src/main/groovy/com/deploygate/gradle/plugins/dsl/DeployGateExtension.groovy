@@ -4,10 +4,9 @@ import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
 import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal
-import com.deploygate.gradle.plugins.internal.http.HttpClient
-import com.deploygate.gradle.plugins.internal.http.NotifyActionRequest
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.tasks.Internal
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable
@@ -37,11 +36,11 @@ class DeployGateExtension implements ExtensionSyntax {
         this.deployments = deployments
         this.credentialStore = credentialStore
 
-        this.appOwnerName = [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1), credentialStore.name].find {
+        this.appOwnerName = [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1), credentialStore.getName()].find {
             it != null
         }
 
-        this.apiToken = [System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN), credentialStore.token].find {
+        this.apiToken = [System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN), credentialStore.getToken()].find {
             it != null
         }
     }
@@ -115,37 +114,9 @@ class DeployGateExtension implements ExtensionSyntax {
         this.endpoint = value
     }
 
-    /**
-     * Notify the plugin's action to the server. Never throw any exception.
-     *
-     * @param action an action name in plugin lifecycle.
-     * @param data a map of key-values
-     * @return true if the request has been processed regardless of its result, otherwise false.
-     */
-    @DeployGateInternal
-    boolean notifyServer(String action, HashMap<String, String> data = null) {
-        if (!notifyKey) {
-            return false
-        }
-
-        def request = new NotifyActionRequest(action)
-
-        if (data) {
-            data.each {
-                request.setParameter(it.key, it.value)
-            }
-        }
-
-        try {
-            HttpClient.getInstance().getLifecycleNotificationClient(notifyKey).notify(request)
-        } catch (Throwable ignore) {
-        }
-
-        return true
-    }
-
     @DeployGateInternal
     @Nonnull
+    @Internal
     CliCredentialStore getCredentialStore() {
         return credentialStore
     }

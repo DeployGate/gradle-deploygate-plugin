@@ -27,11 +27,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
+import javax.inject.Inject;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,8 +54,8 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
     @NotNull
     private final String endpoint;
 
-    @VisibleForTesting
-    HttpClient() {
+    @Inject
+    public HttpClient() {
         this.endpoint = getParameters().getEndpoint().getOrElse(Config.getDEPLOYGATE_ROOT());
 
         List<BasicHeader> headers = new ArrayList<>();
@@ -88,6 +91,11 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
         } else {
             return new NoOpLifecycleNotificationClient();
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        // no-op
     }
 
     public abstract Property<String> getNotificationKey();
@@ -140,15 +148,9 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
                 }
             }
 
-            if (file.exists()) {
-                if (!file.delete()) {
-                    return;
-                }
-            }
-
             if (file.canWrite()) {
                 try (InputStream io = new ByteArrayInputStream(rawResponse.getBytes(StandardCharsets.UTF_8))) {
-                    Files.copy(io, file.toPath());
+                    Files.copy(io, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ignore) {
                 }
             }

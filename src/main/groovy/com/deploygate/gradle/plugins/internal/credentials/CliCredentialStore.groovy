@@ -1,15 +1,18 @@
 package com.deploygate.gradle.plugins.internal.credentials
 
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 import org.jetbrains.annotations.VisibleForTesting
 
 class CliCredentialStore {
-    def store
-    String name
-    String token
+    private static final Gson GSON = new Gson()
 
     private final File baseDir
+
+    String name
+    String token
 
     CliCredentialStore() {
         this(new File(System.getProperty('user.home'), '.dg'))
@@ -24,36 +27,45 @@ class CliCredentialStore {
     boolean load() {
         def contents = loadLocalCredentialFile()
         if (contents) {
-            store = new JsonSlurper().parseText(contents)
-            name = store.name
-            token = store.token
+            def values = GSON.fromJson(contents, Map<String, String>)
+            name = values["name"] as String
+            token = values["token"] as String
             true
         }
     }
 
     boolean save() {
-        if (!store)
-            store = [:]
-        store.name = name
-        store.token = token
-        saveLocalCredentialFile(JsonOutput.toJson(store))
+        JsonObject serialized = new JsonObject()
+
+        if (name && token) {
+            serialized.addProperty("name", name)
+            serialized.addProperty("token", token)
+        }
+
+        saveLocalCredentialFile(GSON.toJson(serialized))
     }
 
     boolean delete() {
         localCredentialFile().delete()
     }
 
+    @Nullable
     String loadLocalCredentialFile() {
-        def file = localCredentialFile()
-        if (file.exists())
+        File file = localCredentialFile()
+
+        if (file.exists()) {
             file.getText('UTF-8')
+        } else {
+            null
+        }
     }
 
-    boolean saveLocalCredentialFile(String str) {
-        if (!ensureDirectoryWritable())
+    boolean saveLocalCredentialFile(@NotNull String str) {
+        if (!ensureDirectoryWritable()) {
             return false
+        }
 
-        def file = localCredentialFile()
+        File file = localCredentialFile()
         if (!file.exists() || file.canWrite()) {
             file.write(str, 'UTF-8')
             true
@@ -61,10 +73,10 @@ class CliCredentialStore {
     }
 
     private boolean ensureDirectoryWritable() {
-        baseDir.exists() || baseDir.mkdirs()
+        return baseDir.exists() || baseDir.mkdirs()
     }
 
-    def localCredentialFile() {
-        new File(baseDir, 'credentials')
+    File localCredentialFile() {
+        return new File(baseDir, 'credentials')
     }
 }
