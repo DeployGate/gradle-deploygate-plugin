@@ -27,9 +27,9 @@ class CliCredentialStore {
     boolean load() {
         def contents = loadLocalCredentialFile()
         if (contents) {
-            def values = GSON.fromJson(contents, Map<String, String>)
-            name = values["name"] as String
-            token = values["token"] as String
+            def values = GSON.fromJson(contents, JsonObject)
+            name = values.get("name").with { it.isJsonNull() ? null : it.asString }
+            token = values.get("token").with { it.isJsonNull() ? null : it.asString }
             true
         }
     }

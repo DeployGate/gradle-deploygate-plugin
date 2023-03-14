@@ -57,7 +57,7 @@ class DeployGatePlugin implements Plugin<Project> {
         GradleCompat.init(project)
 
         def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
-            spec.parameters.endpoint.set(project.deploygate.endpoint)
+            spec.parameters.endpoint.set(GradleCompat.forUseAtConfigurationTime(project.providers.environmentVariable("TEST_SERVER_URL")))
         }
 
         def loginTask = project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->

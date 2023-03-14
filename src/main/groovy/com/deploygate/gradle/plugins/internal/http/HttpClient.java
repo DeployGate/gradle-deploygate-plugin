@@ -2,15 +2,12 @@ package com.deploygate.gradle.plugins.internal.http;
 
 import com.deploygate.gradle.plugins.Config;
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin;
-import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal;
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import org.apache.hc.client5.http.HttpResponseException;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -24,15 +21,12 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.services.BuildService;
 import org.gradle.api.services.BuildServiceParameters;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import javax.inject.Inject;
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -148,11 +142,15 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
                 }
             }
 
-            if (file.canWrite()) {
+            try {
+                if (!file.createNewFile()) {
+                    return;
+                }
+
                 try (InputStream io = new ByteArrayInputStream(rawResponse.getBytes(StandardCharsets.UTF_8))) {
                     Files.copy(io, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException ignore) {
                 }
+            } catch (IOException ignore) {
             }
         }
     }

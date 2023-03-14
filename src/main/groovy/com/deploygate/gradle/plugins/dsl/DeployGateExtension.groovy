@@ -26,10 +26,7 @@ class DeployGateExtension implements ExtensionSyntax {
     private final NamedDomainObjectContainer<NamedDeployment> deployments
 
     @Nonnull
-    private final CliCredentialStore credentialStore;
-
-    @Nullable
-    private String endpoint;
+    private final CliCredentialStore credentialStore
 
     DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments, @Nonnull CliCredentialStore credentialStore) {
         this.project = project
@@ -100,18 +97,6 @@ class DeployGateExtension implements ExtensionSyntax {
 
     boolean hasDeployment(@Nonnull String name) {
         return deployments.findByName(name)
-    }
-
-    @DeployGateInternal
-    @Deprecated
-    String getEndpoint() {
-        return endpoint
-    }
-
-    @DeployGateInternal
-    @Deprecated
-    void setEndpoint(String value) {
-        this.endpoint = value
     }
 
     @DeployGateInternal
