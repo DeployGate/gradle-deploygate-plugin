@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -143,13 +144,7 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
             }
 
             try {
-                if (!file.createNewFile()) {
-                    return;
-                }
-
-                try (InputStream io = new ByteArrayInputStream(rawResponse.getBytes(StandardCharsets.UTF_8))) {
-                    Files.copy(io, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                }
+                Files.write(file.toPath(), rawResponse.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
             } catch (IOException ignore) {
             }
         }
