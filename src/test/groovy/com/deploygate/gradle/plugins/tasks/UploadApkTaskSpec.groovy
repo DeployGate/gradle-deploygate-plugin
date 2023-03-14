@@ -27,7 +27,7 @@ class UploadApkTaskSpec extends Specification {
 
     def "doUpload should reject unsigned apk"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment), new CliCredentialStore(File.createTempDir()))
+        def deploygate = new DeployGateExtension(project.container(NamedDeployment))
         project.extensions.add("deploygate", deploygate)
 
         and:
@@ -46,7 +46,7 @@ class UploadApkTaskSpec extends Specification {
 
     def "doUpload should reject non universal apk"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment), new CliCredentialStore(File.createTempDir()))
+        def deploygate = new DeployGateExtension(project.container(NamedDeployment))
         project.extensions.add("deploygate", deploygate)
 
         and:

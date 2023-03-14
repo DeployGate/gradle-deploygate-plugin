@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import java.io.*;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -91,6 +92,24 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
         }
     }
 
+    @NotNull
+    public URI buildURI(
+            @NotNull Map<@NotNull String, @NotNull String> queryParams,
+            @NotNull String... fragments
+    ) {
+        try {
+            URIBuilder builder = new URIBuilder(endpoint).appendPathSegments(fragments);
+
+            for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+                builder.addParameter(entry.getKey(), entry.getValue());
+            }
+
+            return builder.build();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void close() throws Exception {
         // no-op
@@ -106,17 +125,7 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
             @NotNull String method,
             @NotNull Map<@NotNull String, @NotNull String> queryParams,
             @NotNull String... fragments) {
-        try {
-            URIBuilder builder = new URIBuilder(endpoint).appendPathSegments(fragments);
-
-            for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-                builder.addParameter(entry.getKey(), entry.getValue());
-            }
-
-            return new HttpUriRequestBase(method, builder.build());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        return new HttpUriRequestBase(method, buildURI(queryParams, fragments));
     }
 
     @NotNull <T> Response<T> execute(@NotNull HttpUriRequest request, @NotNull Class<T> klass)

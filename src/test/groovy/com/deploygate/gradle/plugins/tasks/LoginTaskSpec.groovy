@@ -3,6 +3,8 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
+import org.gradle.api.provider.ProviderFactory
+
 import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -22,16 +24,19 @@ class LoginTaskSpec extends Specification {
         String stubApiToken
 
         @Inject
-        StubLoginTask(@NotNull ObjectFactory objectFactory) {
-            super(objectFactory)
+        StubLoginTask(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory) {
+            super(objectFactory, providerFactory)
         }
 
         @Override
         boolean setupCredential() {
-            deployGateExtension.credentialStore.name = stubAppOwnerName
-            deployGateExtension.credentialStore.token = stubApiToken
+            CliCredentialStore store = new CliCredentialStore(getCredentialsDirPath().map { new File(it) }.get())
 
-            return deployGateExtension.credentialStore.name && deployGateExtension.credentialStore.token
+            store.name = stubAppOwnerName
+            store.token = stubApiToken
+            store.save()
+
+            return store.name && store.token
         }
     }
 
@@ -48,60 +53,64 @@ class LoginTaskSpec extends Specification {
     def "complete the credentials from cli credentials"() {
         setup:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        def extension = new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir()))
+        DeployGateExtension extension = new DeployGateExtension(deployments)
         project.extensions.add("deploygate", extension)
 
         when:
-        def loginTask1 = project.tasks.create("loginTask1", StubLoginTask)
-        loginTask1.deployGateExtension = extension
+        project.tasks.register("loginTask1", StubLoginTask) { task ->
+            task.credentialsDirPath.set(testProjectDir.root.absolutePath)
+        }
 
         and:
-        loginTask1.setup()
+        StubLoginTask loginTask1 = project.tasks.getByName("loginTask1") as StubLoginTask
+        loginTask1.execute()
 
         then: "no credentials are found"
         thrown(RuntimeException)
 
         when:
-        def loginTask2 = project.tasks.create("loginTask2", StubLoginTask)
-        loginTask2.deployGateExtension = extension
+        project.tasks.register("loginTask2", StubLoginTask) { task ->
+            task.credentialsDirPath.set(testProjectDir.root.absolutePath)
+            task.stubApiToken = "stub.token"
+            task.stubAppOwnerName = "stub.appOwnerName"
+        }
 
         and:
-        loginTask2.stubApiToken = "stub.token"
-        loginTask2.stubAppOwnerName = "stub.appOwnerName"
-        loginTask2.setup()
+        StubLoginTask loginTask2 = project.tasks.getByName("loginTask2") as StubLoginTask
+        loginTask2.execute()
 
         then: "load from the cli credential store"
         loginTask2.credentials.getApiToken().get() == "stub.token"
         loginTask2.credentials.getAppOwnerName().get() == "stub.appOwnerName"
 
         when:
-        def loginTask3 = project.tasks.create("loginTask3", StubLoginTask)
-        loginTask3.deployGateExtension = extension
+        project.tasks.register("loginTask3", StubLoginTask) { task ->
+            task.explicitApiToken.set("ext.token")
+            task.credentialsDirPath.set(testProjectDir.root.absolutePath)
+            task.stubApiToken = "stub.token"
+            task.stubAppOwnerName = "stub.appOwnerName"
+        }
 
         and:
-        loginTask3.apiToken.set("ext.token")
-
-        and:
-        loginTask3.stubApiToken = "stub.token"
-        loginTask3.stubAppOwnerName = "stub.appOwnerName"
-        loginTask3.setup()
+        StubLoginTask loginTask3 = project.tasks.getByName("loginTask3") as StubLoginTask
+        loginTask3.execute()
 
         then: "complete and load by using the extension and the cli credential store"
         loginTask3.credentials.getApiToken().get() == "ext.token"
         loginTask3.credentials.getAppOwnerName().get() == "stub.appOwnerName"
 
         when:
-        def loginTask4 = project.tasks.create("loginTask4", StubLoginTask)
-        loginTask4.deployGateExtension = extension
+        project.tasks.register("loginTask4", StubLoginTask) { task ->
+            task.explicitApiToken.set("ext.token")
+            task.explicitAppOwnerName.set("ext.appOwnerName")
+            task.credentialsDirPath.set(testProjectDir.root.absolutePath)
+            task.stubApiToken = "stub.token"
+            task.stubAppOwnerName = "stub.appOwnerName"
+        }
 
         and:
-        loginTask4.apiToken.set("ext.token")
-        loginTask4.appOwnerName.set("ext.appOwnerName")
-
-        and:
-        loginTask4.stubApiToken = "stub.token"
-        loginTask4.stubAppOwnerName = "stub.appOwnerName"
-        loginTask4.setup()
+        StubLoginTask loginTask4 = project.tasks.getByName("loginTask4") as StubLoginTask
+        loginTask4.execute()
 
         then: "do not use the credential store's values"
         loginTask4.credentials.getApiToken().get() == "ext.token"

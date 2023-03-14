@@ -41,7 +41,7 @@ class DeployGateExtensionSpec extends Specification {
 
         and:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
+        project.extensions.add("deploygate", new DeployGateExtension(deployments))
         project.evaluate()
 
         when:
@@ -96,7 +96,7 @@ class DeployGateExtensionSpec extends Specification {
 
         and:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
+        project.extensions.add("deploygate", new DeployGateExtension(deployments))
         project.evaluate()
 
         when:
@@ -156,7 +156,7 @@ class DeployGateExtensionSpec extends Specification {
 
         and:
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        project.extensions.add("deploygate", new DeployGateExtension(project, deployments, new CliCredentialStore(File.createTempDir())))
+        project.extensions.add("deploygate", new DeployGateExtension(deployments))
         project.evaluate()
 
         when:

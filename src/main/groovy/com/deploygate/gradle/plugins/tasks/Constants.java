@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins.tasks;
 
-import java.util.Locale;
+import com.deploygate.gradle.plugins.internal.utils.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class Constants {
@@ -13,14 +13,10 @@ public class Constants {
     public static String SUFFIX_AAB_TASK_NAME = "uploadDeployGateAab";
 
     @NotNull public static String uploadApkTaskName(@NotNull String variantName) {
-        return SUFFIX_APK_TASK_NAME + capitalize(variantName);
+        return SUFFIX_APK_TASK_NAME + StringUtils.capitalize(variantName);
     }
 
     @NotNull public static String uploadAabTaskName(@NotNull String variantName) {
-        return SUFFIX_AAB_TASK_NAME + capitalize(variantName);
-    }
-
-    @NotNull private static String capitalize(@NotNull String value) {
-        return value.substring(0, 1).toUpperCase(Locale.US) + value.substring(1);
+        return SUFFIX_AAB_TASK_NAME + StringUtils.capitalize(variantName);
     }
 }

@@ -28,8 +28,8 @@ class CliCredentialStore {
         def contents = loadLocalCredentialFile()
         if (contents) {
             def values = GSON.fromJson(contents, JsonObject)
-            name = values.get("name").with { it.isJsonNull() ? null : it.asString }
-            token = values.get("token").with { it.isJsonNull() ? null : it.asString }
+            name = values.get("name")?.with { it.isJsonNull() ? null : it.asString }
+            token = values.get("token")?.with { it.isJsonNull() ? null : it.asString }
             true
         }
     }
@@ -66,9 +66,12 @@ class CliCredentialStore {
         }
 
         File file = localCredentialFile()
+
         if (!file.exists() || file.canWrite()) {
             file.write(str, 'UTF-8')
-            true
+            load()
+        } else {
+            false
         }
     }
 
