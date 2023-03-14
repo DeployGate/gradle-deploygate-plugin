@@ -1,4 +1,4 @@
-package com.deploygate.gradle.plugins.utils
+package com.deploygate.gradle.plugins.internal.utils
 
 import org.jetbrains.annotations.NotNull
 

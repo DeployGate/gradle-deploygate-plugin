@@ -6,7 +6,7 @@ import com.deploygate.gradle.plugins.internal.http.HttpClient;
 import com.deploygate.gradle.plugins.internal.http.LocalServer;
 import com.deploygate.gradle.plugins.internal.utils.StringUtils;
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials;
-import com.deploygate.gradle.plugins.utils.BrowserUtils;
+import com.deploygate.gradle.plugins.internal.utils.BrowserUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.model.ObjectFactory;

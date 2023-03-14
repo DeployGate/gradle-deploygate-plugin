@@ -1,6 +1,7 @@
-package com.deploygate.gradle.plugins.utils
+package com.deploygate.gradle.plugins.internal.utils
 
 import com.deploygate.gradle.plugins.TestSystemEnv
+import com.deploygate.gradle.plugins.internal.utils.BrowserUtils
 import org.junit.Rule
 import spock.lang.Specification
 import spock.lang.Unroll
