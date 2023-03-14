@@ -34,34 +34,17 @@ import static com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils
  */
 public abstract class LoginTask extends DefaultTask {
 
-    @Input
-    @Optional
+    @NotNull
     private final Provider<String> appOwnerName;
 
-    @Input
-    @Optional
+    @NotNull
     private final Provider<String> apiToken;
 
-    @InputDirectory
-    @Optional
-    private final Supplier<@Nullable File> credentialsDirectoryProvider = () -> {
-        // workaround of OptionalInputFile: https://github.com/gradle/gradle/issues/2016
-        String path = getCredentialsDirPath().getOrNull();
-
-        if (path == null || path.isEmpty()) {
-            return null;
-        }
-
-        File f = new File(path);
-        return f.exists() && f.isDirectory() ? f : null;
-    };
-
-    @Internal
     @NotNull
-    public final Credentials credentials;
+    private final Credentials credentials;
 
     @Inject
-    LoginTask(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory) {
+    public LoginTask(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory) {
         //noinspection unchecked
         appOwnerName = getExplicitAppOwnerName().orElse(environmentVariable(providerFactory, DeployGatePlugin.getENV_NAME_APP_OWNER_NAME(), DeployGatePlugin.getENV_NAME_APP_OWNER_NAME_V1()));
 
@@ -80,6 +63,24 @@ public abstract class LoginTask extends DefaultTask {
     @Override
     public String getDescription() {
         return "Load the credentials that shared between the plugin and DeployGate's cli";
+    }
+
+    @Input
+    @Optional
+    public Provider<String> getAppOwnerName() {
+        return appOwnerName;
+    }
+
+    @Input
+    @Optional
+    public Provider<String> getApiToken() {
+        return apiToken;
+    }
+
+    @NotNull
+    @Internal
+    public Credentials getCredentials() {
+        return credentials;
     }
 
     @Input
@@ -119,9 +120,9 @@ public abstract class LoginTask extends DefaultTask {
             return;
         }
 
-        File credentialsDir = credentialsDirectoryProvider.get();
+        File credentialsDir = new File(getCredentialsDirPath().get());
 
-        if (credentialsDir != null) {
+        if (credentialsDir.exists() && credentialsDir.isDirectory()) {
             CliCredentialStore store = new CliCredentialStore(credentialsDir);
 
             if (StringUtils.isNullOrBlank(store.getName()) || StringUtils.isNullOrBlank(store.getToken())) {
@@ -134,7 +135,6 @@ public abstract class LoginTask extends DefaultTask {
         } else {
             getLogger().info("No credential file is found on local system.");
 
-            credentialsDir = new File(getCredentialsDirPath().get());
             if (!credentialsDir.mkdirs()) {
                 throw new GradleException("Cannot create a directory on this local system.");
             }

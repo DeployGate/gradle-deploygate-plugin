@@ -7,6 +7,8 @@ import com.deploygate.gradle.plugins.dsl.Distribution;
 import com.deploygate.gradle.plugins.dsl.NamedDeployment;
 import com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils;
 import javax.inject.Inject;
+
+import org.gradle.api.Transformer;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.ProviderFactory;
@@ -40,18 +42,24 @@ public abstract class DeploymentConfiguration {
     @Inject
     public DeploymentConfiguration(
             @NotNull ProviderFactory providerFactory, @NotNull ProjectLayout projectLayout) {
+        // for configuration cache
+        //noinspection Convert2Lambda
         getSourceFilePath()
                 .set(
                         forUseAtConfigurationTime(
                                         providerFactory.environmentVariable(
                                                 DeployGatePlugin.getENV_NAME_SOURCE_FILE()))
-                                .map(
-                                        s ->
-                                                projectLayout
-                                                        .getProjectDirectory()
-                                                        .file(s)
-                                                        .getAsFile()
-                                                        .getAbsolutePath()));
+                                .map(new Transformer<String, String>() {
+                                    @NotNull
+                                    @Override
+                                    public String transform(@NotNull String s) {
+                                        return projectLayout
+                                                .getProjectDirectory()
+                                                .file(s)
+                                                .getAsFile()
+                                                .getAbsolutePath();
+                                    }
+                                }));
         getMessage()
                 .set(
                         forUseAtConfigurationTime(
