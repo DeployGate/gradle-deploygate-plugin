@@ -1,4 +1,4 @@
-package com.deploygate.gradle.plugins.credentials
+package com.deploygate.gradle.plugins.internal.credentials
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper

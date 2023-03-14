@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins.dsl
 
-import com.deploygate.gradle.plugins.credentials.CliCredentialStore
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder

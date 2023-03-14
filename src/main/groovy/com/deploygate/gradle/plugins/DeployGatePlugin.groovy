@@ -2,7 +2,7 @@ package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
-import com.deploygate.gradle.plugins.credentials.CliCredentialStore
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.DeprecationLogger

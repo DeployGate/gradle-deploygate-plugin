@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.credentials
 
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import groovy.mock.interceptor.StubFor
 import org.junit.Test
 

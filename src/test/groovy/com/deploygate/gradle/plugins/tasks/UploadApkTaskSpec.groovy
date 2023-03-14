@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
-import com.deploygate.gradle.plugins.credentials.CliCredentialStore
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
