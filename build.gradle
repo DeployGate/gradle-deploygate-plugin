@@ -274,6 +274,10 @@ allprojects {
             indentWithSpaces(4)
             endWithNewline()
         }
+
+        // TODO detect violations automatically
+        // DO: Use org.jetbrains.annotations.{NotNull,Nullable,VisibleForTesting}
+        // DON'T: Use javax.annotations.{Nonnull,Nullable}, Guavas VisibleForTesting
     }
 }
 

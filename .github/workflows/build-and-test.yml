@@ -11,8 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: master # for ratchet
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-java
-      - run: ./gradlew spotlessCheck
+      - run: ./gradlew spotlessApply
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: spotless
 
   unit-test:
     runs-on: ubuntu-latest
