@@ -3,6 +3,7 @@ package com.deploygate.gradle.plugins.internal.http;
 import com.deploygate.gradle.plugins.Config;
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin;
 import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal;
+import com.deploygate.gradle.plugins.tasks.inputs.Credentials;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
@@ -19,69 +20,30 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.net.URIBuilder;
+import org.gradle.api.provider.Property;
+import org.gradle.api.services.BuildService;
+import org.gradle.api.services.BuildServiceParameters;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class HttpClient {
-    private static final Object LOCK = new Object();
-    private static HttpClient sInstance;
-
+public abstract class HttpClient implements BuildService<HttpClient.Params>, AutoCloseable {
     @VisibleForTesting
     static final Gson GSON = new GsonBuilder().create();
 
-    private static String sEndpoint = Config.getDEPLOYGATE_ROOT();
-
-    @DeployGateInternal
-    public static void setEndpoint(@Nullable String endpoint) {
-        if (sInstance != null) {
-            // too late
-            return;
-        }
-
-        HttpClient.sEndpoint = endpoint != null ? endpoint : Config.getDEPLOYGATE_ROOT();
-    }
-
-    @NotNull
-    @DeployGateInternal
-    @Deprecated
-    public static String getEndpoint() {
-        return sEndpoint;
-    }
-
-    @VisibleForTesting
-    static void clear() {
-        sEndpoint = Config.getDEPLOYGATE_ROOT();
-        sInstance = null;
-    }
-
-    @NotNull
-    public static HttpClient getInstance() {
-        if (sInstance != null) {
-            return sInstance;
-        }
-
-        synchronized (LOCK) {
-            if (sInstance != null) {
-                return sInstance;
-            }
-
-            sInstance = new HttpClient(sEndpoint);
-        }
-
-        return sInstance;
+    interface Params extends BuildServiceParameters {
+        Property<String> getEndpoint();
     }
 
     @NotNull
@@ -90,8 +52,8 @@ public class HttpClient {
     private final String endpoint;
 
     @VisibleForTesting
-    HttpClient(@NotNull String endpoint) {
-        this.endpoint = endpoint;
+    HttpClient() {
+        this.endpoint = getParameters().getEndpoint().getOrElse(Config.getDEPLOYGATE_ROOT());
 
         List<BasicHeader> headers = new ArrayList<>();
         headers.add(new BasicHeader("X-DEPLOYGATE-CLIENT-ID", "gradle-plugin/" + Config.getVERSION_CODE()));
@@ -115,14 +77,20 @@ public class HttpClient {
     }
 
     @NotNull
-    public ApiClient getApiClient(@NotNull String apiToken) {
-        return new ApiClient(this, apiToken);
+    public ApiClient getApiClient(@NotNull Credentials credentials) {
+        return new ApiClient(this, credentials);
     }
 
     @NotNull
-    public LifecycleNotificationClient getLifecycleNotificationClient(@NotNull String notifyKey) {
-        return new LifecycleNotificationClient(this, notifyKey);
+    public ILifecycleNotificationClient getLifecycleNotificationClient() {
+        if (getNotificationKey().isPresent()) {
+            return new LifecycleNotificationClient(this, getNotificationKey().get());
+        } else {
+            return new NoOpLifecycleNotificationClient();
+        }
     }
+
+    public abstract Property<String> getNotificationKey();
 
     @NotNull
     HttpUriRequestBase buildRequest(@NotNull String method, @NotNull String... fragments) {
@@ -163,6 +131,27 @@ public class HttpClient {
         public Response(@NotNull T typedResponse, @NotNull String rawResponse) {
             this.typedResponse = typedResponse;
             this.rawResponse = rawResponse;
+        }
+
+        public void writeTo(@NotNull File file) {
+            if (!file.getParentFile().exists()) {
+                if (!file.getParentFile().mkdirs()) {
+                    return;
+                }
+            }
+
+            if (file.exists()) {
+                if (!file.delete()) {
+                    return;
+                }
+            }
+
+            if (file.canWrite()) {
+                try (InputStream io = new ByteArrayInputStream(rawResponse.getBytes(StandardCharsets.UTF_8))) {
+                    Files.copy(io, file.toPath());
+                } catch (IOException ignore) {
+                }
+            }
         }
     }
 

@@ -29,6 +29,9 @@ class DeployGateExtension implements ExtensionSyntax {
     @Nonnull
     private final CliCredentialStore credentialStore;
 
+    @Nullable
+    private String endpoint;
+
     DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments, @Nonnull CliCredentialStore credentialStore) {
         this.project = project
         this.deployments = deployments
@@ -103,13 +106,13 @@ class DeployGateExtension implements ExtensionSyntax {
     @DeployGateInternal
     @Deprecated
     String getEndpoint() {
-        return HttpClient.endpoint
+        return endpoint
     }
 
     @DeployGateInternal
     @Deprecated
     void setEndpoint(String value) {
-        HttpClient.endpoint = value
+        this.endpoint = value
     }
 
     /**

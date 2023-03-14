@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.internal.http;
 
+import com.deploygate.gradle.plugins.tasks.inputs.Credentials;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -10,21 +11,20 @@ public class ApiClient {
     private final HttpClient httpClient;
 
     @NotNull
-    private final String apiToken;
+    private final Credentials credentials;
 
     /**
      * @param httpClient should be immutable
-     * @param apiToken   an authorization token
+     * @param credentials a credential of those requests
      */
-    ApiClient(@NotNull HttpClient httpClient, @NotNull String apiToken) {
+    ApiClient(@NotNull HttpClient httpClient, @NotNull Credentials credentials) {
         this.httpClient = httpClient;
-        this.apiToken = apiToken;
+        this.credentials = credentials;
     }
 
     /**
      * Upload the application file to the app owner space
      *
-     * @param appOwnerName an app owner name
      * @param request      a request to the server that must contain a file
      * @return a successful response that contains a typed json.
      * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
@@ -32,8 +32,8 @@ public class ApiClient {
      */
     @SuppressWarnings("RedundantThrows")
     @NotNull
-    public HttpClient.Response<UploadAppResponse> uploadApp(@NotNull String appOwnerName, @NotNull UploadAppRequest request) throws HttpResponseException, NetworkFailure {
-        HttpUriRequestBase httpPost = httpClient.buildRequest(HttpPost.METHOD_NAME, "api", "users", appOwnerName, "apps");
+    public HttpClient.Response<UploadAppResponse> uploadApp(@NotNull UploadAppRequest request) throws HttpResponseException, NetworkFailure {
+        HttpUriRequestBase httpPost = httpClient.buildRequest(HttpPost.METHOD_NAME, "api", "users", credentials.getAppOwnerName().get(), "apps");
         httpPost.setEntity(request.toEntity());
 
         configureAuthorizationHeader(httpPost);
@@ -42,6 +42,6 @@ public class ApiClient {
     }
 
     private void configureAuthorizationHeader(@NotNull HttpUriRequestBase base) {
-        base.setHeader("Authorization", "Bearer " + apiToken);
+        base.setHeader("Authorization", "Bearer " + credentials.getApiToken().get());
     }
 }

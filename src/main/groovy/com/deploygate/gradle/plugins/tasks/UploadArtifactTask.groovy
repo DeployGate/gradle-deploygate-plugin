@@ -67,6 +67,9 @@ abstract class UploadArtifactTask extends DefaultTask {
     @Nested
     final DeploymentConfiguration deployment
 
+    @Internal
+    final Property<HttpClient> httpClient
+
     @OutputFile
     final Provider<RegularFile> response
 
@@ -76,6 +79,7 @@ abstract class UploadArtifactTask extends DefaultTask {
 
         credentials = objectFactory.property(Credentials)
         deployment = objectFactory.newInstance(DeploymentConfiguration)
+        httpClient = objectFactory.property(HttpClient)
 
         response = projectLayout.buildDirectory.file(["deploygate", name, "response.json"].join(File.separator))
     }
@@ -88,14 +92,11 @@ abstract class UploadArtifactTask extends DefaultTask {
             throw new IllegalStateException("An artifact file (${inputParams.artifactFilePath}) was not found.")
         }
 
-        def appOwnerName = credentials.get().appOwnerName.get()
-        def apiToken = credentials.get().apiToken.get()
-
-        uploadArtifactToServer(appOwnerName, apiToken, inputParams)
+        uploadArtifactToServer(credentials.get(), inputParams)
     }
 
-    private void uploadArtifactToServer(@NotNull String appOwnerName, @NotNull String apiToken, @NotNull InputParams inputParams) {
-        onBeforeUpload(inputParams.artifactFile)
+    private void uploadArtifactToServer(@NotNull Credentials credentials, @NotNull InputParams inputParams) {
+        httpClient.get().lifecycleNotificationClient.notifyOnBeforeArtifactUpload(inputParams.artifactFile.length())
 
         def request = new UploadAppRequest(inputParams.artifactFile).tap {
             it.message = inputParams.message
@@ -104,33 +105,19 @@ abstract class UploadArtifactTask extends DefaultTask {
         }
 
         try {
-            def response = HttpClient.getInstance().getApiClient(apiToken).uploadApp(appOwnerName, request)
-            writeUploadResponse(response.rawResponse)
-            def sent = project.deploygate.notifyServer 'upload_finished', ['path': response.typedResponse.application.path]
+            def uploadResponse = httpClient.get().getApiClient(credentials).uploadApp(request)
 
-            if (!sent && (Config.shouldOpenAppDetailAfterUpload() || response.typedResponse.application.revision == 1)) {
-                BrowserUtils.openBrowser "${project.deploygate.endpoint}${response.typedResponse.application.path}"
+            uploadResponse.writeTo(response.get().asFile)
+
+            def hasNotified = httpClient.get().lifecycleNotificationClient.notifyOnSuccessOfArtifactUpload(uploadResponse.typedResponse.application.path)
+
+            if (!hasNotified && (Config.shouldOpenAppDetailAfterUpload() || uploadResponse.typedResponse.application.revision == 1)) {
+                BrowserUtils.openBrowser "${project.deploygate.endpoint}${uploadResponse.typedResponse.application.path}"
             }
         } catch (Throwable e) {
             logger.debug(e.message, e)
-            project.deploygate.notifyServer 'upload_finished', ['error': true, message: e.message]
+            httpClient.get().lifecycleNotificationClient.notifyOnFailureOfArtifactUpload(e.message ?: 'something went wrong');
             throw new GradleException("${inputParams.variantName} failed due to ${e.message}", e)
         }
-    }
-
-    private void onBeforeUpload(@NotNull File artifactFile) {
-        project.deploygate.notifyServer 'start_upload', ['length': Long.toString(artifactFile.length())]
-    }
-
-    private void writeUploadResponse(String rawResponse) {
-        def f = response.get().asFile
-        if (!f.parentFile.exists()) {
-            f.parentFile.mkdirs()
-        }
-
-        if (f.exists()) {
-            f.delete()
-        }
-        f.write(rawResponse)
     }
 }
