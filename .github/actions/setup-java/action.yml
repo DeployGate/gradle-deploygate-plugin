@@ -1,9 +1,10 @@
 name: 'Set up Java'
 inputs:
   java-version:
-    default: '8'
+    description: JRE version to run tasks
     required: false
   android-components:
+    description: Additional Android components to install
     required: false
 runs:
   using: 'composite'
@@ -16,7 +17,9 @@ runs:
     - uses: android-actions/setup-android@v2
     - run: sdkmanager "build-tools;29.0.2" "build-tools;30.0.0" "build-tools;30.0.2" "platforms;android-29" "platform-tools" ${{ inputs.android-components }}
       shell: bash
-    - uses: actions/setup-java@v3
+    - if: >
+        inputs.java-version
+      uses: actions/setup-java@v3
       with:
         java-version: ${{ inputs.java-version }}
         distribution: 'temurin'

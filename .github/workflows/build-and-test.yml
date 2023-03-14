@@ -12,8 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-java
-        with:
-          java-version: '8'
       - run: ./gradlew spotlessCheck
 
   unit-test:
@@ -32,8 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-java
-        with:
-          java-version: '8'
       - run: ./gradlew publishToMavenLocal test
         env:
           TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
@@ -64,8 +60,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-java
-        with:
-          java-version: '8'
       - run: ./gradlew testUnrollAcceptanceTest
         env:
           TEST_SERVER_URL: http://localhost:3000
@@ -106,25 +100,18 @@ jobs:
         include:
           - agp_version: '4.2.0'
             gradle_version: '6.7.1'
-            java_version: '8'
           - agp_version: '4.2.0'
             gradle_version: '7.0.2'
-            java_version: '8'
           - agp_version: '7.0.0'
             gradle_version: '7.0.2'
-            java_version: '11'
           - agp_version: '7.1.0'
             gradle_version: '7.2'
-            java_version: '11'
           - agp_version: '7.2.0'
             gradle_version: '7.3.3'
-            java_version: '11'
           - agp_version: '7.3.0'
             gradle_version: '7.4.2'
-            java_version: '11'
           - agp_version: '7.4.0'
             gradle_version: '7.5'
-            java_version: '11'
           - agp_version: '8.0.0-beta04'
             gradle_version: '8.0'
             java_version: '17'
