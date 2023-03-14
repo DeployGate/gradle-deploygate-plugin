@@ -1,47 +1,73 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.ApkInfo
-import com.deploygate.gradle.plugins.dsl.NamedDeployment
-import com.deploygate.gradle.plugins.tasks.factory.DeployGateTaskFactory
+import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.VisibleForTesting
 
-import javax.annotation.Nonnull
+import javax.inject.Inject
 
-class UploadApkTask extends UploadArtifactTask {
-    static Configuration createConfiguration(@Nonnull NamedDeployment deployment, @Nonnull ApkInfo apkInfo) {
-        return new Configuration(
-                artifactFile: deployment.sourceFile ?: apkInfo.apkFile,
-                isSigningReady: apkInfo.isSigningReady(),
-                isUniversalApk: apkInfo.isUniversalApk(),
-                message: deployment.message,
-                distributionKey: deployment.distribution.key,
-                releaseNote: deployment.distribution.releaseNote
+abstract class UploadApkTask extends UploadArtifactTask {
+    @NotNull
+    @VisibleForTesting
+    static InputParams createInputParams(@NotNull ApkInfo apk, @NotNull DeploymentConfiguration deployment) {
+        return new InputParams(
+                variantName: apk.variantName,
+                artifactFilePath: deployment.sourceFilePath.getOrElse(apk.apkFile?.absolutePath),
+                isSigningReady: apk.isSigningReady(),
+                isUniversalApk: apk.isUniversalApk(),
+                message: deployment.message.getOrNull(),
+                distributionKey: deployment.distributionKey.getOrNull(),
+                releaseNote: deployment.distributionReleaseNote.getOrNull()
         )
     }
 
-    @TaskAction
-    void doUpload() {
-        super.doUpload()
+    @Internal
+    final Property<ApkInfo> apkInfo
+
+    @Inject
+    UploadApkTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
+        super(objectFactory, projectLayout)
+        apkInfo = objectFactory.property(ApkInfo)
     }
 
+    @Internal
     @Override
-    void applyTaskProfile() {
-        setDescription("Deploy assembled $variantName to DeployGate")
+    Provider<InputParams> getInputParamsProvider() {
+        return apkInfo.map { apk -> createInputParams(apk, deployment) }
+    }
 
-        if (!configuration.isSigningReady) {
+    @Internal
+    @Override
+    String getDescription() {
+        def inputParams = inputParamsProvider.get()
+
+        if (inputParams.isSigningReady) {
+            return "Deploy assembled ${inputParams.variantName} to DeployGate"
+        } else {
             // require signing config to build a signed APKs
-            setDescription(description + " (requires valid signingConfig setting)")
-        }
-
-        if (configuration.isUniversalApk) {
-            group = DeployGateTaskFactory.GROUP_NAME
+            return "Deploy assembled ${inputParams.variantName} to DeployGate (requires valid signingConfig setting)"
         }
     }
 
-    @Override
-    void runArtifactSpecificVerification() {
-        if (!configuration.isSigningReady) {
+    @TaskAction
+    void execute() {
+        def inputParams = inputParamsProvider.get()
+
+        if (!inputParams.isSigningReady) {
             throw new IllegalStateException('Cannot upload a build without code signature to DeployGate')
         }
+
+        if (!inputParams.isUniversalApk) {
+            throw new IllegalStateException('Cannot upload non-universal apk to DeployGate')
+        }
+
+        doUpload(inputParams)
     }
 }

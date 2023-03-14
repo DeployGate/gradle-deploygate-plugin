@@ -128,7 +128,7 @@ jobs:
           java-version: ${{ matrix.java_version }}
       - uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: ${{ matrix.runner_gradle_version || '5.4' }}
+          gradle-version: ${{ matrix.runner_gradle_version || '6.7.1' }}
       - run: gradle testPluginAcceptanceTest
         env:
           TEST_AGP_VERSION: ${{ matrix.agp_version }}

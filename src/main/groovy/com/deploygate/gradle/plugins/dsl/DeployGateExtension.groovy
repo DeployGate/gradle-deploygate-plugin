@@ -3,10 +3,9 @@ package com.deploygate.gradle.plugins.dsl
 import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
-import com.deploygate.gradle.plugins.internal.annotation.Internal
+import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal
 import com.deploygate.gradle.plugins.internal.http.ApiClient
 import com.deploygate.gradle.plugins.internal.http.NotifyActionRequest
-import com.google.common.annotations.VisibleForTesting
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
@@ -101,65 +100,16 @@ class DeployGateExtension implements ExtensionSyntax {
         return deployments.findByName(name)
     }
 
-    @Nonnull
-    NamedDeployment findDeploymentByName(@Nonnull String name) {
-        def result = new NamedDeployment(name)
-        NamedDeployment declaredTarget = deployments.findByName(name)
-
-        if (declaredTarget) {
-            mergeDeployments(result, declaredTarget)
-        }
-
-        mergeDeployments(result, getEnvironmentBasedDeployment(project))
-
-        return result
-    }
-
-    @Internal
+    @DeployGateInternal
     @Deprecated
     String getEndpoint() {
         return ApiClient.endpoint
     }
 
-    @Internal
+    @DeployGateInternal
     @Deprecated
     void setEndpoint(String value) {
         ApiClient.endpoint = value
-    }
-
-    @VisibleForTesting
-    static void mergeDeployments(@Nonnull NamedDeployment base, @Nullable NamedDeployment other) {
-        base.sourceFile = base.sourceFile ?: other.sourceFile
-        base.message = base.message ?: other.message
-        base._internalSetVisibility(base._internalGetVisibility() ?: other._internalGetVisibility())
-        base.skipAssemble = base.skipAssemble || other.skipAssemble
-        base.distribution.merge(other.distribution)
-    }
-
-    @VisibleForTesting
-    static NamedDeployment getEnvironmentBasedDeployment(Project project) {
-        File sourceFile = System.getenv(DeployGatePlugin.ENV_NAME_SOURCE_FILE)?.with { it -> project.file(it) }
-        String message = System.getenv(DeployGatePlugin.ENV_NAME_MESSAGE)
-        String distributionKey = System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_KEY)
-        String distributionReleaseNote = [
-                System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE),
-                System.getenv(DeployGatePlugin.ENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1)
-        ].find { it }
-        String visibility = System.getenv(DeployGatePlugin.ENV_NAME_APP_VISIBILITY)
-
-        def deployment = new NamedDeployment("environment-based")
-
-        deployment.sourceFile = sourceFile
-        deployment.message = message
-        deployment.distribution { Distribution distribution ->
-            distribution.key = distributionKey
-            distribution.releaseNote = distributionReleaseNote
-        }
-        if (visibility) {
-            deployment.visibility = visibility
-        }
-
-        return deployment
     }
 
     /**
@@ -169,7 +119,7 @@ class DeployGateExtension implements ExtensionSyntax {
      * @param data a map of key-values
      * @return true if the request has been processed regardless of its result, otherwise false.
      */
-    @Internal
+    @DeployGateInternal
     boolean notifyServer(String action, HashMap<String, String> data = null) {
         if (!notifyKey) {
             return false
@@ -191,7 +141,7 @@ class DeployGateExtension implements ExtensionSyntax {
         return true
     }
 
-    @Internal
+    @DeployGateInternal
     @Nonnull
     CliCredentialStore getCredentialStore() {
         return credentialStore

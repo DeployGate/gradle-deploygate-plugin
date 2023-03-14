@@ -1,7 +1,6 @@
 package com.deploygate.gradle.plugins.dsl
 
 import com.deploygate.gradle.plugins.dsl.syntax.DistributionSyntax
-import org.gradle.util.Configurable
 
 import javax.annotation.Nonnull
 import javax.annotation.Nullable

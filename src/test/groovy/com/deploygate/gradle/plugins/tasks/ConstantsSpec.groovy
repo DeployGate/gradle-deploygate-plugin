@@ -1,12 +1,12 @@
-package com.deploygate.gradle.plugins.tasks.factory
+package com.deploygate.gradle.plugins.tasks
 
 import spock.lang.Specification
 
-class DeployGateTaskFactorySpec extends Specification {
+class ConstantsSpec extends Specification {
 
     def "uploadApkTaskName should return #taskName"() {
         expect:
-        DeployGateTaskFactory.uploadApkTaskName(variantName) == taskName
+        Constants.uploadApkTaskName(variantName) == taskName
 
         where:
         variantName | taskName
@@ -17,7 +17,7 @@ class DeployGateTaskFactorySpec extends Specification {
 
     def "uploadAabTaskName should return #taskName"() {
         expect:
-        DeployGateTaskFactory.uploadAabTaskName(variantName) == taskName
+        Constants.uploadAabTaskName(variantName) == taskName
 
         where:
         variantName | taskName

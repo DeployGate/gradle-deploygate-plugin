@@ -101,7 +101,7 @@ ext {
     androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "4.2.0")
     gradleVersion = VersionString.parse(gradle.gradleVersion)
 
-    requireJava11 = VersionString.parse("8.0.0-alpha09") <= androidGradleVersion
+    requireJava11 = VersionString.parse("7.4.0") <= androidGradleVersion
     requireGroovy3 = VersionString.parse("7.0") <= gradleVersion
 }
 

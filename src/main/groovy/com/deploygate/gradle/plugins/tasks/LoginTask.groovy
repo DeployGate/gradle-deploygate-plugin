@@ -3,23 +3,39 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.internal.http.ApiClient
 import com.deploygate.gradle.plugins.internal.http.GetCredentialsResponse
+import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import com.deploygate.gradle.plugins.utils.BrowserUtils
 import com.deploygate.gradle.plugins.utils.UrlUtils
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.VisibleForTesting
 
+import javax.inject.Inject
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class LoginTask extends DefaultTask {
+abstract class LoginTask extends DefaultTask {
+
+    @Input
+    @Optional
+    final Property<String> appOwnerName
+
+    @Input
+    @Optional
+    final Property<String> apiToken
 
     @Internal
-    DeployGateExtension deployGateExtension
+    DeployGateExtension deployGateExtension // TODO remove this reference
 
     @Internal
     String onetimeKey
@@ -27,9 +43,22 @@ class LoginTask extends DefaultTask {
     @Internal
     CountDownLatch countDownLatch
 
+    @Internal
+    final Credentials credentials
+
+    @Inject
+    LoginTask(@NotNull ObjectFactory objectFactory) {
+        credentials = objectFactory.newInstance(Credentials)
+        appOwnerName = objectFactory.property(String)
+        apiToken = objectFactory.property(String)
+
+        description = "Check the configured credentials and launch the authentication flow if they are not enough."
+        group = Constants.TASK_GROUP_NAME
+    }
+
     @TaskAction
     def setup() {
-        if (!(deployGateExtension.appOwnerName && deployGateExtension.apiToken)) {
+        if (!(appOwnerName.isPresent() && apiToken.isPresent())) {
             if (!setupCredential()) {
                 throw new RuntimeException('We could not retrieve DeployGate credentials. Please make sure you have configured app owner name and api token or any browser application is available to launch the authentication flow.')
             }
@@ -40,23 +69,23 @@ class LoginTask extends DefaultTask {
 
             logger.info("The authentication has succeeded. The application owner name is ${store.name}.")
 
-            // We can set the values iff it's not set yet because of the idempotency.
-
-            if (!deployGateExtension.appOwnerName) {
-                deployGateExtension.setAppOwnerName(store.name)
-            }
-
-            if (!deployGateExtension.apiToken) {
-                deployGateExtension.setApiToken(store.token)
-            }
+            // We can set the values unless they are found because of the idempotency.
+            credentials.appOwnerName.set(appOwnerName.getOrElse(store.name))
+            credentials.apiToken.set(apiToken.getOrElse(store.token))
+        } else {
+            credentials.appOwnerName.set(appOwnerName)
+            credentials.apiToken.set(apiToken)
         }
+
+        credentials.normalizeAndValidate()
     }
 
     /**
      * Launch the authentication flow and fetch the credentials if possible
      * @return true if the credentials are persisted, otherwise false.
      */
-    private boolean setupCredential() {
+    @VisibleForTesting
+    boolean setupCredential() {
         if (BrowserUtils.hasBrowser()) {
             setupBrowser()
         } else {

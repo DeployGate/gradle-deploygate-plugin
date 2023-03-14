@@ -2,97 +2,105 @@ package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.internal.http.ApiClient
-import com.deploygate.gradle.plugins.internal.http.NetworkFailure
 import com.deploygate.gradle.plugins.internal.http.UploadAppRequest
+import com.deploygate.gradle.plugins.tasks.inputs.Credentials
+import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
 import com.deploygate.gradle.plugins.utils.BrowserUtils
-import com.google.common.annotations.VisibleForTesting
-import org.apache.hc.client5.http.HttpResponseException
-import org.apache.hc.core5.http.HttpException
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputFile
-
-import javax.annotation.Nonnull
-import javax.annotation.Nullable
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFile
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.*
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 abstract class UploadArtifactTask extends DefaultTask {
-    static class Configuration {
+    static class InputParams {
+        @Input
+        String variantName
+
+        @Input
         boolean isSigningReady
+
+        @Input
         boolean isUniversalApk
 
-        File artifactFile
+        @InputFile
+        @Optional
+        final Closure<File> artifactFileProvider = {
+            // workaround of OptionalInputFile: https://github.com/gradle/gradle/issues/2016
+            def f = new File(artifactFilePath)
+            f.exists() ? f : null
+        }
 
+        /**
+         * must be an absolute path
+         */
+        @Input
+        String artifactFilePath
+
+        @Input
+        @Optional
         String message
+
+        @Nested
+        @Optional
         String distributionKey
+
+        @Input
+        @Optional
         String releaseNote
+
+        @Internal
+        @Nullable
+        File getArtifactFile() {
+            return artifactFileProvider.call()
+        }
     }
 
-    @Internal
-    @Nullable
-    private String variantName
+    @Nested
+    final Property<Credentials> credentials
 
-    @Internal
-    Configuration configuration
-
-    private def packageApplicationTaskProvider
+    @Nested
+    final DeploymentConfiguration deployment
 
     @OutputFile
-    File response = new File(new File(new File(project.buildDir, "deploygate"), name), "response.json")
+    final Provider<RegularFile> response
 
-    void setVariantName(@Nonnull String variantName) {
-        if (this.variantName && this.variantName != variantName) {
-            throw new IllegalStateException("different variant name cannot be assigned")
-        }
+    UploadArtifactTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
+        super()
+        group = Constants.TASK_GROUP_NAME
 
-        this.variantName = variantName
+        credentials = objectFactory.property(Credentials)
+        deployment = objectFactory.newInstance(DeploymentConfiguration)
+
+        response = projectLayout.buildDirectory.file(["deploygate", name, "response.json"].join(File.separator))
     }
 
-    @Nullable
-    String getVariantName() {
-        return variantName
+    @NotNull
+    abstract Provider<InputParams> getInputParamsProvider()
+
+    protected final void doUpload(@NotNull InputParams inputParams) {
+        if (!inputParams.artifactFile) {
+            throw new IllegalStateException("An artifact file (${inputParams.artifactFilePath}) was not found.")
+        }
+
+        def appOwnerName = credentials.get().appOwnerName.get()
+        def apiToken = credentials.get().apiToken.get()
+
+        uploadArtifactToServer(appOwnerName, apiToken, inputParams)
     }
 
-    void setConfiguration(@Nonnull Configuration configuration) {
-        if (!this.variantName) {
-            throw new IllegalStateException("variant name must be set first")
-        }
+    private void uploadArtifactToServer(@NotNull String appOwnerName, @NotNull String apiToken, @NotNull InputParams inputParams) {
+        onBeforeUpload(inputParams.artifactFile)
 
-        if (this.configuration) {
-            logger.debug("$variantName upload artifact (${this.getClass().simpleName}) task configuration has been overwritten")
-        }
-
-        this.configuration = configuration
-    }
-
-    // Add TaskAction annotation in overrider classes
-    void doUpload() {
-        runArtifactSpecificVerification()
-        uploadArtifactToServer()
-    }
-
-    abstract void applyTaskProfile()
-
-    abstract void runArtifactSpecificVerification()
-
-    private void uploadArtifactToServer() {
-        if (!configuration.artifactFile) {
-            throw new IllegalStateException("An artifact file to be upload not specified.")
-        }
-
-        if (!configuration.artifactFile.exists()) {
-            throw new IllegalStateException("An artifact file (${configuration.artifactFile}) was not found. If you are using Android Build Tools >= 3.0.0, you need to set `sourceFile` in your build.gradle. See https://docs.deploygate.com/docs/gradle-plugin")
-        }
-
-        def appOwnerName = getAppOwnerName()
-        def apiToken = getApiToken()
-
-        onBeforeUpload()
-
-        def request = new UploadAppRequest(configuration.artifactFile).tap {
-            it.message = configuration.message
-            it.distributionKey = configuration.distributionKey
-            it.releaseNote = configuration.releaseNote
+        def request = new UploadAppRequest(inputParams.artifactFile).tap {
+            it.message = inputParams.message
+            it.distributionKey = inputParams.distributionKey
+            it.releaseNote = inputParams.releaseNote
         }
 
         try {
@@ -106,48 +114,23 @@ abstract class UploadArtifactTask extends DefaultTask {
         } catch (Throwable e) {
             logger.debug(e.message, e)
             project.deploygate.notifyServer 'upload_finished', ['error': true, message: e.message]
-            throw new GradleException("${variantName} failed due to ${e.message}", e)
+            throw new GradleException("${inputParams.variantName} failed due to ${e.message}", e)
         }
     }
 
-    private void onBeforeUpload() {
-        project.deploygate.notifyServer 'start_upload', ['length': Long.toString(configuration.artifactFile.length())]
+    private void onBeforeUpload(@NotNull File artifactFile) {
+        project.deploygate.notifyServer 'start_upload', ['length': Long.toString(artifactFile.length())]
     }
 
     private void writeUploadResponse(String rawResponse) {
-        if (!response.parentFile.exists()) {
-            response.parentFile.mkdirs()
+        def f = response.get().asFile
+        if (!f.parentFile.exists()) {
+            f.parentFile.mkdirs()
         }
 
-        if (response.exists()) {
-            response.delete()
+        if (f.exists()) {
+            f.delete()
         }
-        response.write(rawResponse)
-    }
-
-    @Nonnull
-    @VisibleForTesting
-    @Internal
-    String getApiToken() {
-        def apiToken = project.deploygate.apiToken
-
-        if (!apiToken?.trim()) {
-            throw new GradleException('apiToken is missing. Please enter the token.')
-        }
-
-        apiToken.trim()
-    }
-
-    @Nonnull
-    @VisibleForTesting
-    @Internal
-    String getAppOwnerName() {
-        def appOwnerName = project.deploygate.appOwnerName
-
-        if (!appOwnerName?.trim()) {
-            throw new GradleException('appOwnerName is missing. Please enter the token.')
-        }
-
-        appOwnerName.trim()
+        f.write(rawResponse)
     }
 }
