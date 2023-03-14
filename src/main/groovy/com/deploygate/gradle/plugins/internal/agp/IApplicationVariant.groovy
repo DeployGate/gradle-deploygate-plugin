@@ -2,17 +2,16 @@ package com.deploygate.gradle.plugins.internal.agp
 
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
-
-import javax.annotation.Nonnull
+import org.jetbrains.annotations.NotNull
 
 interface IApplicationVariant {
 
-    @Nonnull
+    @NotNull
     String getName()
 
     /**
      * @return TaskProvider of com.android.build.gradle.tasks.PackageApplication
      */
-    @Nonnull
+    @NotNull
     TaskProvider<? extends Task> packageApplicationTaskProvider()
 }

@@ -4,14 +4,13 @@ import org.gradle.api.provider.Provider;
 import org.jetbrains.annotations.NotNull;
 
 public final class ProviderFactoryUtils {
-    private ProviderFactoryUtils() {
-    }
+    private ProviderFactoryUtils() {}
 
     /**
      * The new provider will return the first-seen value in providers.
      *
      * @param providers
-     * @param <T>       Value type
+     * @param <T> Value type
      * @return the first-seen value
      */
     public static <T> Provider<T> pickFirst(@NotNull Provider<T>... providers) {

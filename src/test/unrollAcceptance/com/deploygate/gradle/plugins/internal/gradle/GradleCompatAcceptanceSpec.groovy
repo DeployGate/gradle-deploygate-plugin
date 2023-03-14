@@ -4,6 +4,7 @@ import com.deploygate.gradle.plugins.TestAndroidProject
 import com.deploygate.gradle.plugins.TestDeployGatePlugin
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.IgnoreIf
@@ -11,17 +12,15 @@ import spock.lang.Requires
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.annotation.Nonnull
-
 class GradleCompatAcceptanceSpec extends Specification {
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
 
-    @Nonnull
+    @NotNull
     TestAndroidProject testAndroidProject
 
-    @Nonnull
+    @NotNull
     TestDeployGatePlugin testDeployGatePlugin
 
     def setup() {
@@ -48,9 +47,7 @@ class GradleCompatAcceptanceSpec extends Specification {
         buildResult.task(":tasks").outcome == TaskOutcome.SUCCESS
 
         where:
-        gradleVersion << [
-                "7.0.2"
-        ]
+        gradleVersion << ["7.0.2"]
     }
 
     @Requires(value = { jvm.isJavaVersionCompatible(17) }, reason = "jdk 17 or higher cannot evaluate old Gradles that depend on jvm7")
@@ -70,8 +67,6 @@ class GradleCompatAcceptanceSpec extends Specification {
         buildResult.task(":tasks").outcome == TaskOutcome.SUCCESS
 
         where:
-        gradleVersion << [
-                "8.0"
-        ]
+        gradleVersion << ["8.0"]
     }
 }

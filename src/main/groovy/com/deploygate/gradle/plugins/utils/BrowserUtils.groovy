@@ -1,15 +1,15 @@
 package com.deploygate.gradle.plugins.utils
 
-import javax.annotation.Nonnull
+import org.jetbrains.annotations.NotNull
 
 class BrowserUtils {
 
-    @Nonnull
+    @NotNull
     private static String getOS_NAME() {
         return (System.getProperty("os.name") ?: "unknown").toLowerCase(Locale.US)
     }
 
-    static boolean openBrowser(@Nonnull String url) {
+    static boolean openBrowser(@NotNull String url) {
         if (hasBrowser()) {
             try {
                 if (isExecutableOnMacOS()) {
@@ -27,15 +27,15 @@ class BrowserUtils {
         false
     }
 
-    static boolean openBrowserForMac(@Nonnull String url) {
+    static boolean openBrowserForMac(@NotNull String url) {
         return ['open', url].execute().waitFor() == 0
     }
 
-    static boolean openBrowserForWindows(@Nonnull String url) {
+    static boolean openBrowserForWindows(@NotNull String url) {
         return ['cmd', '/c', 'start', url].execute().waitFor() == 0
     }
 
-    static boolean openBrowserForLinux(@Nonnull String url) {
+    static boolean openBrowserForLinux(@NotNull String url) {
         try {
             int result = ['xdg-open', url].execute().waitFor()
             if (result == 0) {

@@ -1,32 +1,35 @@
 package com.deploygate.gradle.plugins.internal.http;
 
+import java.util.Collections;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-
 public class LifecycleNotificationClient implements ILifecycleNotificationClient {
-    @NotNull
-    private final HttpClient httpClient;
-    @NotNull
-    private final String notifyKey;
+    @NotNull private final HttpClient httpClient;
+    @NotNull private final String notifyKey;
 
     /**
      * @param httpClient a real http client
-     * @param notifyKey  a notification key. In general, this is generated in the authentication flow.
+     * @param notifyKey a notification key. In general, this is generated in the authentication
+     *     flow.
      */
     LifecycleNotificationClient(@NotNull HttpClient httpClient, @NotNull String notifyKey) {
         this.httpClient = httpClient;
         this.notifyKey = notifyKey;
     }
 
-    @NotNull
-    @Override
-    public HttpClient.Response<GetCredentialsResponse> getCredentials() throws HttpResponseException, NetworkFailure {
-        HttpUriRequestBase requestBase = httpClient.buildRequest(HttpGet.METHOD_NAME, Collections.singletonMap("key", notifyKey), "cli", "credential");
+    @NotNull @Override
+    public HttpClient.Response<GetCredentialsResponse> getCredentials()
+            throws HttpResponseException, NetworkFailure {
+        HttpUriRequestBase requestBase =
+                httpClient.buildRequest(
+                        HttpGet.METHOD_NAME,
+                        Collections.singletonMap("key", notifyKey),
+                        "cli",
+                        "credential");
 
         return httpClient.execute(requestBase, GetCredentialsResponse.class);
     }
@@ -64,11 +67,12 @@ public class LifecycleNotificationClient implements ILifecycleNotificationClient
      * @param request a request to the server that must contain an action name
      * @return true anyway
      * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
-     * @throws NetworkFailure        is thrown if a network trouble happens
+     * @throws NetworkFailure is thrown if a network trouble happens
      */
     private boolean notify(@NotNull NotifyActionRequest request) {
         try {
-            HttpUriRequestBase httpPost = httpClient.buildRequest(HttpPost.METHOD_NAME, "cli", "notify");
+            HttpUriRequestBase httpPost =
+                    httpClient.buildRequest(HttpPost.METHOD_NAME, "cli", "notify");
             httpPost.setEntity(request.toEntity(notifyKey));
 
             httpClient.execute(httpPost, Object.class);

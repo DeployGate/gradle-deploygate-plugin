@@ -1,9 +1,9 @@
 package com.deploygate.gradle.plugins.artifacts
 
-import javax.annotation.Nonnull
+import org.jetbrains.annotations.NotNull
 
 class DefaultPresetAabInfo extends DirectAabInfo {
-    DefaultPresetAabInfo(@Nonnull String variantName) {
+    DefaultPresetAabInfo(@NotNull String variantName) {
         super(variantName, null)
     }
 }

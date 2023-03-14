@@ -14,7 +14,7 @@ class AcceptanceKtsTestSpec extends AcceptanceTestBaseSpec {
         given:
         testAndroidProject.useGradleKtsForBackwardCompatibilityResource()
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()

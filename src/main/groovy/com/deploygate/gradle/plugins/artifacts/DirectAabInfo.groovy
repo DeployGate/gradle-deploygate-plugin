@@ -1,18 +1,17 @@
 package com.deploygate.gradle.plugins.artifacts
 
-import com.google.common.annotations.VisibleForTesting
-
-import javax.annotation.Nonnull
-import javax.annotation.Nullable
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
+import org.jetbrains.annotations.VisibleForTesting
 
 @VisibleForTesting
 class DirectAabInfo implements AabInfo {
-    @Nonnull
+    @NotNull
     private final String variantName
     @Nullable
     private final File aabFile
 
-    DirectAabInfo(@Nonnull String variantName, @Nullable File aabFile) {
+    DirectAabInfo(@NotNull String variantName, @Nullable File aabFile) {
         this.variantName = variantName
         this.aabFile = aabFile
 
@@ -22,7 +21,7 @@ class DirectAabInfo implements AabInfo {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     String getVariantName() {
         return variantName
     }

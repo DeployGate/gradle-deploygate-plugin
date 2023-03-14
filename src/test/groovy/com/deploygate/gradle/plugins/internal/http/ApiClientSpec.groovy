@@ -4,19 +4,18 @@ import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import org.apache.hc.client5.http.HttpResponseException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import spock.lang.Unroll
-
-import javax.annotation.Nonnull
 
 class ApiClientSpec extends Specification {
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
 
-    @Nonnull
+    @NotNull
     private Project project
 
     def setup() {

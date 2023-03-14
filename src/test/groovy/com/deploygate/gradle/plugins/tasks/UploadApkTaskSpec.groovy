@@ -1,24 +1,23 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.DirectApkInfo
-import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-
-import javax.annotation.Nonnull
 
 class UploadApkTaskSpec extends Specification {
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
 
-    @Nonnull
+    @NotNull
     private Project project
 
     def setup() {

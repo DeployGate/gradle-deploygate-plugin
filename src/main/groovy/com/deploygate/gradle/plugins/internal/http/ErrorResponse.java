@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class ErrorResponse {
 
-    @NotNull
-    @SerializedName("message")
+    @NotNull @SerializedName("message")
     public final String message = "";
 }

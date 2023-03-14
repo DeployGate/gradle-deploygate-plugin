@@ -4,14 +4,10 @@ import java.util.regex.Pattern
 
 buildscript {
     repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        maven { url "https://plugins.gradle.org/m2/" }
         mavenCentral()
     }
-    dependencies {
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:6.13.0"
-    }
+    dependencies { classpath "com.diffplug.spotless:spotless-plugin-gradle:6.13.0" }
 }
 
 class VersionString implements Comparable<VersionString> {
@@ -154,7 +150,7 @@ task createClasspathManifest {
 if (requireJava11) {
     // since this version, android gradle plugin artifact is targeting Java 11 and we are using it in testing dependencies.
     // We need to change target compatibility only for testing.
-    sourceCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_11
 } else {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -165,8 +161,8 @@ dependencies {
     compileOnly gradleApi()
     compileOnly localGroovy()
     // Don't enable this on the repository because this artifact may include bytecode incompatibility.
-//    compileOnly "com.android.tools.build:gradle:$androidGradleVersion"
-    implementation 'org.jetbrains:annotations:23.1.0'
+    //    compileOnly "com.android.tools.build:gradle:$androidGradleVersion"
+    implementation 'org.jetbrains:annotations:24.0.1'
     implementation 'com.google.guava:guava-annotations:r03'
 
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
@@ -217,10 +213,10 @@ project.tasks.withType(Test).configureEach {
     }
 
     environment([
-            "ANDROID_HOME": System.getenv("ANDROID_HOME"),
-            "TEST_AGP_VERSION": System.getenv("TEST_AGP_VERSION"),
-            "TEST_GRADLE_VERSION": System.getenv("TEST_GRADLE_VERSION"),
-            "TEST_SERVER_URL": System.getenv("TEST_SERVER_URL") ?: "http://localhost:3000",
+        "ANDROID_HOME": System.getenv("ANDROID_HOME"),
+        "TEST_AGP_VERSION": System.getenv("TEST_AGP_VERSION"),
+        "TEST_GRADLE_VERSION": System.getenv("TEST_GRADLE_VERSION"),
+        "TEST_SERVER_URL": System.getenv("TEST_SERVER_URL") ?: "http://localhost:3000",
     ])
 }
 
@@ -247,6 +243,7 @@ def isRelease() {
 }
 
 allprojects {
+    // spotless requires Java11 so please comment out all spotless configurations if you wanna run on JRE 8
     spotless {
         ratchetFrom 'origin/master'
 
@@ -257,21 +254,24 @@ allprojects {
             removeUnusedImports()
             googleJavaFormat('1.16.0').aosp().reflowLongStrings()
             formatAnnotations()
+            indentWithSpaces(4)
         }
         groovy {
             importOrder()
             excludeJava()
             greclipse('4.8.0')
+            indentWithSpaces(4)
         }
         groovyGradle {
             target '*.gradle'
             greclipse('4.8.0')
+            indentWithSpaces(4)
         }
         format 'misc', {
             target '*.md', '.gitignore', '*.properties'
 
             trimTrailingWhitespace()
-            indentWithSpaces()
+            indentWithSpaces(4)
             endWithNewline()
         }
     }
@@ -315,9 +315,7 @@ afterEvaluate {
                             name = "DeployGate"
                         }
                     }
-                    scm {
-                        url = 'https://github.com/DeployGate/gradle-deploygate-plugin'
-                    }
+                    scm { url = 'https://github.com/DeployGate/gradle-deploygate-plugin' }
                 }
             }
         }
@@ -328,9 +326,7 @@ afterEvaluate {
             def signingKey = findProperty("signingKey")
             def signingPassword = findProperty("signingPassword")
             useInMemoryPgpKeys(signingKey, signingPassword)
-            publishing.publications.configureEach { publication ->
-                sign publication
-            }
+            publishing.publications.configureEach { publication -> sign publication }
         }
     }
 }

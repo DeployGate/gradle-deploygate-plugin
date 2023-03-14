@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.artifacts.ApkInfo
 import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
+import javax.inject.Inject
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -10,8 +11,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.VisibleForTesting
-
-import javax.inject.Inject
 
 abstract class UploadApkTask extends UploadArtifactTask {
     @NotNull
@@ -25,7 +24,7 @@ abstract class UploadApkTask extends UploadArtifactTask {
                 message: deployment.message.getOrNull(),
                 distributionKey: deployment.distributionKey.getOrNull(),
                 releaseNote: deployment.distributionReleaseNote.getOrNull()
-        )
+                )
     }
 
     @Internal

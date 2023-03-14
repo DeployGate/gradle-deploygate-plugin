@@ -5,8 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class NoOpLifecycleNotificationClient implements ILifecycleNotificationClient {
     @Override
-    @Nullable
-    public HttpClient.Response<GetCredentialsResponse> getCredentials() {
+    @Nullable public HttpClient.Response<GetCredentialsResponse> getCredentials() {
         return null;
     }
 

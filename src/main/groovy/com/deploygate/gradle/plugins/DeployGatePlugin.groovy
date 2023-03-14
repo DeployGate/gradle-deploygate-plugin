@@ -1,13 +1,18 @@
 package com.deploygate.gradle.plugins
 
+import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getAabInfo
+import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getApkInfo
+import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
+import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidBundleTaskName
+
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
-import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.DeprecationLogger
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.internal.http.HttpClient
 import com.deploygate.gradle.plugins.tasks.Constants
@@ -15,7 +20,6 @@ import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.UploadAabTask
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
@@ -23,11 +27,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.annotations.NotNull
-
-import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getAabInfo
-import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getApkInfo
-import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
-import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidBundleTaskName
 
 class DeployGatePlugin implements Plugin<Project> {
     private static final String EXTENSION_NAME = 'deploygate'

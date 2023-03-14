@@ -14,21 +14,14 @@ class BrowserUtilsSpec extends Specification {
     @Unroll
     def "openBrowser. Unrolled #name"() {
         given:
-        [""].class.metaClass.execute = { ->
+        [""].class.metaClass.execute = {
+            ->
             [waitFor: { -> 0 }]
         }
-        BrowserUtils.metaClass.static.hasBrowser = { ->
-            hasBrowser
-        }
-        BrowserUtils.metaClass.static.isExecutableOnMacOS = { ->
-            onMacOS
-        }
-        BrowserUtils.metaClass.static.isExecutableOnWindows = { ->
-            onWindows
-        }
-        BrowserUtils.metaClass.static.isExecutableOnLinux = { ->
-            onLinux
-        }
+        BrowserUtils.metaClass.static.hasBrowser = { -> hasBrowser }
+        BrowserUtils.metaClass.static.isExecutableOnMacOS = { -> onMacOS }
+        BrowserUtils.metaClass.static.isExecutableOnWindows = { -> onWindows }
+        BrowserUtils.metaClass.static.isExecutableOnLinux = { -> onLinux }
 
         expect:
         BrowserUtils.openBrowser(url) == result
@@ -46,8 +39,8 @@ class BrowserUtilsSpec extends Specification {
     def "isCiEnvironment. Unrolled #name"() {
         given:
         envStub.setEnv([
-                "CI"         : isCI,
-                "JENKINS_URL": jenkinsUrl
+            "CI"         : isCI,
+            "JENKINS_URL": jenkinsUrl
         ])
 
         expect:
@@ -67,11 +60,9 @@ class BrowserUtilsSpec extends Specification {
     def "isExecutableXXX. Unrolled osName is #osName"() {
         given:
         envStub.setEnv([
-                "DISPLAY": display,
+            "DISPLAY": display,
         ])
-        BrowserUtils.metaClass.static.getOS_NAME = { ->
-            osName
-        }
+        BrowserUtils.metaClass.static.getOS_NAME = { -> osName }
 
         expect:
         BrowserUtils.isExecutableOnMacOS() == onMacOS
@@ -96,18 +87,10 @@ class BrowserUtilsSpec extends Specification {
     @Unroll
     def "hasBrowser. Unrolled #name"() {
         given:
-        BrowserUtils.metaClass.static.isCiEnvironment = { ->
-            isCI
-        }
-        BrowserUtils.metaClass.static.isExecutableOnMacOS = { ->
-            onMacOS
-        }
-        BrowserUtils.metaClass.static.isExecutableOnWindows = { ->
-            onWindows
-        }
-        BrowserUtils.metaClass.static.isExecutableOnLinux = { ->
-            onLinux
-        }
+        BrowserUtils.metaClass.static.isCiEnvironment = { -> isCI }
+        BrowserUtils.metaClass.static.isExecutableOnMacOS = { -> onMacOS }
+        BrowserUtils.metaClass.static.isExecutableOnWindows = { -> onWindows }
+        BrowserUtils.metaClass.static.isExecutableOnLinux = { -> onLinux }
 
         expect:
         BrowserUtils.hasBrowser() == result

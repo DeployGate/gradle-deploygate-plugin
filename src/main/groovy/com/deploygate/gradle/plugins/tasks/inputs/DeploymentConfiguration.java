@@ -1,10 +1,12 @@
 package com.deploygate.gradle.plugins.tasks.inputs;
 
+import static com.deploygate.gradle.plugins.internal.gradle.GradleCompat.forUseAtConfigurationTime;
+
 import com.deploygate.gradle.plugins.DeployGatePlugin;
 import com.deploygate.gradle.plugins.dsl.Distribution;
 import com.deploygate.gradle.plugins.dsl.NamedDeployment;
-import com.deploygate.gradle.plugins.internal.gradle.GradleCompat;
 import com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils;
+import javax.inject.Inject;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.ProviderFactory;
@@ -13,53 +15,64 @@ import org.gradle.api.tasks.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.inject.Inject;
-
-import static com.deploygate.gradle.plugins.internal.gradle.GradleCompat.forUseAtConfigurationTime;
-
 public abstract class DeploymentConfiguration {
 
-    /**
-     * must be an absolute path
-     */
+    /** must be an absolute path */
     @Input
     @Optional
-    @NotNull
-    public abstract Property<String> getSourceFilePath();
+    @NotNull public abstract Property<String> getSourceFilePath();
 
     @Input
     @Optional
-    @NotNull
-    public abstract Property<String> getMessage();
+    @NotNull public abstract Property<String> getMessage();
 
     @Input
-    @NotNull
-    public abstract Property<Boolean> getSkipAssemble();
-
-    @Input
-    @Optional
-    @NotNull
-    public abstract Property<String> getDistributionKey();
+    @NotNull public abstract Property<Boolean> getSkipAssemble();
 
     @Input
     @Optional
-    @NotNull
-    public abstract Property<String> getDistributionReleaseNote();
+    @NotNull public abstract Property<String> getDistributionKey();
+
+    @Input
+    @Optional
+    @NotNull public abstract Property<String> getDistributionReleaseNote();
 
     @Inject
-    public DeploymentConfiguration(@NotNull ProviderFactory providerFactory, @NotNull ProjectLayout projectLayout) {
-        getSourceFilePath().set(
-                forUseAtConfigurationTime(providerFactory.environmentVariable(DeployGatePlugin.getENV_NAME_SOURCE_FILE()))
-                        .map(s -> projectLayout.getProjectDirectory().file(s).getAsFile().getAbsolutePath())
-        );
-        getMessage().set(forUseAtConfigurationTime(providerFactory.environmentVariable(DeployGatePlugin.getENV_NAME_MESSAGE())));
-        getDistributionKey().set(forUseAtConfigurationTime(providerFactory.environmentVariable(DeployGatePlugin.getENV_NAME_DISTRIBUTION_KEY())));
-        getDistributionReleaseNote().set(
-                ProviderFactoryUtils.pickFirst(
-                        forUseAtConfigurationTime(providerFactory.environmentVariable(DeployGatePlugin.getENV_NAME_DISTRIBUTION_RELEASE_NOTE())),
-                        forUseAtConfigurationTime(providerFactory.environmentVariable(DeployGatePlugin.getENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1()))
-                )
-        );
+    public DeploymentConfiguration(
+            @NotNull ProviderFactory providerFactory, @NotNull ProjectLayout projectLayout) {
+        getSourceFilePath()
+                .set(
+                        forUseAtConfigurationTime(
+                                        providerFactory.environmentVariable(
+                                                DeployGatePlugin.getENV_NAME_SOURCE_FILE()))
+                                .map(
+                                        s ->
+                                                projectLayout
+                                                        .getProjectDirectory()
+                                                        .file(s)
+                                                        .getAsFile()
+                                                        .getAbsolutePath()));
+        getMessage()
+                .set(
+                        forUseAtConfigurationTime(
+                                providerFactory.environmentVariable(
+                                        DeployGatePlugin.getENV_NAME_MESSAGE())));
+        getDistributionKey()
+                .set(
+                        forUseAtConfigurationTime(
+                                providerFactory.environmentVariable(
+                                        DeployGatePlugin.getENV_NAME_DISTRIBUTION_KEY())));
+        getDistributionReleaseNote()
+                .set(
+                        ProviderFactoryUtils.pickFirst(
+                                forUseAtConfigurationTime(
+                                        providerFactory.environmentVariable(
+                                                DeployGatePlugin
+                                                        .getENV_NAME_DISTRIBUTION_RELEASE_NOTE())),
+                                forUseAtConfigurationTime(
+                                        providerFactory.environmentVariable(
+                                                DeployGatePlugin
+                                                        .getENV_NAME_DISTRIBUTION_RELEASE_NOTE_V1()))));
         getSkipAssemble().set(false);
     }
 

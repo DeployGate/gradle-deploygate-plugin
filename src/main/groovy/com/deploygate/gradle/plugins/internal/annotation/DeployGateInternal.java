@@ -7,5 +7,4 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.SOURCE)
-public @interface DeployGateInternal {
-}
+public @interface DeployGateInternal {}

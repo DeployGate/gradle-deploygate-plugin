@@ -9,10 +9,10 @@ public interface ILifecycleNotificationClient {
      * Get the credentials from the server
      *
      * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
-     * @throws NetworkFailure        is thrown if a network trouble happens
+     * @throws NetworkFailure is thrown if a network trouble happens
      */
-    @Nullable
-    HttpClient.Response<GetCredentialsResponse> getCredentials() throws HttpResponseException, NetworkFailure;
+    @Nullable HttpClient.Response<GetCredentialsResponse> getCredentials()
+            throws HttpResponseException, NetworkFailure;
 
     boolean notifyOnCredentialSaved();
 

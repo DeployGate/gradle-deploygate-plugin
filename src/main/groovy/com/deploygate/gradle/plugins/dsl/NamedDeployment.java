@@ -3,13 +3,12 @@ package com.deploygate.gradle.plugins.dsl;
 import com.deploygate.gradle.plugins.dsl.syntax.DeploymentSyntax;
 import com.deploygate.gradle.plugins.internal.DeprecationLogger;
 import groovy.lang.Closure;
-import org.gradle.api.Action;
-import org.gradle.api.Named;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Objects;
+import org.gradle.api.Action;
+import org.gradle.api.Named;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /*
  * This file cannot be written in Groovy until we decide to drop supporting Gradle 6.7 or lower.
@@ -18,33 +17,27 @@ import java.util.Objects;
  * For the more details, please check https://github.com/DeployGate/gradle-deploygate-plugin/pull/144 out.
  */
 public class NamedDeployment implements Named, DeploymentSyntax {
-    @Nonnull
-    private final String name;
+    @NotNull private final String name;
 
-    @Nullable
-    private File sourceFile;
+    @Nullable private File sourceFile;
 
-    @Nullable
-    private String message;
+    @Nullable private String message;
 
     private boolean skipAssemble;
 
-    @Nullable
-    @Deprecated
-    private String visibility;
+    @Nullable @Deprecated private String visibility;
 
-    // Avoid using Optional like Guava for now because we want to reduce external dependencies as much as possible.
-    @Nonnull
-    private Distribution[] optionalDistribution;
+    // Avoid using Optional like Guava for now because we want to reduce external dependencies as
+    // much as possible.
+    @NotNull private Distribution[] optionalDistribution;
 
-    public NamedDeployment(@Nonnull String name) {
+    public NamedDeployment(@NotNull String name) {
         this.name = name;
-        this.optionalDistribution = new Distribution[]{new Distribution()};
+        this.optionalDistribution = new Distribution[] {new Distribution()};
     }
 
     @Override
-    @Nonnull
-    public String getName() {
+    @NotNull public String getName() {
         return name;
     }
 
@@ -52,9 +45,7 @@ public class NamedDeployment implements Named, DeploymentSyntax {
         return skipAssemble;
     }
 
-    /**
-     * for Kotlin properly access
-     */
+    /** for Kotlin properly access */
     public boolean getSkipAssemble() {
         return skipAssemble;
     }
@@ -64,8 +55,7 @@ public class NamedDeployment implements Named, DeploymentSyntax {
         this.skipAssemble = skipAssemble;
     }
 
-    @Nullable
-    public File getSourceFile() {
+    @Nullable public File getSourceFile() {
         return sourceFile;
     }
 
@@ -74,8 +64,7 @@ public class NamedDeployment implements Named, DeploymentSyntax {
         this.sourceFile = sourceFile;
     }
 
-    @Nullable
-    public String getMessage() {
+    @Nullable public String getMessage() {
         return message;
     }
 
@@ -85,12 +74,12 @@ public class NamedDeployment implements Named, DeploymentSyntax {
     }
 
     @Override
-    public void distribution(@Nonnull Action<Distribution> builder) {
+    public void distribution(@NotNull Action<Distribution> builder) {
         builder.execute(getDistribution());
     }
 
     @Override
-    public void distribution(@Nonnull Closure cl) {
+    public void distribution(@NotNull Closure cl) {
         Distribution distribution = getDistribution();
         cl.setDelegate(distribution);
         cl.setResolveStrategy(Closure.DELEGATE_ONLY);
@@ -101,8 +90,7 @@ public class NamedDeployment implements Named, DeploymentSyntax {
         return getDistribution().isPresent();
     }
 
-    @Nonnull
-    public Distribution getDistribution() {
+    @NotNull public Distribution getDistribution() {
         return optionalDistribution[0];
     }
 
@@ -111,61 +99,92 @@ public class NamedDeployment implements Named, DeploymentSyntax {
     @Override
     @Deprecated
     public void setVisibility(@Nullable String visibility) {
-        DeprecationLogger.deprecation("NamedDeployment.setVisibility(String)", "2.5", "3.0", "This API has no effect and no alternative is available. You would see this message until ${DeployGatePlugin.ENV_NAME_APP_VISIBILITY} environment variable is removed.");
+        DeprecationLogger.deprecation(
+                "NamedDeployment.setVisibility(String)",
+                "2.5",
+                "3.0",
+                "This API has no effect and no alternative is available. You would see this message"
+                    + " until ${DeployGatePlugin.ENV_NAME_APP_VISIBILITY} environment variable is"
+                    + " removed.");
         _internalSetVisibility(visibility);
     }
 
     @Deprecated
     public String getVisibility() {
-        DeprecationLogger.deprecation("NamedDeployment.getVisibility()", "2.5", "3.0", "This API has no effect and no alternative is available.");
+        DeprecationLogger.deprecation(
+                "NamedDeployment.getVisibility()",
+                "2.5",
+                "3.0",
+                "This API has no effect and no alternative is available.");
         return _internalGetVisibility();
     }
 
     @Deprecated
-    @Nullable
-    public String getDistributionKey() {
-        DeprecationLogger.deprecation("NamedDeployment.getDistributionKey()", "2.0", "3.0", "Use distribution closure directly.");
+    @Nullable public String getDistributionKey() {
+        DeprecationLogger.deprecation(
+                "NamedDeployment.getDistributionKey()",
+                "2.0",
+                "3.0",
+                "Use distribution closure directly.");
         return hasDistribution() ? getDistribution().getKey() : null;
     }
 
     @Deprecated
     public void setDistributionKey(@Nullable final String distributionKey) {
-        DeprecationLogger.deprecation("NamedDeployment.setDistributionKey(String)", "2.0", "3.0", "Use distribution closure instead.");
-        distribution(new Action<Distribution>() {
-            @Override
-            public void execute(Distribution distribution) {
-                distribution.setKey(distributionKey);
-            }
-        });
+        DeprecationLogger.deprecation(
+                "NamedDeployment.setDistributionKey(String)",
+                "2.0",
+                "3.0",
+                "Use distribution closure instead.");
+        distribution(
+                new Action<Distribution>() {
+                    @Override
+                    public void execute(Distribution distribution) {
+                        distribution.setKey(distributionKey);
+                    }
+                });
     }
 
     @Deprecated
-    @Nullable
-    public String getReleaseNote() {
-        DeprecationLogger.deprecation("NamedDeployment.getReleaseNote()", "2.0", "3.0", "Use distribution closure directly.");
+    @Nullable public String getReleaseNote() {
+        DeprecationLogger.deprecation(
+                "NamedDeployment.getReleaseNote()",
+                "2.0",
+                "3.0",
+                "Use distribution closure directly.");
         return hasDistribution() ? getDistribution().getReleaseNote() : null;
     }
 
     @Deprecated
     public void setReleaseNote(@Nullable final String releaseNote) {
-        DeprecationLogger.deprecation("NamedDeployment.setReleaseNote(String)", "2.0", "3.0", "Use distribution closure instead.");
-        distribution(new Action<Distribution>() {
-            @Override
-            public void execute(Distribution distribution) {
-                distribution.setReleaseNote(releaseNote);
-            }
-        });
+        DeprecationLogger.deprecation(
+                "NamedDeployment.setReleaseNote(String)",
+                "2.0",
+                "3.0",
+                "Use distribution closure instead.");
+        distribution(
+                new Action<Distribution>() {
+                    @Override
+                    public void execute(Distribution distribution) {
+                        distribution.setReleaseNote(releaseNote);
+                    }
+                });
     }
 
     @Deprecated
     public boolean getNoAssemble() {
-        DeprecationLogger.deprecation("NamedDeployment.getNoAssemble()", "2.0", "3.0", "Use isSkipAssemble() instead.");
+        DeprecationLogger.deprecation(
+                "NamedDeployment.getNoAssemble()", "2.0", "3.0", "Use isSkipAssemble() instead.");
         return isSkipAssemble();
     }
 
     @Deprecated
     public void setNoAssemble(boolean noAssemble) {
-        DeprecationLogger.deprecation("NamedDeployment.setNoAssemble(boolean)", "2.0", "3.0", "Use setSkipAssemble() instead.");
+        DeprecationLogger.deprecation(
+                "NamedDeployment.setNoAssemble(boolean)",
+                "2.0",
+                "3.0",
+                "Use setSkipAssemble() instead.");
         setSkipAssemble(noAssemble);
     }
 

@@ -49,7 +49,7 @@ pluginManagement {
 2 ) Apply this plugin to your app module
 
 ```groovy
-apply plugin: 'com.android.application' // It's better to apply Android Plugin for Gradle first. 
+apply plugin: 'com.android.application' // It's better to apply Android Plugin for Gradle first.
 apply plugin: 'deploygate'
 ```
 
@@ -64,10 +64,10 @@ plugins {
 This plugin does not work with non-app modules and/or library modules correctly.
 
 3 ) Ready for deployments. Run tasks which you need. Please check the *Usage#Tasks* section for the detail of added tasks.
- 
+
 ### If you are using `dg` command (for MacOSX)
 
-[dg](https://github.com/deploygate/deploygate-cli) will make diffs to apply this plugin if you run `dg deploy` on the project root. 
+[dg](https://github.com/deploygate/deploygate-cli) will make diffs to apply this plugin if you run `dg deploy` on the project root.
 
 ## Version Compatibility
 
@@ -123,7 +123,7 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 
 #### loginDeployGate
 
-This task reads stored and/or specified credentials. 
+This task reads stored and/or specified credentials.
 If no credentials are found, this requests you to log in to DeployGate and save credentials to your local.
 
 #### logoutDeployGate
@@ -156,10 +156,10 @@ deploygate {
 
 ## How configure your deployments
 
-*v2* has changed the DSL. See [Migrate from v1 to v2](#migrate-v2) for more detail. 
+*v2* has changed the DSL. See [Migrate from v1 to v2](#migrate-v2) for more detail.
 
 ```groovy
-apply plugin: 'deploygate'                    // add this *after* 'android' plugin 
+apply plugin: 'deploygate'                    // add this *after* 'android' plugin
 
 // Optional configuration
 deploygate {
@@ -170,9 +170,9 @@ deploygate {
 
   // You can also specify additional configurations for each variants.
   deployments {
-    
+
     // This corresponds to `flavor1` product flavor and `debug` buildType
-    // This configuration will be used for `uploadDeployGateFlavor1Debug` task 
+    // This configuration will be used for `uploadDeployGateFlavor1Debug` task
     flavor1Debug {
       // ProTip: Use Git hash of the current commit for easier troubleshooting
       def hash = "git rev-parse --short HEAD".execute([], project.rootDir).in.text.trim()
@@ -182,7 +182,7 @@ deploygate {
 
       // `uploadDeployGateFlavor1Debug` will skip running `assembleFlavor1Debug` if this property is `true`.
       skipAssemble = true // false by default
-      
+
       // This property is basically optional.
       // Because this plugin will set the apk path automatically if you would like to upload a build artifact of this variant
       sourceFile = file("${project.rootDir}/app/build/outputs/apk/manual-manipulate/app-signed.apk")
@@ -190,18 +190,18 @@ deploygate {
       // You can update a distribution as well. This configuration is optional.
       // Known limitation: *name* is not supported, so this plugin cannot create a new distribution.
       distribution {
-          // A key of an existing distribution 
+          // A key of an existing distribution
           key = "1234567890abcdef1234567890abcdef"
           // A release note of a distribution which is associated with this build
           releaseNote = "release note sample"
       }
-      
+
       // If you are using KotlinDSL
       distribution(closureOf<com.deploygate.gradle.plugins.dsl.Distribution> {
           ...
       })
     }
-    
+
     // You can define any names which you would like to use.
     // In this case, this plugin creates `uploadDeployGateUniversalApkOfAab` task to upload the specified apk file.
     universalApkOfAab {
@@ -225,7 +225,7 @@ You can configure this plugin as well by providing environment variables. This w
  * `DEPLOYGATE_DISTRIBUTION_KEY`
  * `DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE`
  * `DEPLOYGATE_SOURCE_FILE`
- * `DEPLOYGATE_OPEN_BROWSER` (Env only; open the app page after the uploading finished) 
+ * `DEPLOYGATE_OPEN_BROWSER` (Env only; open the app page after the uploading finished)
 
 Environment variable configurations allow you to avoid writing your credentials directly in the code.
 
@@ -277,6 +277,13 @@ If you get a time-out error from jitpack, then please run your task again.
 
 ## Development
 
+### Requirements
+
+- JRE 11+
+- Docker (only for testing)
+
+### Steps
+
 You can try this plugin locally by following the steps below.
 
 0. Clone this repository
@@ -285,10 +292,10 @@ You can try this plugin locally by following the steps below.
 3. Add mavenLocal to buildscript repository of a test project
 4. Specify the version which you specify at step 1
 
-And also, please make sure your changes pass unit tests and acceptance tests.  
+And also, please make sure your changes pass unit tests and acceptance tests.
 
 ```bash
-# please make sure the mock server has been launched 
+# please make sure the mock server has been launched
 docker compose build
 docker compose up -d
 
@@ -312,9 +319,9 @@ Deprecated | New
 
 *If both of v1 and v2 variables are specified, v2 variables will be used.*
 
-**v2.0.x can use the v1 syntax as it is, but we will start to make it obsolete from v2.1.0**  
+**v2.0.x can use the v1 syntax as it is, but we will start to make it obsolete from v2.1.0**
 
-Let's say we have a v1 configuration like below. 
+Let's say we have a v1 configuration like below.
 
 ```groovy
 deploygate {

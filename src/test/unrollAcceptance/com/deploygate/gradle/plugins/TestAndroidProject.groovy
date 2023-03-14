@@ -1,8 +1,7 @@
 package com.deploygate.gradle.plugins
 
+import org.jetbrains.annotations.NotNull
 import org.junit.rules.TemporaryFolder
-
-import javax.annotation.Nonnull
 
 class TestAndroidProject {
     private TemporaryFolder temporaryFolder
@@ -64,7 +63,7 @@ ndk.dir=${androidSdk}/ndk-bundle
         buildGradleKts << new File(dir, "build.gradle.kts").newInputStream()
     }
 
-    @Nonnull
+    @NotNull
     private File copyDir(String dirName) {
         def classLoader = getClass().getClassLoader()
         def dir = classLoader.getResource(dirName).file as File

@@ -5,19 +5,18 @@ import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import spock.lang.Unroll
-
-import javax.annotation.Nonnull
 
 class UploadApkTaskInputParamsSpec extends Specification {
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
 
-    @Nonnull
+    @NotNull
     private Project project
 
     def setup() {
@@ -74,5 +73,4 @@ class UploadApkTaskInputParamsSpec extends Specification {
         new File("build.gradle") | null
         new File("build.gradle") | new File("build2.gradle")
     }
-
 }

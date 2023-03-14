@@ -7,7 +7,7 @@
 This version also includes
 
 - Several improvements for developers' support.
-- Arctic Fox, Bumblebee, Chipmunk supports.  
+- Arctic Fox, Bumblebee, Chipmunk supports.
 
 ## ver 2.4.0
 
@@ -42,7 +42,7 @@ Includes changes to support Android Studio 4.1.0-beta01, 4.2.0-alpha01 [#106](ht
 - Change the DSL syntax
 - Change environment variable names
 - Support Android Studio 3.3.0 and higher
-- Avoid using obsoleted apis of Android Plugin for Gradle whose version is lower than 3.4.0-beta04 
+- Avoid using obsoleted apis of Android Plugin for Gradle whose version is lower than 3.4.0-beta04
 
 *Breaking changes*
 
@@ -79,7 +79,7 @@ Deprecated | New
 
 ## ver 1.1.3
 
- * Restore auto configuring APK file path functionality (supports Android Gradle Plugin 3.0.0-alpha4) 
+ * Restore auto configuring APK file path functionality (supports Android Gradle Plugin 3.0.0-alpha4)
 
 ## ver 1.1.2
 
@@ -88,7 +88,7 @@ Deprecated | New
 ## ver 1.1.1
 
  * Workaround for the issue on Android Gradle Plugin 3.0 Preview
-    * You need to specify the `sourceFile` option manually in your build.gradle to upload builds. This temporal limitation will be resolved in future release of Android Gradle Plugin. 
+    * You need to specify the `sourceFile` option manually in your build.gradle to upload builds. This temporal limitation will be resolved in future release of Android Gradle Plugin.
 
 ## ver 1.1.0
 
@@ -113,5 +113,5 @@ Deprecated | New
 
 ## ver 1.0.0
 
- * Support browser log in and share credentials with `dg` command. 
+ * Support browser log in and share credentials with `dg` command.
  * DeployGate plugin now handles all Android project automatically, so you don't have to write `deploygate` settings to your `build.gradle`.

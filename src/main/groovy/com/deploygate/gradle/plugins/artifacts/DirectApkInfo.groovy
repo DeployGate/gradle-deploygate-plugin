@@ -1,20 +1,19 @@
 package com.deploygate.gradle.plugins.artifacts
 
-import com.google.common.annotations.VisibleForTesting
-
-import javax.annotation.Nonnull
-import javax.annotation.Nullable
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
+import org.jetbrains.annotations.VisibleForTesting
 
 @VisibleForTesting
 class DirectApkInfo implements ApkInfo {
-    @Nonnull
+    @NotNull
     private final String variantName
     @Nullable
     private final File apkFile
     private final boolean signingReady
     private final boolean universalApk
 
-    DirectApkInfo(@Nonnull String variantName, @Nullable File apkFile, boolean signingReady, boolean universalApk) {
+    DirectApkInfo(@NotNull String variantName, @Nullable File apkFile, boolean signingReady, boolean universalApk) {
         this.variantName = variantName
         this.apkFile = apkFile
         this.signingReady = signingReady
@@ -26,7 +25,7 @@ class DirectApkInfo implements ApkInfo {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     String getVariantName() {
         return variantName
     }

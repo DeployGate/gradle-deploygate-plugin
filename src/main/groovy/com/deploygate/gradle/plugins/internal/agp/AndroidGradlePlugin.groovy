@@ -7,12 +7,10 @@ import org.gradle.api.Project
 import org.jetbrains.annotations.NotNull
 import org.slf4j.Logger
 
-import javax.annotation.Nonnull
-
 class AndroidGradlePlugin {
     private static VersionString AGP_VERSION
 
-    static void ifPresent(@Nonnull Project project, @NotNull Action<?> onFound) {
+    static void ifPresent(@NotNull Project project, @NotNull Action<?> onFound) {
         try {
             def agpPlugin = project.plugins.findPlugin("com.android.application")
 
@@ -41,13 +39,13 @@ class AndroidGradlePlugin {
         return AGP_VERSION
     }
 
-    @Nonnull
-    static String androidAssembleTaskName(@Nonnull String variantName) {
+    @NotNull
+    static String androidAssembleTaskName(@NotNull String variantName) {
         return "assemble${variantName.capitalize()}"
     }
 
-    @Nonnull
-    static String androidBundleTaskName(@Nonnull String variantName) {
+    @NotNull
+    static String androidBundleTaskName(@NotNull String variantName) {
         return "bundle${variantName.capitalize()}"
     }
 
@@ -66,7 +64,7 @@ class AndroidGradlePlugin {
         return Integer.MAX_VALUE + ".0.0"
     }
 
-    private static void checkModelLevel(@Nonnull ClassLoader classLoader, @Nonnull Logger logger) {
+    private static void checkModelLevel(@NotNull ClassLoader classLoader, @NotNull Logger logger) {
         try {
             def modelLevel = classLoader.loadClass("com.android.builder.model.AndroidProject").getField("MODEL_LEVEL_LATEST").get(null).toString().toInteger()
 

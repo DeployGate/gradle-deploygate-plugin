@@ -3,9 +3,8 @@ package com.deploygate.gradle.plugins.internal
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-
-import javax.annotation.Nonnull
-import javax.annotation.Nullable
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 final class DeprecationLogger {
     private final static LOCK = new Object();
@@ -31,7 +30,7 @@ final class DeprecationLogger {
         getLogger().clear()
     }
 
-    static void deprecation(@Nonnull String signature, @Nonnull String sinceVersion, @Nullable String versionToRemove, @Nonnull String message, Object... args) {
+    static void deprecation(@NotNull String signature, @NotNull String sinceVersion, @Nullable String versionToRemove, @NotNull String message, Object... args) {
         DeprecationLogger deprecationLogger = getLogger();
 
         if (!deprecationLogger.addSignature(signature)) {
