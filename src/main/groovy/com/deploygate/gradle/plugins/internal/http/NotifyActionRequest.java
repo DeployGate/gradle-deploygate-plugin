@@ -16,7 +16,7 @@ public class NotifyActionRequest {
     @NotNull private final Map<String, Object> data = new HashMap<>();
 
     public NotifyActionRequest(@NotNull String action) {
-        this.action = Objects.requireNotNull(action);
+        this.action = Objects.requireNonNull(action);
     }
 
     public void setParameter(@NotNull String name, @Nullable Object value) {
