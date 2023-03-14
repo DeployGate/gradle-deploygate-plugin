@@ -13,16 +13,12 @@ import java.util.*;
 
 public class NotifyActionRequest {
     @NotNull
-    private final String notifyKey;
-
-    @NotNull
     private final String action;
 
     @NotNull
     private final Map<String, Object> data = new HashMap<>();
 
-    public NotifyActionRequest(@NotNull String notifyKey, @NotNull String action) {
-        this.notifyKey = Objects.requireNonNull(notifyKey);
+    public NotifyActionRequest(@NotNull String action) {
         this.action = Objects.requireNonNull(action);
     }
 
@@ -30,12 +26,12 @@ public class NotifyActionRequest {
         data.put(name, value);
     }
 
-    HttpEntity toEntity() {
-        return new UrlEncodedFormEntity(buildNameValuePairs(), StandardCharsets.UTF_8);
+    HttpEntity toEntity(@NotNull String notifyKey) {
+        return new UrlEncodedFormEntity(buildNameValuePairs(notifyKey), StandardCharsets.UTF_8);
     }
 
     @VisibleForTesting
-    List<NameValuePair> buildNameValuePairs() {
+    List<NameValuePair> buildNameValuePairs(@NotNull String notifyKey) {
         List<NameValuePair> values = new ArrayList<>();
 
         values.add(new BasicNameValuePair("key", notifyKey));

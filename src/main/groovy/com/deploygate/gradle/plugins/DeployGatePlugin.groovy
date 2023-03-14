@@ -2,13 +2,14 @@ package com.deploygate.gradle.plugins
 
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
-import com.deploygate.gradle.plugins.credentials.CliCredentialStore
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.DeprecationLogger
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
+import com.deploygate.gradle.plugins.internal.http.HttpClient
 import com.deploygate.gradle.plugins.tasks.Constants
 import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
@@ -55,12 +56,18 @@ class DeployGatePlugin implements Plugin<Project> {
 
         GradleCompat.init(project)
 
+        def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
+            spec.parameters.endpoint.set(GradleCompat.forUseAtConfigurationTime(project.providers.environmentVariable("TEST_SERVER_URL")))
+        }
+
         def loginTask = project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
             DeployGateExtension deploygate = project.deploygate
 
             task.deployGateExtension = deploygate
             task.appOwnerName.set(deploygate.appOwnerName)
             task.apiToken.set(deploygate.apiToken)
+            task.httpClient.set(httpClientProvider)
+            task.usesService(httpClientProvider)
         }
 
         project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) { task ->
@@ -96,6 +103,8 @@ class DeployGatePlugin implements Plugin<Project> {
                 task.credentials.set(loginTask.map { it.credentials })
                 task.deployment.copyFrom(deployment)
                 task.apkInfo.set(new DefaultPresetApkInfo(deployment.name))
+                task.httpClient.set(httpClientProvider)
+                task.usesService(httpClientProvider)
                 task.dependsOn(loginTask)
             }
 
@@ -107,6 +116,8 @@ class DeployGatePlugin implements Plugin<Project> {
                 task.credentials.set(loginTask.map { it.credentials })
                 task.deployment.copyFrom(deployment)
                 task.aabInfo.set(new DefaultPresetAabInfo(deployment.name))
+                task.httpClient.set(httpClientProvider)
+                task.usesService(httpClientProvider)
                 task.dependsOn(loginTask)
             }
         }
@@ -119,6 +130,8 @@ class DeployGatePlugin implements Plugin<Project> {
                     task.credentials.set(loginTask.map { it.credentials })
 
                     task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
+                    task.httpClient.set(httpClientProvider)
+                    task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {
                         task.dependsOn(loginTask)
@@ -131,6 +144,8 @@ class DeployGatePlugin implements Plugin<Project> {
                     task.credentials.set(loginTask.map { it.credentials })
 
                     task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.buildDir) })
+                    task.httpClient.set(httpClientProvider)
+                    task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {
                         task.dependsOn(loginTask)

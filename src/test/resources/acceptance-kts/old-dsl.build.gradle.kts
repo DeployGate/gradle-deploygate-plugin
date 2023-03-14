@@ -6,9 +6,6 @@ plugins {
 apply(from = "android_block.gradle")
 
 deploygate {
-    // for testing
-    endpoint = System.getenv("TEST_SERVER_URL")
-
     userName = "owner_1"
     token = "api token"
 

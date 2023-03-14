@@ -2,7 +2,6 @@ package com.deploygate.gradle.plugins.dsl
 
 import com.deploygate.gradle.plugins.dsl.syntax.DistributionSyntax
 
-import javax.annotation.Nonnull
 import javax.annotation.Nullable
 
 class Distribution implements DistributionSyntax {
@@ -15,11 +14,6 @@ class Distribution implements DistributionSyntax {
 
     boolean isPresent() {
         return key || releaseNote
-    }
-
-    void merge(@Nonnull Distribution other) {
-        this.key = this.key ?: other.key
-        this.releaseNote = this.releaseNote ?: other.releaseNote
     }
 
     boolean equals(o) {

@@ -1,7 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
-import com.deploygate.gradle.plugins.internal.http.ApiClient
+import com.deploygate.gradle.plugins.internal.http.HttpClient
 import com.deploygate.gradle.plugins.internal.http.GetCredentialsResponse
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import com.deploygate.gradle.plugins.utils.BrowserUtils
@@ -38,6 +38,9 @@ abstract class LoginTask extends DefaultTask {
     DeployGateExtension deployGateExtension // TODO remove this reference
 
     @Internal
+    final Property<HttpClient> httpClient
+
+    @Internal
     String onetimeKey
 
     @Internal
@@ -51,6 +54,7 @@ abstract class LoginTask extends DefaultTask {
         credentials = objectFactory.newInstance(Credentials)
         appOwnerName = objectFactory.property(String)
         apiToken = objectFactory.property(String)
+        httpClient = objectFactory.property(HttpClient)
 
         description = "Check the configured credentials and launch the authentication flow if they are not enough."
         group = Constants.TASK_GROUP_NAME
@@ -92,12 +96,17 @@ abstract class LoginTask extends DefaultTask {
             setupTerminal()
         }
 
-        if (!onetimeKey || !retrieveCredentialFromKey(onetimeKey)) {
+        if (!onetimeKey) {
             return false
         }
 
-        deployGateExtension.notifyKey = onetimeKey
-        deployGateExtension.notifyServer('credential_saved')
+        this.httpClient.get().notificationKey.set(onetimeKey)
+
+        if (!fetchAndSaveCredentials()) {
+            return false
+        }
+
+        this.httpClient.get().lifecycleNotificationClient.notifyOnCredentialSaved()
 
         return true
     }
@@ -176,11 +185,11 @@ abstract class LoginTask extends DefaultTask {
         }
     }
 
-    boolean retrieveCredentialFromKey(String key) {
-        ApiClient.Response<GetCredentialsResponse> response
+    boolean fetchAndSaveCredentials() {
+        HttpClient.Response<GetCredentialsResponse> response
 
         try {
-            response = ApiClient.instance.getCredentials(key)
+            response = httpClient.get().lifecycleNotificationClient.getCredentials()
         } catch (Throwable th) {
             logger.error('failed to retrieve credential', th)
             return false

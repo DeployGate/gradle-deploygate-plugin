@@ -14,7 +14,7 @@ class ErrorResponseSpec extends Specification {
 """
 
         when:
-        def response = ApiClient.GSON.fromJson(jsonStr, ErrorResponse)
+        def response = HttpClient.GSON.fromJson(jsonStr, ErrorResponse)
 
         then:
         response.message == "error message"

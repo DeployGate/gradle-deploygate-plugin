@@ -1,14 +1,37 @@
 package com.deploygate.gradle.plugins.internal.http
 
+import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import org.apache.hc.client5.http.HttpResponseException
+import org.gradle.api.Project
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.annotation.Nonnull
+
 class ApiClientSpec extends Specification {
+
+    @Rule
+    TemporaryFolder testProjectDir = new TemporaryFolder()
+
+    @Nonnull
+    private Project project
+
+    def setup() {
+        project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+    }
+
     @Unroll
     def "uploadApp should be #fail"() {
         setup:
-        def client = new ApiClient(System.getenv("TEST_SERVER_URL"))
+        def credentials = project.objects.newInstance(Credentials)
+        credentials.appOwnerName.set(appOwnerName)
+        credentials.apiToken.set(apiToken)
+        def client = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
+            spec.parameters.endpoint.set(System.getenv("TEST_SERVER_URL"))
+        }.get().getApiClient(credentials)
 
         and:
         def request = new UploadAppRequest(appFile)
@@ -21,7 +44,7 @@ class ApiClientSpec extends Specification {
         HttpResponseException e = null
 
         try {
-            response = client.uploadApp(appOwnerName, apiToken, request).typedResponse
+            response = client.uploadApp(request).typedResponse
         } catch (HttpResponseException th) {
             e = th
         }

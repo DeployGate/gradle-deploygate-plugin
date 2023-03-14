@@ -21,11 +21,6 @@ abstract class AcceptanceTestBaseSpec extends Specification {
 
     abstract void useProperResource()
 
-    boolean isAppBundleSupport(String agpVersion) {
-        def version = VersionString.tryParse(agpVersion)
-        return version.major >= 4 || version.major == 3 && version.minor > 1
-    }
-
     def setup() {
         testAndroidProject = new TestAndroidProject(testProjectDir)
         testDeployGatePlugin = new TestDeployGatePlugin()
@@ -58,27 +53,15 @@ abstract class AcceptanceTestBaseSpec extends Specification {
         runner.withArguments("existsTask", "-PtaskName=uploadDeployGateFlavor2Flavor4Release").build()
         runner.withArguments("existsTask", "-PtaskName=uploadDeployGateCustomApk").build()
 
-        if (isAppBundleSupport(agpVersion)) {
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Debug").build()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Debug").build()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Debug").build()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Debug").build()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Release").build()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Release").build()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Release").build()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Release").build()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabCustomApk").build()
-        } else {
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Debug").buildAndFail()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Debug").buildAndFail()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Debug").buildAndFail()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Debug").buildAndFail()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Release").buildAndFail()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Release").buildAndFail()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Release").buildAndFail()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Release").buildAndFail()
-            runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabCustomApk").buildAndFail()
-        }
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Debug").build()
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Debug").build()
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Debug").build()
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Debug").build()
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor3Release").build()
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor3Release").build()
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor1Flavor4Release").build()
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabFlavor2Flavor4Release").build()
+        runner.withArguments("existsTask", "-PtaskName=uploadDeployGateAabCustomApk").build()
 
         where:
         agpVersion = System.getenv("TEST_AGP_VERSION")
