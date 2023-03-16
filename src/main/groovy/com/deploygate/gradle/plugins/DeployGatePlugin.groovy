@@ -1,7 +1,5 @@
 package com.deploygate.gradle.plugins
 
-import com.deploygate.gradle.plugins.internal.http.LocalServer
-
 import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getAabInfo
 import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getApkInfo
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
@@ -16,6 +14,7 @@ import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.internal.http.HttpClient
+import com.deploygate.gradle.plugins.internal.http.LocalServer
 import com.deploygate.gradle.plugins.tasks.Constants
 import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask

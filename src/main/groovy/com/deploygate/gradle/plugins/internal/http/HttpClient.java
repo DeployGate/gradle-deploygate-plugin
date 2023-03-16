@@ -92,11 +92,9 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
         }
     }
 
-    @NotNull
-    public URI buildURI(
+    @NotNull public URI buildURI(
             @NotNull Map<@NotNull String, @NotNull String> queryParams,
-            @NotNull String... fragments
-    ) {
+            @NotNull String... fragments) {
         try {
             URIBuilder builder = new URIBuilder(endpoint).appendPathSegments(fragments);
 

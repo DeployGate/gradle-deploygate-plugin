@@ -1,12 +1,21 @@
 package com.deploygate.gradle.plugins.tasks;
 
+import static com.deploygate.gradle.plugins.internal.gradle.PropertyUtils.setIfAbsent;
+import static com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils.environmentVariable;
+
 import com.deploygate.gradle.plugins.DeployGatePlugin;
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore;
 import com.deploygate.gradle.plugins.internal.http.HttpClient;
 import com.deploygate.gradle.plugins.internal.http.LocalServer;
+import com.deploygate.gradle.plugins.internal.utils.BrowserUtils;
 import com.deploygate.gradle.plugins.internal.utils.StringUtils;
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials;
-import com.deploygate.gradle.plugins.internal.utils.BrowserUtils;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
+import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.model.ObjectFactory;
@@ -15,47 +24,40 @@ import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
-
-import javax.inject.Inject;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
-
-import static com.deploygate.gradle.plugins.internal.gradle.PropertyUtils.setIfAbsent;
-import static com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils.environmentVariable;
 
 /**
  * Provide the *enough* credentials to the next tasks. The credentials may cause Unauthorized error.
  */
 public abstract class LoginTask extends DefaultTask {
 
-    @NotNull
-    private final Provider<String> appOwnerName;
+    @NotNull private final Provider<String> appOwnerName;
 
-    @NotNull
-    private final Provider<String> apiToken;
+    @NotNull private final Provider<String> apiToken;
 
-    @NotNull
-    private final Credentials credentials;
+    @NotNull private final Credentials credentials;
 
     @Inject
-    public LoginTask(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory) {
-        //noinspection unchecked
-        appOwnerName = getExplicitAppOwnerName().orElse(environmentVariable(providerFactory, DeployGatePlugin.getENV_NAME_APP_OWNER_NAME(), DeployGatePlugin.getENV_NAME_APP_OWNER_NAME_V1()));
+    public LoginTask(
+            @NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory) {
+        Provider<String> appOwnerNameFromEnvVars =
+                environmentVariable(
+                        providerFactory,
+                        DeployGatePlugin.getENV_NAME_APP_OWNER_NAME(),
+                        DeployGatePlugin.getENV_NAME_APP_OWNER_NAME_V1());
 
-        //noinspection unchecked
-        apiToken = getExplicitApiToken().orElse(
-                environmentVariable(providerFactory, DeployGatePlugin.getENV_NAME_API_TOKEN())
-        );
+        appOwnerName = getExplicitAppOwnerName().orElse(appOwnerNameFromEnvVars);
+
+        Provider<String> apiTokenFromEnvVars =
+                environmentVariable(providerFactory, DeployGatePlugin.getENV_NAME_API_TOKEN());
+
+        apiToken = getExplicitApiToken().orElse(apiTokenFromEnvVars);
 
         credentials = objectFactory.newInstance(Credentials.class);
 
-        setDescription("Check the configured credentials and launch the authentication flow if they are not enough.");
+        setDescription(
+                "Check the configured credentials and launch the authentication flow if they are"
+                        + " not enough.");
         setGroup(Constants.TASK_GROUP_NAME);
     }
 
@@ -77,21 +79,18 @@ public abstract class LoginTask extends DefaultTask {
         return apiToken;
     }
 
-    @NotNull
-    @Internal
+    @NotNull @Internal
     public Credentials getCredentials() {
         return credentials;
     }
 
     @Input
     @Optional
-    @NotNull
-    public abstract Property<String> getExplicitAppOwnerName();
+    @NotNull public abstract Property<String> getExplicitAppOwnerName();
 
     @Input
     @Optional
-    @NotNull
-    public abstract Property<String> getExplicitApiToken();
+    @NotNull public abstract Property<String> getExplicitApiToken();
 
     /**
      * A path to a directory that may contain a credential file.
@@ -99,16 +98,13 @@ public abstract class LoginTask extends DefaultTask {
      * @return a directory path property
      */
     @Input
-    @NotNull
-    public abstract Property<String> getCredentialsDirPath();
+    @NotNull public abstract Property<String> getCredentialsDirPath();
 
     @Internal
-    @NotNull
-    public abstract Property<HttpClient> getHttpClient();
+    @NotNull public abstract Property<HttpClient> getHttpClient();
 
     @Internal
-    @NotNull
-    public abstract Property<LocalServer> getLocalServer();
+    @NotNull public abstract Property<LocalServer> getLocalServer();
 
     @TaskAction
     public void execute() {
@@ -125,8 +121,10 @@ public abstract class LoginTask extends DefaultTask {
         if (credentialsDir.exists() && credentialsDir.isDirectory()) {
             CliCredentialStore store = new CliCredentialStore(credentialsDir);
 
-            if (StringUtils.isNullOrBlank(store.getName()) || StringUtils.isNullOrBlank(store.getToken())) {
-                getLogger().info("A local credential file does not contain app owner name and token.");
+            if (StringUtils.isNullOrBlank(store.getName())
+                    || StringUtils.isNullOrBlank(store.getToken())) {
+                getLogger()
+                        .info("A local credential file does not contain app owner name and token.");
             } else {
                 setIfAbsent(credentials.getAppOwnerName(), store.getName());
                 setIfAbsent(credentials.getApiToken(), store.getToken());
@@ -147,7 +145,11 @@ public abstract class LoginTask extends DefaultTask {
 
         if (!setupCredential()) {
             getLogger().error("We could not retrieve DeployGate credentials.");
-            getLogger().error("Please make sure you have configured app owner name and api token or any browser application is available to launch the authentication flow.");
+            getLogger()
+                    .error(
+                            "Please make sure you have configured app owner name and api token or"
+                                    + " any browser application is available to launch the"
+                                    + " authentication flow.");
 
             throw new RuntimeException("Could not fetch the credentials");
         }
@@ -156,7 +158,10 @@ public abstract class LoginTask extends DefaultTask {
 
         System.out.printf(Locale.US, "Welcome %s!%n", store.getName());
 
-        getLogger().info("The authentication has succeeded. The application owner name is {}.", store.getName());
+        getLogger()
+                .info(
+                        "The authentication has succeeded. The application owner name is {}.",
+                        store.getName());
 
         // We can set the values unless they are found because of the idempotency.
         credentials.getAppOwnerName().set(store.getName());
@@ -183,9 +188,7 @@ public abstract class LoginTask extends DefaultTask {
         return false;
     }
 
-    /**
-     * Launch the authentication flow by using a browser application.
-     */
+    /** Launch the authentication flow by using a browser application. */
     private boolean setupBrowser() {
         LocalServer server = getLocalServer().get();
         int port = server.start();
@@ -211,7 +214,8 @@ public abstract class LoginTask extends DefaultTask {
 
         if (!BrowserUtils.openBrowser(url)) {
             getLogger().error("Could not open a browser on current environment.");
-            System.out.println("Please log in to DeployGate by opening the following URL on your browser:");
+            System.out.println(
+                    "Please log in to DeployGate by opening the following URL on your browser:");
             System.out.println(url);
         }
     }

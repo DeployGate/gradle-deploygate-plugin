@@ -1,14 +1,13 @@
 package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.annotations.NotNull
-
-import javax.inject.Inject
 
 abstract class LogoutTask extends DefaultTask {
 

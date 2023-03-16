@@ -1,14 +1,13 @@
 package com.deploygate.gradle.plugins.tasks.inputs;
 
+import static com.deploygate.gradle.plugins.internal.gradle.PropertyUtils.presence;
+
+import java.util.Locale;
 import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Optional;
-
-import java.util.Locale;
-
-import static com.deploygate.gradle.plugins.internal.gradle.PropertyUtils.presence;
 
 public abstract class Credentials {
     @Input

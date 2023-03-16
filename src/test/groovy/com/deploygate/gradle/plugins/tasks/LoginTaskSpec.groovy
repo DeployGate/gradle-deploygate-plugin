@@ -3,12 +3,11 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
-import org.gradle.api.provider.ProviderFactory
-
 import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.annotations.NotNull

@@ -3,9 +3,9 @@ package com.deploygate.gradle.plugins.tasks
 import com.deploygate.gradle.plugins.Config
 import com.deploygate.gradle.plugins.internal.http.HttpClient
 import com.deploygate.gradle.plugins.internal.http.UploadAppRequest
+import com.deploygate.gradle.plugins.internal.utils.BrowserUtils
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials
 import com.deploygate.gradle.plugins.tasks.inputs.DeploymentConfiguration
-import com.deploygate.gradle.plugins.internal.utils.BrowserUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ProjectLayout

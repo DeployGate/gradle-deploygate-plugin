@@ -3,16 +3,6 @@ package com.deploygate.gradle.plugins.internal.http;
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore;
 import com.deploygate.gradle.plugins.internal.utils.UrlUtils;
 import com.sun.net.httpserver.HttpServer;
-import org.gradle.api.GradleException;
-import org.gradle.api.provider.Property;
-import org.gradle.api.services.BuildService;
-import org.gradle.api.services.BuildServiceParameters;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -21,6 +11,15 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.inject.Inject;
+import org.gradle.api.GradleException;
+import org.gradle.api.provider.Property;
+import org.gradle.api.services.BuildService;
+import org.gradle.api.services.BuildServiceParameters;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class LocalServer implements BuildService<LocalServer.Params>, AutoCloseable {
 
@@ -32,11 +31,9 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalServer.class);
 
-    @NotNull
-    private final HttpClient httpClient;
+    @NotNull private final HttpClient httpClient;
 
-    @NotNull
-    private final File credentialStoreDir;
+    @NotNull private final File credentialStoreDir;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<HttpServer> optionalHttpServer;
@@ -59,22 +56,27 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
         }
 
         optionalHttpServer = Optional.ofNullable(s);
-        optionalHttpServer.ifPresent(server -> {
-            server.createContext("/token", httpExchange -> {
-                httpExchange.sendResponseHeaders(204, -1);
-                httpExchange.close();
+        optionalHttpServer.ifPresent(
+                server -> {
+                    server.createContext(
+                            "/token",
+                            httpExchange -> {
+                                httpExchange.sendResponseHeaders(204, -1);
+                                httpExchange.close();
 
-                try {
-                    Map<String, String> params = UrlUtils.parseQueryString(httpExchange.getRequestURI().getQuery());
+                                try {
+                                    Map<String, String> params =
+                                            UrlUtils.parseQueryString(
+                                                    httpExchange.getRequestURI().getQuery());
 
-                    if (!params.containsKey("cancel")) {
-                        httpClient.getNotificationKey().set(params.get("key"));
-                    }
-                } finally {
-                    countDownLatch.countDown();
-                }
-            });
-        });
+                                    if (!params.containsKey("cancel")) {
+                                        httpClient.getNotificationKey().set(params.get("key"));
+                                    }
+                                } finally {
+                                    countDownLatch.countDown();
+                                }
+                            });
+                });
     }
 
     public int start() {
@@ -89,8 +91,7 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
         return server.getAddress().getPort();
     }
 
-    @Nullable
-    public boolean await() throws InterruptedException, TimeoutException {
+    @Nullable public boolean await() throws InterruptedException, TimeoutException {
         long now = System.currentTimeMillis();
         long until = now + TimeUnit.MINUTES.toMillis(3);
 
@@ -111,7 +112,8 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
 
     boolean fetchAndSaveCredentials() {
         try {
-            HttpClient.Response<GetCredentialsResponse> response = httpClient.getLifecycleNotificationClient().getCredentials();
+            HttpClient.Response<GetCredentialsResponse> response =
+                    httpClient.getLifecycleNotificationClient().getCredentials();
 
             if (response == null) {
                 LOGGER.error("could not get a client key for the authentication.");

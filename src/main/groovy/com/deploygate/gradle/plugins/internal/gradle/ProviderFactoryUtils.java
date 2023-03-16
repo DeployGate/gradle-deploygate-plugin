@@ -1,25 +1,22 @@
 package com.deploygate.gradle.plugins.internal.gradle;
 
+import java.util.Objects;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 @SuppressWarnings("UnstableApiUsage")
 public final class ProviderFactoryUtils {
-    private ProviderFactoryUtils() {
-    }
+    private ProviderFactoryUtils() {}
 
     /**
      * The new provider will return the first-seen value in providers.
      *
      * @param providers
-     * @param <T>       Value type
+     * @param <T> Value type
      * @return the first-seen value
      */
-    @NotNull
-    public static <T> Provider<T> pickFirst(@NotNull Provider<T>... providers) {
+    @NotNull public static <T> Provider<T> pickFirst(@NotNull Provider<T>... providers) {
         if (providers.length < 2) {
             throw new IllegalArgumentException("providers must be 2 or greater");
         }
@@ -45,8 +42,8 @@ public final class ProviderFactoryUtils {
      * @param names environment variables in order of pickFirst
      * @return the first-seen value
      */
-    @NotNull
-    public static Provider<String> environmentVariable(@NotNull ProviderFactory providerFactory, @NotNull String... names) {
+    @NotNull public static Provider<String> environmentVariable(
+            @NotNull ProviderFactory providerFactory, @NotNull String... names) {
         if (names.length == 0) {
             throw new IllegalArgumentException("environment name must be present");
         }
@@ -56,9 +53,9 @@ public final class ProviderFactoryUtils {
         for (final String name : names) {
             Objects.requireNonNull(name, "null name is not allowed");
 
-            Provider<String> envProvider = GradleCompat.forUseAtConfigurationTime(
-                    providerFactory.environmentVariable(name)
-            );
+            Provider<String> envProvider =
+                    GradleCompat.forUseAtConfigurationTime(
+                            providerFactory.environmentVariable(name));
 
             if (result == null) {
                 result = envProvider;
