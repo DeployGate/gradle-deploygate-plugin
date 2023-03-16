@@ -1,12 +1,7 @@
 package com.deploygate.gradle.plugins.dsl
 
-import com.deploygate.gradle.plugins.DeployGatePlugin
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
-import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal
-import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.Project
-import org.gradle.api.tasks.Internal
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
@@ -15,33 +10,11 @@ class DeployGateExtension implements ExtensionSyntax {
 
     String appOwnerName
 
-    @Deprecated
-    String notifyKey = null
-
-    @NotNull
-    private final Project project
-
     @NotNull
     private final NamedDomainObjectContainer<NamedDeployment> deployments
 
-    @NotNull
-    private final CliCredentialStore credentialStore
-
-    DeployGateExtension(@NotNull Project project, @NotNull NamedDomainObjectContainer<NamedDeployment> deployments, @NotNull CliCredentialStore credentialStore) {
-        this.project = project
+    DeployGateExtension(@NotNull NamedDomainObjectContainer<NamedDeployment> deployments) {
         this.deployments = deployments
-        this.credentialStore = credentialStore
-
-        this.appOwnerName = [
-            System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME),
-            System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1),
-            credentialStore.getName()
-        ].find { it != null }
-
-        this.apiToken = [
-            System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN),
-            credentialStore.getToken()
-        ].find { it != null }
     }
 
     // backward compatibility
@@ -99,12 +72,5 @@ class DeployGateExtension implements ExtensionSyntax {
 
     boolean hasDeployment(@NotNull String name) {
         return deployments.findByName(name)
-    }
-
-    @DeployGateInternal
-    @NotNull
-    @Internal
-    CliCredentialStore getCredentialStore() {
-        return credentialStore
     }
 }

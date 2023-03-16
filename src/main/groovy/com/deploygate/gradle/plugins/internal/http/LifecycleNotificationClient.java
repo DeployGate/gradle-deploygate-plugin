@@ -48,14 +48,14 @@ public class LifecycleNotificationClient implements ILifecycleNotificationClient
 
     @Override
     public boolean notifyOnSuccessOfArtifactUpload(@NotNull String appDetailPath) {
-        NotifyActionRequest request = new NotifyActionRequest("'upload_finished'");
+        NotifyActionRequest request = new NotifyActionRequest("upload_finished");
         request.setParameter("path", appDetailPath);
         return notify(request);
     }
 
     @Override
     public boolean notifyOnFailureOfArtifactUpload(@NotNull String errorMessage) {
-        NotifyActionRequest request = new NotifyActionRequest("'upload_finished'");
+        NotifyActionRequest request = new NotifyActionRequest("upload_finished");
         request.setParameter("error", "true");
         request.setParameter("message", errorMessage);
         return notify(request);
@@ -66,8 +66,6 @@ public class LifecycleNotificationClient implements ILifecycleNotificationClient
      *
      * @param request a request to the server that must contain an action name
      * @return true anyway
-     * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
-     * @throws NetworkFailure is thrown if a network trouble happens
      */
     private boolean notify(@NotNull NotifyActionRequest request) {
         try {

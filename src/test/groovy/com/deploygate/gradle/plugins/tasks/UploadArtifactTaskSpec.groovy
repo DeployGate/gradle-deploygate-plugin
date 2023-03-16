@@ -42,7 +42,7 @@ class UploadArtifactTaskSpec extends Specification {
 
     def "doUpload should reject illegal states before processing"() {
         setup:
-        def deploygate = new DeployGateExtension(project, project.container(NamedDeployment), new CliCredentialStore(File.createTempDir()))
+        def deploygate = new DeployGateExtension(project.container(NamedDeployment))
         project.extensions.add("deploygate", deploygate)
 
         and:

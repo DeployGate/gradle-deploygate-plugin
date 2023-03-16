@@ -1,12 +1,13 @@
 package com.deploygate.gradle.plugins.tasks.inputs;
 
+import static com.deploygate.gradle.plugins.internal.gradle.PropertyUtils.presence;
+
 import java.util.Locale;
 import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Optional;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.VisibleForTesting;
 
 public abstract class Credentials {
     @Input
@@ -17,6 +18,16 @@ public abstract class Credentials {
     @Optional
     public abstract Property<String> getApiToken();
 
+    @Internal
+    public boolean isPresent() {
+        return getAppOwnerName().isPresent() && getApiToken().isPresent();
+    }
+
+    public void normalize() {
+        presence(getAppOwnerName());
+        presence(getApiToken());
+    }
+
     /**
      * Normalize and validate the properties. This throws an exception if invalid.
      *
@@ -24,26 +35,25 @@ public abstract class Credentials {
      */
     @SuppressWarnings("UnstableApiUsage")
     public void normalizeAndValidate() {
-        presence(getAppOwnerName(), "application owner name").finalizeValue();
-        presence(getApiToken(), "api token").finalizeValue();
-    }
+        normalize();
 
-    @NotNull @VisibleForTesting
-    static Property<String> presence(
-            @NotNull Property<String> property, @NotNull String displayName) {
-        // To keep the backward compatibility, we have to trim values *safely*.
-        final String value = (property.getOrNull() != null ? property.get() : "").trim();
-
-        if (value.isEmpty()) {
+        if (!getAppOwnerName().isPresent()) {
             throw new GradleException(
                     String.format(
                             Locale.US,
                             "%s is missing. Please configure the value properly.",
-                            displayName));
-        } else {
-            property.set(value);
+                            "application owner name"));
         }
 
-        return property;
+        if (!getApiToken().isPresent()) {
+            throw new GradleException(
+                    String.format(
+                            Locale.US,
+                            "%s is missing. Please configure the value properly.",
+                            "api token"));
+        }
+
+        getAppOwnerName().finalizeValue();
+        getApiToken().finalizeValue();
     }
 }

@@ -4,6 +4,7 @@ import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getAa
 import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getApkInfo
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidBundleTaskName
+import static com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils.environmentVariable
 
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
@@ -12,9 +13,9 @@ import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.DeprecationLogger
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
-import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.internal.http.HttpClient
+import com.deploygate.gradle.plugins.internal.http.LocalServer
 import com.deploygate.gradle.plugins.tasks.Constants
 import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
@@ -25,6 +26,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.annotations.NotNull
 
@@ -55,22 +57,33 @@ class DeployGatePlugin implements Plugin<Project> {
 
         GradleCompat.init(project)
 
-        def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
-            spec.parameters.endpoint.set(GradleCompat.forUseAtConfigurationTime(project.providers.environmentVariable("TEST_SERVER_URL")))
+        // the presence of the value is same to the existence of the directory.
+        Provider<String> credentialDirPathProvider = project.providers.systemProperty("user.home").map { home ->
+            File f = new File(home, '.dg')
+            (f.directory || f.mkdirs()) ? f.absolutePath : null
         }
 
-        def loginTask = project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
-            DeployGateExtension deploygate = project.deploygate
+        def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
+            spec.parameters.endpoint.set(environmentVariable(project.providers, "TEST_SERVER_URL").orElse(Config.getDEPLOYGATE_ROOT()))
+        }
 
-            task.deployGateExtension = deploygate
-            task.appOwnerName.set(deploygate.appOwnerName)
-            task.apiToken.set(deploygate.apiToken)
+        def localServerProvider = project.gradle.sharedServices.registerIfAbsent("httpserver", LocalServer) { spec ->
+            spec.parameters.httpClient.set(httpClientProvider)
+            spec.parameters.credentialsDirPath.set(credentialDirPathProvider)
+        }
+
+        def loginTaskProvider = project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
+            task.explicitAppOwnerName.set(project.deploygate.appOwnerName)
+            task.explicitApiToken.set(project.deploygate.apiToken)
+            task.credentialsDirPath.set(credentialDirPathProvider)
             task.httpClient.set(httpClientProvider)
+            task.localServer.set(localServerProvider)
             task.usesService(httpClientProvider)
+            task.usesService(localServerProvider)
         }
 
         project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) { task ->
-            task.credentialStore = project.deploygate.credentialStore
+            task.credentialsDirPath.set(credentialDirPathProvider)
         }
 
         project.tasks.register(Constants.SUFFIX_APK_TASK_NAME, DefaultTask).configure { task ->
@@ -99,12 +112,12 @@ class DeployGatePlugin implements Plugin<Project> {
                     task.logger.debug("${deployment.name} required assmble but ignored")
                 }
 
-                task.credentials.set(loginTask.map { it.credentials })
+                task.credentials.set(loginTaskProvider.map { it.credentials })
                 task.deployment.copyFrom(deployment)
                 task.apkInfo.set(new DefaultPresetApkInfo(deployment.name))
                 task.httpClient.set(httpClientProvider)
                 task.usesService(httpClientProvider)
-                task.dependsOn(loginTask)
+                task.dependsOn(loginTaskProvider)
             }
 
             project.tasks.register(Constants.uploadAabTaskName(deployment.name), UploadAabTask) { task ->
@@ -112,12 +125,12 @@ class DeployGatePlugin implements Plugin<Project> {
                     task.logger.debug("${deployment.name} required assmble but ignored")
                 }
 
-                task.credentials.set(loginTask.map { it.credentials })
+                task.credentials.set(loginTaskProvider.map { it.credentials })
                 task.deployment.copyFrom(deployment)
                 task.aabInfo.set(new DefaultPresetAabInfo(deployment.name))
                 task.httpClient.set(httpClientProvider)
                 task.usesService(httpClientProvider)
-                task.dependsOn(loginTask)
+                task.dependsOn(loginTaskProvider)
             }
         }
 
@@ -126,30 +139,30 @@ class DeployGatePlugin implements Plugin<Project> {
                 def variantProxy = new IApplicationVariantImpl(variant)
 
                 namedOrRegister(project, Constants.uploadApkTaskName(variantProxy.name), UploadApkTask).configure { task ->
-                    task.credentials.set(loginTask.map { it.credentials })
+                    task.credentials.set(loginTaskProvider.map { it.credentials })
 
                     task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
                     task.httpClient.set(httpClientProvider)
                     task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {
-                        task.dependsOn(loginTask)
+                        task.dependsOn(loginTaskProvider)
                     } else {
-                        task.dependsOn(androidAssembleTaskName(variantProxy.name), loginTask)
+                        task.dependsOn(androidAssembleTaskName(variantProxy.name), loginTaskProvider)
                     }
                 }
 
                 namedOrRegister(project, Constants.uploadAabTaskName(variantProxy.name), UploadAabTask).configure { task ->
-                    task.credentials.set(loginTask.map { it.credentials })
+                    task.credentials.set(loginTaskProvider.map { it.credentials })
 
                     task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.buildDir) })
                     task.httpClient.set(httpClientProvider)
                     task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {
-                        task.dependsOn(loginTask)
+                        task.dependsOn(loginTaskProvider)
                     } else {
-                        task.dependsOn(androidBundleTaskName(variantProxy.name), loginTask)
+                        task.dependsOn(androidBundleTaskName(variantProxy.name), loginTaskProvider)
                     }
                 }
             }
@@ -165,9 +178,8 @@ class DeployGatePlugin implements Plugin<Project> {
     }
 
     private static void setupExtension(@NotNull Project project) {
-        CliCredentialStore credentialStore = new CliCredentialStore()
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         // TODO we should use ExtensionSyntax as the 1st argument but we need to investigate the expected side effects first.
-        project.extensions.create(DeployGateExtension, EXTENSION_NAME, DeployGateExtension, project, deployments, credentialStore)
+        project.extensions.create(DeployGateExtension, EXTENSION_NAME, DeployGateExtension, deployments)
     }
 }

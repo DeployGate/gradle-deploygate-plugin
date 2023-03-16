@@ -4,9 +4,10 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
-import org.jetbrains.annotations.VisibleForTesting
 
 class CliCredentialStore {
+    public static final String CREDENTIALS_FILE_NAME = "credentials"
+
     private static final Gson GSON = new Gson()
 
     private final File baseDir
@@ -14,12 +15,15 @@ class CliCredentialStore {
     String name
     String token
 
-    CliCredentialStore() {
-        this(new File(System.getProperty('user.home'), '.dg'))
-    }
+    CliCredentialStore(@NotNull File baseDir) {
+        if (baseDir.exists()) {
+            if (!baseDir.isDirectory()) {
+                throw new IllegalArgumentException("${baseDir.absolutePath} is not a directory")
+            }
+        } else if (!baseDir.mkdirs()) {
+            throw new IllegalStateException("${baseDir.absolutePath} cannot be created")
+        }
 
-    @VisibleForTesting
-    CliCredentialStore(File baseDir) {
         this.baseDir = baseDir
         load()
     }
@@ -28,25 +32,46 @@ class CliCredentialStore {
         def contents = loadLocalCredentialFile()
         if (contents) {
             def values = GSON.fromJson(contents, JsonObject)
-            name = values.get("name").with { it.isJsonNull() ? null : it.asString }
-            token = values.get("token").with { it.isJsonNull() ? null : it.asString }
+            name = values.get("name")?.with { it.isJsonNull() ? null : it.asString }
+            token = values.get("token")?.with { it.isJsonNull() ? null : it.asString }
             true
+        } else {
+            name = null
+            token = null
         }
     }
 
     boolean save() {
-        JsonObject serialized = new JsonObject()
-
         if (name && token) {
+            JsonObject serialized = new JsonObject()
+
             serialized.addProperty("name", name)
             serialized.addProperty("token", token)
-        }
 
-        saveLocalCredentialFile(GSON.toJson(serialized))
+            return saveLocalCredentialFile(GSON.toJson(serialized))
+        } else {
+            return false
+        }
     }
 
+    /**
+     * Delete the only credential file
+     *
+     * @return true if the file does not exist after processing, otherwise false.
+     */
     boolean delete() {
-        localCredentialFile().delete()
+        File file = localCredentialFile()
+        return !file.exists() || file.delete()
+    }
+
+    /**
+     * Whether or not the file is an expected format.
+     *
+     * @return true if the content is valid, otherwise false.
+     */
+    boolean isValid() {
+        // xor is not available for null...
+        return name && token || !name && !token
     }
 
     @Nullable
@@ -61,22 +86,17 @@ class CliCredentialStore {
     }
 
     boolean saveLocalCredentialFile(@NotNull String str) {
-        if (!ensureDirectoryWritable()) {
-            return false
-        }
-
         File file = localCredentialFile()
+
         if (!file.exists() || file.canWrite()) {
             file.write(str, 'UTF-8')
-            true
+            load()
+        } else {
+            false
         }
-    }
-
-    private boolean ensureDirectoryWritable() {
-        return baseDir.exists() || baseDir.mkdirs()
     }
 
     File localCredentialFile() {
-        return new File(baseDir, 'credentials')
+        return new File(baseDir, CREDENTIALS_FILE_NAME)
     }
 }
