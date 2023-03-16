@@ -25,6 +25,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.annotations.NotNull
 
@@ -55,19 +56,23 @@ class DeployGatePlugin implements Plugin<Project> {
 
         GradleCompat.init(project)
 
+        Provider<String> credentialDirPathProvider = project.providers.systemProperty("user.home").map { home ->
+            new File(home, '.dg').absolutePath
+        }
+
         def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
             spec.parameters.endpoint.set(GradleCompat.forUseAtConfigurationTime(project.providers.environmentVariable("TEST_SERVER_URL")))
         }
 
         def localServerProvider = project.gradle.sharedServices.registerIfAbsent("httpserver", LocalServer) { spec ->
             spec.parameters.httpClient.set(httpClientProvider)
-            spec.parameters.credentialsDirPath.set(new File(System.getProperty('user.home'), '.dg').absolutePath)
+            spec.parameters.credentialsDirPath.set(credentialDirPathProvider)
         }
 
         def loginTaskProvider = project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
             task.explicitAppOwnerName.set(project.deploygate.appOwnerName)
             task.explicitApiToken.set(project.deploygate.apiToken)
-            task.credentialsDirPath.set(new File(System.getProperty('user.home'), '.dg').absolutePath)
+            task.credentialsDirPath.set(credentialDirPathProvider)
             task.httpClient.set(httpClientProvider)
             task.localServer.set(localServerProvider)
             task.usesService(httpClientProvider)
@@ -75,7 +80,7 @@ class DeployGatePlugin implements Plugin<Project> {
         }
 
         project.tasks.register(Constants.LOGOUT_TASK_NAME, LogoutTask) { task ->
-            task.credentialsDirPath.set(new File(System.getProperty('user.home'), '.dg').absolutePath)
+            task.credentialsDirPath.set(credentialDirPathProvider)
         }
 
         project.tasks.register(Constants.SUFFIX_APK_TASK_NAME, DefaultTask).configure { task ->
