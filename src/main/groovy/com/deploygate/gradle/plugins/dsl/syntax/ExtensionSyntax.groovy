@@ -2,8 +2,7 @@ package com.deploygate.gradle.plugins.dsl.syntax
 
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import org.gradle.api.NamedDomainObjectContainer
-
-import javax.annotation.Nonnull
+import org.jetbrains.annotations.NotNull
 
 interface ExtensionSyntax {
     /**
@@ -12,7 +11,7 @@ interface ExtensionSyntax {
      * @param apiToken
      * @see com.deploygate.gradle.plugins.DeployGatePlugin#ENV_NAME_API_TOKEN
      */
-    void setApiToken(@Nonnull String apiToken)
+    void setApiToken(@NotNull String apiToken)
 
     /**
      * Set the application owner name.
@@ -20,7 +19,7 @@ interface ExtensionSyntax {
      * @param appOwnerName
      * @see com.deploygate.gradle.plugins.DeployGatePlugin#ENV_NAME_APP_OWNER_NAME
      */
-    void setAppOwnerName(@Nonnull String appOwnerName)
+    void setAppOwnerName(@NotNull String appOwnerName)
 
     /**
      * Define deployments for each product flavors.
@@ -32,6 +31,6 @@ interface ExtensionSyntax {
     /**
      * Define deployments for each product flavors.
      */
-    @Nonnull
+    @NotNull
     NamedDomainObjectContainer<NamedDeployment> getDeployments() // for Kotlin DSL
 }

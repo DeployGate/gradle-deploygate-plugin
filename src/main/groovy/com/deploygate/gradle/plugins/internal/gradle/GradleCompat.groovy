@@ -3,8 +3,7 @@ package com.deploygate.gradle.plugins.internal.gradle
 import com.deploygate.gradle.plugins.internal.VersionString
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-
-import javax.annotation.Nonnull
+import org.jetbrains.annotations.NotNull
 
 class GradleCompat {
     private static VersionString GRADLE_VERSION
@@ -12,11 +11,11 @@ class GradleCompat {
     private GradleCompat() {
     }
 
-    static void init(@Nonnull Project project) {
+    static void init(@NotNull Project project) {
         GRADLE_VERSION = VersionString.tryParse(project.gradle.gradleVersion)
     }
 
-    @Nonnull
+    @NotNull
     static VersionString getVersion() {
         if (!GRADLE_VERSION) {
             throw new IllegalStateException("must be initialized")

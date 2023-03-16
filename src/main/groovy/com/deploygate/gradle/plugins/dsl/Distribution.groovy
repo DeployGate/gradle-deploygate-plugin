@@ -1,8 +1,7 @@
 package com.deploygate.gradle.plugins.dsl
 
 import com.deploygate.gradle.plugins.dsl.syntax.DistributionSyntax
-
-import javax.annotation.Nullable
+import org.jetbrains.annotations.Nullable
 
 class Distribution implements DistributionSyntax {
 

@@ -2,26 +2,25 @@ package com.deploygate.gradle.plugins.internal.agp
 
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
-
-import javax.annotation.Nonnull
+import org.jetbrains.annotations.NotNull
 
 class IApplicationVariantImpl implements IApplicationVariant {
-    @Nonnull
-//    private com.android.build.gradle.api.ApplicationVariant applicationVariant
+    @NotNull
+    //    private com.android.build.gradle.api.ApplicationVariant applicationVariant
     private def applicationVariant
 
-    IApplicationVariantImpl(@Nonnull /* ApplicationVariant */ applicationVariant) {
+    IApplicationVariantImpl(@NotNull /* ApplicationVariant */ applicationVariant) {
         this.applicationVariant = applicationVariant
     }
 
     @Override
-    @Nonnull
+    @NotNull
     String getName() {
         return applicationVariant.name
     }
 
     @Override
-    @Nonnull
+    @NotNull
     TaskProvider<? extends Task> packageApplicationTaskProvider() {
         return applicationVariant.packageApplicationProvider
     }

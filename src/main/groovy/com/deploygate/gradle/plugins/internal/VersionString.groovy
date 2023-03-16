@@ -1,21 +1,20 @@
 package com.deploygate.gradle.plugins.internal
 
+import java.util.regex.Pattern
 import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import javax.annotation.Nullable
-import java.util.regex.Pattern
 
 class VersionString implements Comparable<VersionString> {
     private static final Logger LOGGER = LoggerFactory.getLogger(this.getClass())
     private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?\$")
     private static final Pattern PRERELEASE_TAG_PATTERN = Pattern.compile("^([a-zA-Z]+).*\$")
     private static final Map<String, Integer> PRERELEASE_DELTAS = [
-            "alpha": 1,
-            "beta": 2,
-            "rc": 3,
-            "": 100
+        "alpha": 1,
+        "beta": 2,
+        "rc": 3,
+        "": 100
     ]
 
     @Nullable
@@ -95,14 +94,12 @@ class VersionString implements Comparable<VersionString> {
     @Override
     int compareTo(@NotNull VersionString versionString) {
         return [
-                major <=> versionString.major,
-                minor <=> versionString.minor,
-                patch <=> versionString.patch,
-                PRERELEASE_DELTAS[prerelease ?: ""] <=> PRERELEASE_DELTAS[versionString.prerelease ?: ""],
-                metaBuild <=> versionString.metaBuild
-        ].find {
-            it != 0
-        } ?: 0
+            major <=> versionString.major,
+            minor <=> versionString.minor,
+            patch <=> versionString.patch,
+            PRERELEASE_DELTAS[prerelease ?: ""] <=> PRERELEASE_DELTAS[versionString.prerelease ?: ""],
+            metaBuild <=> versionString.metaBuild
+        ].find { it != 0 } ?: 0
     }
 
     @Override

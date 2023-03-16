@@ -5,13 +5,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class UploadAppResponse {
     @SuppressWarnings("ConstantConditions")
-    @NotNull
-    @SerializedName("results")
+    @NotNull @SerializedName("results")
     public final ApplicationFragment application = null;
 
     static class ApplicationFragment {
-        @NotNull
-        @SerializedName("path")
+        @NotNull @SerializedName("path")
         public final String path = "";
 
         @SerializedName("revision")

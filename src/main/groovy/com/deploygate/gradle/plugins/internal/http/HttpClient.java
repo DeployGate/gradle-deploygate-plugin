@@ -7,6 +7,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -23,64 +34,56 @@ import org.gradle.api.services.BuildServiceParameters;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.VisibleForTesting;
 
-import javax.inject.Inject;
-import java.io.*;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 public abstract class HttpClient implements BuildService<HttpClient.Params>, AutoCloseable {
-    @VisibleForTesting
-    static final Gson GSON = new GsonBuilder().create();
+    @VisibleForTesting static final Gson GSON = new GsonBuilder().create();
 
     interface Params extends BuildServiceParameters {
         Property<String> getEndpoint();
     }
 
-    @NotNull
-    private final org.apache.hc.client5.http.classic.HttpClient httpClient;
-    @NotNull
-    private final String endpoint;
+    @NotNull private final org.apache.hc.client5.http.classic.HttpClient httpClient;
+    @NotNull private final String endpoint;
 
     @Inject
     public HttpClient() {
         this.endpoint = getParameters().getEndpoint().getOrElse(Config.getDEPLOYGATE_ROOT());
 
         List<BasicHeader> headers = new ArrayList<>();
-        headers.add(new BasicHeader("X-DEPLOYGATE-CLIENT-ID", "gradle-plugin/" + Config.getVERSION_CODE()));
-        headers.add(new BasicHeader("X-DEPLOYGATE-CLIENT-VERSION-NAME", Config.getVERSION() + "-" + Config.getVERSION_NAME()));
-        headers.add(new BasicHeader("X-DEPLOYGATE-GRADLE-PLUGIN-AGP-VERSION", String.valueOf(AndroidGradlePlugin.getVersion())));
+        headers.add(
+                new BasicHeader(
+                        "X-DEPLOYGATE-CLIENT-ID", "gradle-plugin/" + Config.getVERSION_CODE()));
+        headers.add(
+                new BasicHeader(
+                        "X-DEPLOYGATE-CLIENT-VERSION-NAME",
+                        Config.getVERSION() + "-" + Config.getVERSION_NAME()));
+        headers.add(
+                new BasicHeader(
+                        "X-DEPLOYGATE-GRADLE-PLUGIN-AGP-VERSION",
+                        String.valueOf(AndroidGradlePlugin.getVersion())));
 
-        RequestConfig requestConfig = RequestConfig.custom().
-                setExpectContinueEnabled(true).
-                setMaxRedirects(3).
-                setConnectionRequestTimeout(10, TimeUnit.MINUTES).
-                setDefaultKeepAlive(10, TimeUnit.MINUTES).
-                setResponseTimeout(10, TimeUnit.MINUTES).
-                build();
+        RequestConfig requestConfig =
+                RequestConfig.custom()
+                        .setExpectContinueEnabled(true)
+                        .setMaxRedirects(3)
+                        .setConnectionRequestTimeout(10, TimeUnit.MINUTES)
+                        .setDefaultKeepAlive(10, TimeUnit.MINUTES)
+                        .setResponseTimeout(10, TimeUnit.MINUTES)
+                        .build();
 
-        this.httpClient = HttpClientBuilder.create().
-                useSystemProperties().
-                setUserAgent("gradle-deploygate-plugin/" + Config.getVERSION()).
-                setDefaultHeaders(headers).
-                setDefaultRequestConfig(requestConfig).
-                build();
+        this.httpClient =
+                HttpClientBuilder.create()
+                        .useSystemProperties()
+                        .setUserAgent("gradle-deploygate-plugin/" + Config.getVERSION())
+                        .setDefaultHeaders(headers)
+                        .setDefaultRequestConfig(requestConfig)
+                        .build();
     }
 
-    @NotNull
-    public ApiClient getApiClient(@NotNull Credentials credentials) {
+    @NotNull public ApiClient getApiClient(@NotNull Credentials credentials) {
         return new ApiClient(this, credentials);
     }
 
-    @NotNull
-    public ILifecycleNotificationClient getLifecycleNotificationClient() {
+    @NotNull public ILifecycleNotificationClient getLifecycleNotificationClient() {
         if (getNotificationKey().isPresent()) {
             return new LifecycleNotificationClient(this, getNotificationKey().get());
         } else {
@@ -95,17 +98,18 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
 
     public abstract Property<String> getNotificationKey();
 
-    @NotNull
-    HttpUriRequestBase buildRequest(@NotNull String method, @NotNull String... fragments) {
+    @NotNull HttpUriRequestBase buildRequest(@NotNull String method, @NotNull String... fragments) {
         return buildRequest(method, Collections.emptyMap(), fragments);
     }
 
-    @NotNull
-    HttpUriRequestBase buildRequest(@NotNull String method, @NotNull Map<@NotNull String, @NotNull String> queryParams, @NotNull String... fragments) {
+    @NotNull HttpUriRequestBase buildRequest(
+            @NotNull String method,
+            @NotNull Map<@NotNull String, @NotNull String> queryParams,
+            @NotNull String... fragments) {
         try {
             URIBuilder builder = new URIBuilder(endpoint).appendPathSegments(fragments);
 
-            for (Map.Entry<String, String> entry: queryParams.entrySet()) {
+            for (Map.Entry<String, String> entry : queryParams.entrySet()) {
                 builder.addParameter(entry.getKey(), entry.getValue());
             }
 
@@ -115,7 +119,8 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
         }
     }
 
-    @NotNull <T> Response<T> execute(@NotNull HttpUriRequest request, @NotNull Class<T> klass) throws HttpResponseException, NetworkFailure {
+    @NotNull <T> Response<T> execute(@NotNull HttpUriRequest request, @NotNull Class<T> klass)
+            throws HttpResponseException, NetworkFailure {
         try {
             return httpClient.execute(request, new ResponseSerializer<>(klass));
         } catch (HttpResponseException e) {
@@ -126,10 +131,8 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
     }
 
     public static class Response<T> {
-        @NotNull
-        public final T typedResponse;
-        @NotNull
-        public final String rawResponse;
+        @NotNull public final T typedResponse;
+        @NotNull public final String rawResponse;
 
         public Response(@NotNull T typedResponse, @NotNull String rawResponse) {
             this.typedResponse = typedResponse;
@@ -144,13 +147,18 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
             }
 
             try {
-                Files.write(file.toPath(), rawResponse.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+                Files.write(
+                        file.toPath(),
+                        rawResponse.getBytes(StandardCharsets.UTF_8),
+                        StandardOpenOption.WRITE,
+                        StandardOpenOption.CREATE);
             } catch (IOException ignore) {
             }
         }
     }
 
-    private static class ResponseSerializer<T> extends AbstractHttpClientResponseHandler<Response<T>> {
+    private static class ResponseSerializer<T>
+            extends AbstractHttpClientResponseHandler<Response<T>> {
         private final Class<T> klass;
 
         ResponseSerializer(Class<T> klass) {
@@ -177,10 +185,7 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
         public Response<T> handleEntity(HttpEntity entity) throws IOException {
             String responseString = stringify(entity.getContent());
 
-            return new Response<>(
-                    GSON.fromJson(responseString, klass),
-                    responseString
-            );
+            return new Response<>(GSON.fromJson(responseString, klass), responseString);
         }
 
         private static String stringify(@NotNull InputStream is) throws IOException {

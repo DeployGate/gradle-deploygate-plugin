@@ -7,11 +7,9 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.jetbrains.annotations.NotNull;
 
 public class ApiClient {
-    @NotNull
-    private final HttpClient httpClient;
+    @NotNull private final HttpClient httpClient;
 
-    @NotNull
-    private final Credentials credentials;
+    @NotNull private final Credentials credentials;
 
     /**
      * @param httpClient should be immutable
@@ -25,15 +23,21 @@ public class ApiClient {
     /**
      * Upload the application file to the app owner space
      *
-     * @param request      a request to the server that must contain a file
+     * @param request a request to the server that must contain a file
      * @return a successful response that contains a typed json.
      * @throws HttpResponseException is thrown if a request is an error inclduing 4xx and 5xx
-     * @throws NetworkFailure        is thrown if a network trouble happens
+     * @throws NetworkFailure is thrown if a network trouble happens
      */
     @SuppressWarnings("RedundantThrows")
-    @NotNull
-    public HttpClient.Response<UploadAppResponse> uploadApp(@NotNull UploadAppRequest request) throws HttpResponseException, NetworkFailure {
-        HttpUriRequestBase httpPost = httpClient.buildRequest(HttpPost.METHOD_NAME, "api", "users", credentials.getAppOwnerName().get(), "apps");
+    @NotNull public HttpClient.Response<UploadAppResponse> uploadApp(@NotNull UploadAppRequest request)
+            throws HttpResponseException, NetworkFailure {
+        HttpUriRequestBase httpPost =
+                httpClient.buildRequest(
+                        HttpPost.METHOD_NAME,
+                        "api",
+                        "users",
+                        credentials.getAppOwnerName().get(),
+                        "apps");
         httpPost.setEntity(request.toEntity());
 
         configureAuthorizationHeader(httpPost);

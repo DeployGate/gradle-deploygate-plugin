@@ -1,9 +1,10 @@
 package com.deploygate.gradle.plugins.tasks
 
-import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
+import javax.inject.Inject
 import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
@@ -15,9 +16,6 @@ import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-
-import javax.annotation.Nonnull
-import javax.inject.Inject
 
 class UploadArtifactTaskSpec extends Specification {
     static class UploadArtifactTaskStub extends UploadArtifactTask {
@@ -34,7 +32,7 @@ class UploadArtifactTaskSpec extends Specification {
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
 
-    @Nonnull
+    @NotNull
     private Project project
 
     def setup() {
@@ -51,7 +49,7 @@ class UploadArtifactTaskSpec extends Specification {
         def inputParams = new UploadArtifactTask.InputParams(
                 variantName: "dep1",
                 artifactFilePath: new File(project.buildDir, "not_found").absolutePath
-        )
+                )
 
         when: "apkFile must exist"
         def task = project.tasks.create("UploadArtifactTaskStub2", UploadArtifactTaskStub, inputParams)

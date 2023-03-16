@@ -1,6 +1,6 @@
 package com.deploygate.gradle.plugins.dsl.syntax
 
-import javax.annotation.Nullable
+import org.jetbrains.annotations.Nullable
 
 interface DistributionSyntax {
     /**

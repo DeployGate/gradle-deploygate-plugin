@@ -152,7 +152,7 @@ deploygate {
 
 ## デプロイの設定方法
 
-*v2* では設定 DSL を変更しています。その変更については [v1 から v2 への移行](#migrate-v2) を参照してください。 
+*v2* では設定 DSL を変更しています。その変更については [v1 から v2 への移行](#migrate-v2) を参照してください。
 
 ```groovy
 apply plugin: 'deploygate' // android plugin のあとに記述してください
@@ -166,7 +166,7 @@ deploygate {
 
   // 各 Variant についてのデプロイ設定をここに記述します。
   deployments {
-    
+
     // `flavor1` product flavor と `debug` buildType への設定です。
     // `uploadDeployGateFlavor1Debug` タスクがこの設定に基づいて動作します。
     flavor1Debug {
@@ -178,7 +178,7 @@ deploygate {
 
       // このフラグが true の場合、`assembleFlavor1Debug` は実行されません。
       skipAssemble = true // デフォルトは false です。
-      
+
       // product flavor と build type に関連付けられた設定の場合、基本的に指定する必要はありません。
       // プラグインは flavor1Debug の apk 保存先を自動で読み取ります。
       sourceFile = file("${project.rootDir}/app/build/outputs/apk/manual-manipulate/app-signed.apk")
@@ -191,13 +191,13 @@ deploygate {
           // この配布ページに載せるリリースノートを指定できます。上記の key が設定されていない場合は利用されません。
           releaseNote = "release note sample"
       }
-      
+
       // KotlinDSL を利用している場合は以下の記述をお使いください。
       distribution(closureOf<com.deploygate.gradle.plugins.dsl.Distribution> {
           ...
       })
     }
-    
+
     // 任意の名前を設定することも可能です。
     // この設定だと `uploadDeployGateUniversalApkOfAab` タスクが生成されます。
     universalApkOfAab {
@@ -221,7 +221,7 @@ deploygate {
  * `DEPLOYGATE_DISTRIBUTION_KEY`
  * `DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE`
  * `DEPLOYGATE_SOURCE_FILE`
- * `DEPLOYGATE_OPEN_BROWSER` - 環境変数からのみ設定可能。 アップロードが終わり次第ブラウザを開くかどうかが設定できます 
+ * `DEPLOYGATE_OPEN_BROWSER` - 環境変数からのみ設定可能。 アップロードが終わり次第ブラウザを開くかどうかが設定できます
 
 *環境変数経由であれば、認証情報を直接 build.gradle に記述することなく設定できます。*
 
@@ -271,6 +271,13 @@ jitpack.io は初回のリクエストを受けてからスナップショット
 
 ## 開発
 
+### 要求
+
+- JRE 11+
+- Docker (テスト用の機能のみ)
+
+### Steps
+
 下記のステップでローカルでプラグインを試すことができます。
 
 0. リポジトリのクローン
@@ -282,7 +289,7 @@ jitpack.io は初回のリクエストを受けてからスナップショット
 また変更したあとはユニットテストと受け入れテストが通ることを確認してください。
 
 ```bash
-# Mock サーバーを起動させてください 
+# Mock サーバーを起動させてください
 docker compose build
 docker compose up -d
 
@@ -306,7 +313,7 @@ docker compose up -d
 
 *非推奨となった記述と新しい記述が混在する場合、新しい記述が基本的には優先されます。*
 
-**バージョン 2.0.x は v1 の記法をそのまま利用できます。バージョン2.1.0 より、非推奨となった記法を削除していきます。**  
+**バージョン 2.0.x は v1 の記法をそのまま利用できます。バージョン2.1.0 より、非推奨となった記法を削除していきます。**
 
 以下の v1 の設定に対して、v2 への移行を行います。
 

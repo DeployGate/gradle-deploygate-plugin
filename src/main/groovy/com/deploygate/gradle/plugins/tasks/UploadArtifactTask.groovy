@@ -81,7 +81,11 @@ abstract class UploadArtifactTask extends DefaultTask {
         deployment = objectFactory.newInstance(DeploymentConfiguration)
         httpClient = objectFactory.property(HttpClient)
 
-        response = projectLayout.buildDirectory.file(["deploygate", name, "response.json"].join(File.separator))
+        response = projectLayout.buildDirectory.file([
+            "deploygate",
+            name,
+            "response.json"
+        ].join(File.separator))
     }
 
     @NotNull

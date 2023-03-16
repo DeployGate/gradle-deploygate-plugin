@@ -5,18 +5,17 @@ import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-
-import javax.annotation.Nonnull
 
 class DeploymentConfigurationSpec extends Specification {
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
 
-    @Nonnull
+    @NotNull
     private Project project
 
     def setup() {
@@ -82,5 +81,4 @@ class DeploymentConfigurationSpec extends Specification {
         base.distributionReleaseNote.getOrNull() == "other distributionReleaseNote"
         base.skipAssemble
     }
-
 }

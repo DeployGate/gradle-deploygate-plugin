@@ -1,15 +1,14 @@
 package com.deploygate.gradle.plugins.dsl
 
 import com.deploygate.gradle.plugins.DeployGatePlugin
-import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.dsl.syntax.ExtensionSyntax
 import com.deploygate.gradle.plugins.internal.annotation.DeployGateInternal
+import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.tasks.Internal
-
-import javax.annotation.Nonnull
-import javax.annotation.Nullable
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 class DeployGateExtension implements ExtensionSyntax {
     String apiToken
@@ -19,27 +18,30 @@ class DeployGateExtension implements ExtensionSyntax {
     @Deprecated
     String notifyKey = null
 
-    @Nonnull
+    @NotNull
     private final Project project
 
-    @Nonnull
+    @NotNull
     private final NamedDomainObjectContainer<NamedDeployment> deployments
 
-    @Nonnull
+    @NotNull
     private final CliCredentialStore credentialStore
 
-    DeployGateExtension(@Nonnull Project project, @Nonnull NamedDomainObjectContainer<NamedDeployment> deployments, @Nonnull CliCredentialStore credentialStore) {
+    DeployGateExtension(@NotNull Project project, @NotNull NamedDomainObjectContainer<NamedDeployment> deployments, @NotNull CliCredentialStore credentialStore) {
         this.project = project
         this.deployments = deployments
         this.credentialStore = credentialStore
 
-        this.appOwnerName = [System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME), System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1), credentialStore.getName()].find {
-            it != null
-        }
+        this.appOwnerName = [
+            System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME),
+            System.getenv(DeployGatePlugin.ENV_NAME_APP_OWNER_NAME_V1),
+            credentialStore.getName()
+        ].find { it != null }
 
-        this.apiToken = [System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN), credentialStore.getToken()].find {
-            it != null
-        }
+        this.apiToken = [
+            System.getenv(DeployGatePlugin.ENV_NAME_API_TOKEN),
+            credentialStore.getToken()
+        ].find { it != null }
     }
 
     // backward compatibility
@@ -84,7 +86,7 @@ class DeployGateExtension implements ExtensionSyntax {
 
     // end: backward compatibility
 
-    @Nonnull
+    @NotNull
     @Override
     NamedDomainObjectContainer<NamedDeployment> getDeployments() {
         return deployments
@@ -95,12 +97,12 @@ class DeployGateExtension implements ExtensionSyntax {
         deployments.configure(closure)
     }
 
-    boolean hasDeployment(@Nonnull String name) {
+    boolean hasDeployment(@NotNull String name) {
         return deployments.findByName(name)
     }
 
     @DeployGateInternal
-    @Nonnull
+    @NotNull
     @Internal
     CliCredentialStore getCredentialStore() {
         return credentialStore

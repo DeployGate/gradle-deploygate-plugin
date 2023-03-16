@@ -2,21 +2,20 @@ package com.deploygate.gradle.plugins
 
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-
-import javax.annotation.Nonnull
 
 abstract class AcceptanceTestBaseSpec extends Specification {
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
 
-    @Nonnull
+    @NotNull
     TestAndroidProject testAndroidProject
 
-    @Nonnull
+    @NotNull
     TestDeployGatePlugin testDeployGatePlugin
 
     abstract void useProperResource()
@@ -31,7 +30,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "check tasks' existence #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -71,7 +70,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "check task children of uploadDeployGate #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -112,7 +111,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor1Flavor3Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -136,7 +135,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor1Flavor3Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -160,7 +159,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor2Flavor3Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -184,7 +183,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor2Flavor3Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -208,7 +207,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor1Flavor4Debug apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -232,7 +231,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor1Flavor4Debug aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -256,7 +255,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor2Flavor4Debug apk should fail unless assembling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -279,7 +278,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor2Flavor4Debug aab should fail unless bundling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -302,7 +301,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor2Flavor4Debug apk require assembling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def assembleRunner = GradleRunner.create()
@@ -336,7 +335,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "flavor2Flavor4Debug aab require bundling #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def assembleRunner = GradleRunner.create()
@@ -370,7 +369,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "customApk apk #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()
@@ -394,7 +393,7 @@ abstract class AcceptanceTestBaseSpec extends Specification {
     def "customApk aab #agpVersion"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()

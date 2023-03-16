@@ -3,21 +3,20 @@ package com.deploygate.gradle.plugins.internal.agp
 import com.deploygate.gradle.plugins.TestAndroidProject
 import com.deploygate.gradle.plugins.TestDeployGatePlugin
 import org.gradle.testkit.runner.GradleRunner
+import org.jetbrains.annotations.NotNull
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-
-import javax.annotation.Nonnull
 
 class AndroidGradlePluginAcceptanceSpec extends Specification {
 
     @Rule
     TemporaryFolder testProjectDir = new TemporaryFolder()
 
-    @Nonnull
+    @NotNull
     TestAndroidProject testAndroidProject
 
-    @Nonnull
+    @NotNull
     TestDeployGatePlugin testDeployGatePlugin
 
     def setup() {
@@ -40,7 +39,7 @@ class AndroidGradlePluginAcceptanceSpec extends Specification {
     def "version verification"() {
         given:
         testAndroidProject.gradleProperties([
-                "agpVersion": agpVersion
+            "agpVersion": agpVersion
         ])
 
         def runner = GradleRunner.create()

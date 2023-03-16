@@ -1,10 +1,10 @@
 package com.deploygate.gradle.plugins.artifacts
 
-import javax.annotation.Nonnull
-import javax.annotation.Nullable
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 interface ApkInfo {
-    @Nonnull
+    @NotNull
     String getVariantName()
 
     @Nullable

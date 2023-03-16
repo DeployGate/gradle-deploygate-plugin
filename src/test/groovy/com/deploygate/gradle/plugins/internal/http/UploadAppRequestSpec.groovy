@@ -1,12 +1,11 @@
 package com.deploygate.gradle.plugins.internal.http
 
 
+import java.nio.charset.StandardCharsets
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder
 import org.apache.hc.client5.http.entity.mime.StringBody
 import spock.lang.Specification
 import spock.lang.Unroll
-
-import java.nio.charset.StandardCharsets
 
 class UploadAppRequestSpec extends Specification {
     @Unroll

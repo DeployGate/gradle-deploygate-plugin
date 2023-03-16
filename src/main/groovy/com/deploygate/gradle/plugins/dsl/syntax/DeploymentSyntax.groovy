@@ -2,9 +2,8 @@ package com.deploygate.gradle.plugins.dsl.syntax
 
 import com.deploygate.gradle.plugins.dsl.Distribution
 import org.gradle.api.Action
-
-import javax.annotation.Nonnull
-import javax.annotation.Nullable
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 interface DeploymentSyntax {
     /**
@@ -38,12 +37,12 @@ interface DeploymentSyntax {
      *
      * @param closure
      */
-    void distribution(@Nonnull Closure closure) // for Groovy
+    void distribution(@NotNull Closure closure) // for Groovy
 
     /**
      * Configure parameters of a distribution
      *
      * @param builder
      */
-    void distribution(@Nonnull Action<Distribution> builder) // for Kotlin DSL
+    void distribution(@NotNull Action<Distribution> builder) // for Kotlin DSL
 }

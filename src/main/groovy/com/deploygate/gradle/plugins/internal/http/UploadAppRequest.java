@@ -1,5 +1,9 @@
 package com.deploygate.gradle.plugins.internal.http;
 
+import static org.apache.hc.client5.http.entity.mime.HttpMultipartMode.EXTENDED;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.entity.mime.StringBody;
 import org.apache.hc.core5.http.ContentType;
@@ -7,29 +11,17 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-
-import static org.apache.hc.client5.http.entity.mime.HttpMultipartMode.EXTENDED;
-
 public class UploadAppRequest {
-    private static final ContentType UTF8_PLAIN_TEXT = ContentType.create(
-            "text/plain",
-            StandardCharsets.UTF_8
-    );
+    private static final ContentType UTF8_PLAIN_TEXT =
+            ContentType.create("text/plain", StandardCharsets.UTF_8);
 
-    @NotNull
-    private final File appFile;
+    @NotNull private final File appFile;
 
-    @Nullable
-    private String message;
-    @Nullable
-    private String distributionKey;
-    @Nullable
-    private String releaseNote;
+    @Nullable private String message;
+    @Nullable private String distributionKey;
+    @Nullable private String releaseNote;
 
-    @Nullable
-    private MultipartEntityBuilder builder;
+    @Nullable private MultipartEntityBuilder builder;
 
     public UploadAppRequest(@NotNull File appFile) {
         this(appFile, null);
@@ -52,8 +44,7 @@ public class UploadAppRequest {
         this.releaseNote = releaseNote;
     }
 
-    @NotNull
-    HttpEntity toEntity() {
+    @NotNull HttpEntity toEntity() {
         MultipartEntityBuilder builder;
 
         if (this.builder != null) {
