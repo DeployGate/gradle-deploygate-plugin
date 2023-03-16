@@ -6,12 +6,14 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.annotations.NotNull
 
 abstract class LogoutTask extends DefaultTask {
 
     @Input
+    @Optional
     final Property<String> credentialsDirPath
 
     @Inject
@@ -24,7 +26,14 @@ abstract class LogoutTask extends DefaultTask {
 
     @TaskAction
     def remove() {
-        CliCredentialStore store = new CliCredentialStore(new File(credentialsDirPath.get()))
+        String dirPath = credentialsDirPath.getOrNull()
+
+        if (dirPath == null) {
+            logger.info("A local credential is unavailable.")
+            return
+        }
+
+        CliCredentialStore store = new CliCredentialStore(new File(dirPath))
         store.delete()
         logger.info("The local credentials have been removed.")
     }

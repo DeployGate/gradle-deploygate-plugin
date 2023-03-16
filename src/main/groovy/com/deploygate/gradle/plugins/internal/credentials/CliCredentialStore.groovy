@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
-import org.jetbrains.annotations.VisibleForTesting
 
 class CliCredentialStore {
     private static final Gson GSON = new Gson()
@@ -14,12 +13,15 @@ class CliCredentialStore {
     String name
     String token
 
-    CliCredentialStore() {
-        this(new File(System.getProperty('user.home'), '.dg'))
-    }
+    CliCredentialStore(@NotNull File baseDir) {
+        if (baseDir.exists()) {
+            if (!baseDir.isDirectory()) {
+                throw new IllegalArgumentException("${baseDir.absolutePath} is not a directory")
+            }
+        } else if (!baseDir.mkdirs()) {
+            throw new IllegalStateException("${baseDir.absolutePath} cannot be created")
+        }
 
-    @VisibleForTesting
-    CliCredentialStore(File baseDir) {
         this.baseDir = baseDir
         load()
     }
@@ -31,22 +33,32 @@ class CliCredentialStore {
             name = values.get("name")?.with { it.isJsonNull() ? null : it.asString }
             token = values.get("token")?.with { it.isJsonNull() ? null : it.asString }
             true
+        } else {
+            name = null
+            token = null
         }
     }
 
     boolean save() {
-        JsonObject serialized = new JsonObject()
-
         if (name && token) {
+            JsonObject serialized = new JsonObject()
+
             serialized.addProperty("name", name)
             serialized.addProperty("token", token)
-        }
 
-        saveLocalCredentialFile(GSON.toJson(serialized))
+            return saveLocalCredentialFile(GSON.toJson(serialized))
+        } else {
+            return false
+        }
     }
 
     boolean delete() {
         localCredentialFile().delete()
+    }
+
+    boolean isValid() {
+        // xor is not available for null...
+        return name && token || !name && !token
     }
 
     @Nullable
@@ -61,10 +73,6 @@ class CliCredentialStore {
     }
 
     boolean saveLocalCredentialFile(@NotNull String str) {
-        if (!ensureDirectoryWritable()) {
-            return false
-        }
-
         File file = localCredentialFile()
 
         if (!file.exists() || file.canWrite()) {
@@ -73,10 +81,6 @@ class CliCredentialStore {
         } else {
             false
         }
-    }
-
-    private boolean ensureDirectoryWritable() {
-        return baseDir.exists() || baseDir.mkdirs()
     }
 
     File localCredentialFile() {

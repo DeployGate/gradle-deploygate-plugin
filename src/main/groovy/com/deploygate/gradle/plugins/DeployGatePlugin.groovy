@@ -56,8 +56,10 @@ class DeployGatePlugin implements Plugin<Project> {
 
         GradleCompat.init(project)
 
+        // the presence of the value is same to the existence of the directory.
         Provider<String> credentialDirPathProvider = project.providers.systemProperty("user.home").map { home ->
-            new File(home, '.dg').absolutePath
+            File f = new File(home, '.dg')
+            (f.directory || f.mkdirs()) ? f.absolutePath : null
         }
 
         def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->

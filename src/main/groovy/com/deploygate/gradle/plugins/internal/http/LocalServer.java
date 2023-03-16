@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +34,7 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
 
     @NotNull private final HttpClient httpClient;
 
-    @NotNull private final File credentialStoreDir;
+    @Nullable private final File credentialStoreDir;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<HttpServer> optionalHttpServer;
@@ -43,19 +44,26 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
     @Inject
     public LocalServer() {
         this.httpClient = getParameters().getHttpClient().get();
-        this.credentialStoreDir = new File(getParameters().getCredentialsDirPath().get());
 
-        InetSocketAddress address = new InetSocketAddress("localhost", 0);
+        if (getParameters().getCredentialsDirPath().isPresent()) {
+            this.credentialStoreDir = new File(getParameters().getCredentialsDirPath().get());
 
-        HttpServer s;
+            InetSocketAddress address = new InetSocketAddress("localhost", 0);
 
-        try {
-            s = HttpServer.create(address, 0);
-        } catch (IOException ignore) {
-            s = null;
+            HttpServer s;
+
+            try {
+                s = HttpServer.create(address, 0);
+            } catch (IOException ignore) {
+                s = null;
+            }
+
+            optionalHttpServer = Optional.ofNullable(s);
+        } else {
+            this.credentialStoreDir = null;
+            this.optionalHttpServer = Optional.empty();
         }
 
-        optionalHttpServer = Optional.ofNullable(s);
         optionalHttpServer.ifPresent(
                 server -> {
                     server.createContext(
@@ -91,7 +99,11 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
         return server.getAddress().getPort();
     }
 
-    @Nullable public boolean await() throws InterruptedException, TimeoutException {
+    public boolean awaitForCompletion() throws InterruptedException, TimeoutException {
+        if (!optionalHttpServer.isPresent()) {
+            return false;
+        }
+
         long now = System.currentTimeMillis();
         long until = now + TimeUnit.MINUTES.toMillis(3);
 
@@ -111,6 +123,8 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
     }
 
     boolean fetchAndSaveCredentials() {
+        File storeDir = Objects.requireNonNull(credentialStoreDir);
+
         try {
             HttpClient.Response<GetCredentialsResponse> response =
                     httpClient.getLifecycleNotificationClient().getCredentials();
@@ -120,13 +134,12 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
                 return false;
             }
 
-            CliCredentialStore credentialStore = new CliCredentialStore(credentialStoreDir);
+            CliCredentialStore credentialStore = new CliCredentialStore(storeDir);
 
             if (!credentialStore.saveLocalCredentialFile(response.rawResponse)) {
                 throw new GradleException("failed to save the fetched credentials");
             }
 
-            this.httpClient.getLifecycleNotificationClient().notifyOnCredentialSaved();
             return true;
         } catch (Throwable th) {
             LOGGER.error("failed to retrieve credential", th);
