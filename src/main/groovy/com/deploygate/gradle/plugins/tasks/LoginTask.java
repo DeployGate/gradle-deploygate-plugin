@@ -157,8 +157,6 @@ public abstract class LoginTask extends DefaultTask {
             throw new RuntimeException("Could not fetch the credentials");
         }
 
-        getHttpClient().get().getLifecycleNotificationClient().notifyOnCredentialSaved();
-
         if (!store.load()) {
             throw new IllegalStateException(
                     "Local credential is not loadable unexpectedly. Please file a bug if this issue"

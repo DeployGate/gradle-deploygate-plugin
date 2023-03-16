@@ -1,8 +1,7 @@
 package com.deploygate.gradle.plugins.tasks
 
-import com.deploygate.gradle.plugins.dsl.DeployGateExtension
-import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -47,20 +46,17 @@ class LoginTaskSpec extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().withProjectDir(testProjectDir.root).build()
+        GradleCompat.init(project)
     }
 
     def "complete the credentials from cli credentials"() {
         setup:
-        NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
-        DeployGateExtension extension = new DeployGateExtension(deployments)
-        project.extensions.add("deploygate", extension)
-
-        when:
+        def credentialsDirPathProvider = project.providers.provider { testProjectDir.root.absolutePath }
         project.tasks.register("loginTask1", StubLoginTask) { task ->
-            task.credentialsDirPath.set(testProjectDir.root.absolutePath)
+            task.credentialsDirPath.set(credentialsDirPathProvider)
         }
 
-        and:
+        when:
         StubLoginTask loginTask1 = project.tasks.getByName("loginTask1") as StubLoginTask
         loginTask1.execute()
 
@@ -69,7 +65,7 @@ class LoginTaskSpec extends Specification {
 
         when:
         project.tasks.register("loginTask2", StubLoginTask) { task ->
-            task.credentialsDirPath.set(testProjectDir.root.absolutePath)
+            task.credentialsDirPath.set(credentialsDirPathProvider)
             task.stubApiToken = "stub.token"
             task.stubAppOwnerName = "stub.appOwnerName"
         }
@@ -85,7 +81,7 @@ class LoginTaskSpec extends Specification {
         when:
         project.tasks.register("loginTask3", StubLoginTask) { task ->
             task.explicitApiToken.set("ext.token")
-            task.credentialsDirPath.set(testProjectDir.root.absolutePath)
+            task.credentialsDirPath.set(credentialsDirPathProvider)
             task.stubApiToken = "stub.token"
             task.stubAppOwnerName = "stub.appOwnerName"
         }
@@ -102,7 +98,7 @@ class LoginTaskSpec extends Specification {
         project.tasks.register("loginTask4", StubLoginTask) { task ->
             task.explicitApiToken.set("ext.token")
             task.explicitAppOwnerName.set("ext.appOwnerName")
-            task.credentialsDirPath.set(testProjectDir.root.absolutePath)
+            task.credentialsDirPath.set(credentialsDirPathProvider)
             task.stubApiToken = "stub.token"
             task.stubAppOwnerName = "stub.appOwnerName"
         }

@@ -11,7 +11,7 @@ class CliCredentialStoreTest extends Specification {
 
     def "load the file content on initialization"() {
         setup:
-        def file1 = new File(testProjectDir.newFolder("test1"), "credentials")
+        def file1 = new File(testProjectDir.newFolder("test1"), CliCredentialStore.CREDENTIALS_FILE_NAME)
         file1.write('{"name":"name","token":"token"}')
 
         when:
@@ -22,7 +22,7 @@ class CliCredentialStoreTest extends Specification {
         store1.token == "token"
 
         when:
-        def file2 = new File(testProjectDir.newFolder("test2"), "credentials")
+        def file2 = new File(testProjectDir.newFolder("test2"), CliCredentialStore.CREDENTIALS_FILE_NAME)
 
         and:
         def store2 = new CliCredentialStore(file2.parentFile)

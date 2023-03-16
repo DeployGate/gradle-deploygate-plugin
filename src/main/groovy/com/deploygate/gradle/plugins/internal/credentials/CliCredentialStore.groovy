@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
 class CliCredentialStore {
+    public static final String CREDENTIALS_FILE_NAME = "credentials"
+
     private static final Gson GSON = new Gson()
 
     private final File baseDir
@@ -52,10 +54,21 @@ class CliCredentialStore {
         }
     }
 
+    /**
+     * Delete the only credential file
+     *
+     * @return true if the file does not exist after processing, otherwise false.
+     */
     boolean delete() {
-        localCredentialFile().delete()
+        File file = localCredentialFile()
+        return !file.exists() || file.delete()
     }
 
+    /**
+     * Whether or not the file is an expected format.
+     *
+     * @return true if the content is valid, otherwise false.
+     */
     boolean isValid() {
         // xor is not available for null...
         return name && token || !name && !token
@@ -84,6 +97,6 @@ class CliCredentialStore {
     }
 
     File localCredentialFile() {
-        return new File(baseDir, 'credentials')
+        return new File(baseDir, CREDENTIALS_FILE_NAME)
     }
 }

@@ -140,6 +140,8 @@ public abstract class LocalServer implements BuildService<LocalServer.Params>, A
                 throw new GradleException("failed to save the fetched credentials");
             }
 
+            httpClient.getLifecycleNotificationClient().notifyOnCredentialSaved();
+
             return true;
         } catch (Throwable th) {
             LOGGER.error("failed to retrieve credential", th);
