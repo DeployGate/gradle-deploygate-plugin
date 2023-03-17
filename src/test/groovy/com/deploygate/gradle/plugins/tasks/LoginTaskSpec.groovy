@@ -2,6 +2,8 @@ package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
+import org.gradle.api.GradleException
+
 import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -110,5 +112,23 @@ class LoginTaskSpec extends Specification {
         then: "do not use the credential store's values"
         loginTask4.credentials.getApiToken().get() == "ext.token"
         loginTask4.credentials.getAppOwnerName().get() == "ext.appOwnerName"
+    }
+
+    def "forbid specific input states"() {
+        setup:
+        def credentialsDirPathProvider = project.providers.provider { testProjectDir.root.absolutePath }
+        project.tasks.register("loginTask1", StubLoginTask) { task ->
+            task.credentialsDirPath.set(credentialsDirPathProvider)
+            task.explicitApiToken.set("ext.token")
+            task.stubApiToken = "stub.token"
+            task.stubAppOwnerName = "stub.appOwnerName"
+        }
+
+        when:
+        StubLoginTask loginTask1 = project.tasks.getByName("loginTask1") as StubLoginTask
+        loginTask1.execute()
+
+        then: "fail if only api token is provided"
+        thrown(GradleException)
     }
 }
