@@ -4,12 +4,15 @@ on:
   push:
     tags:
       - \d.\d.\d
-      - \d.\d.\d-(alpha|rc)\d
+      - \d.\d.\d-(alpha|rc)\d\d
 
 jobs:
   production-release:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: master
       - uses: actions/checkout@v3
       - run: |
           if [[ "$(cat src/main/resources/VERSION)" != "${GITHUB_REF#refs/tags/}" ]]; then
@@ -17,8 +20,6 @@ jobs:
             exit 1
           fi
       - uses: ./.github/actions/setup-java
-        with:
-          java-version: '8'
       - name: Set up gradle.properties for signing and nexus
         # Add timeout setting due to https://github.com/DeployGate/gradle-deploygate-plugin/runs/2523846388
         run: |
