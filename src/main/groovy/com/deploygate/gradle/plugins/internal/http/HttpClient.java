@@ -158,7 +158,8 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
                         file.toPath(),
                         rawResponse.getBytes(StandardCharsets.UTF_8),
                         StandardOpenOption.WRITE,
-                        StandardOpenOption.CREATE);
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING);
             } catch (IOException ignore) {
             }
         }
