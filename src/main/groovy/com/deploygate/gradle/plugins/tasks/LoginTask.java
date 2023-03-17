@@ -147,7 +147,10 @@ public abstract class LoginTask extends DefaultTask {
 
         if (!credentials.getAppOwnerName().isPresent() && credentials.getApiToken().isPresent()) {
             getLogger().error("An api token is provided but no app owner name is found.");
-            getLogger().error("This behaviour has been obsoleted. See https://github.com/DeployGate/gradle-deploygate-plugin/issues/171.");
+            getLogger()
+                    .error(
+                            "This behaviour has been obsoleted. See"
+                                + " https://github.com/DeployGate/gradle-deploygate-plugin/issues/171.");
 
             throw new GradleException("An app owner name is required to proceed");
         }
