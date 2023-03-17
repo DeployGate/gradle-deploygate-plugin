@@ -2,8 +2,6 @@ package com.deploygate.gradle.plugins.tasks
 
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
-import org.gradle.api.GradleException
-
 import javax.inject.Inject
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
