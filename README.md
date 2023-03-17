@@ -94,6 +94,13 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 | 11  | 8.0.x-alpha06 (Flamingo) | 2.5.0 is OK              |
 | 17  | 8.0.x-alpha10 (Flamingo) | 2.5.0 is OK              |
 
+### Binary compatibility
+
+| Gradle DeployGate Plugin | Minimum JRE version |
+|:-------------------------|:--------------------|
+| \<2.6                    | 7                   |
+| \>=2.6.0                 | 8                   |
+
 ### Gradle compatibility
 
 | Gradle DeployGate Plugin | Minimum Gradle version |

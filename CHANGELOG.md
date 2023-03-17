@@ -1,5 +1,16 @@
 # ChangeLog
 
+## ver 2.6.0
+
+- Support Gradle 8 builds. [#159](https://github.com/DeployGate/gradle-deploygate-plugin/pull/159)
+- Use lazy configuration to set up.
+
+*Breaking Changes*
+
+- Drop support for Android Gradle Plugin 4.1.x or lower. [#164](https://github.com/DeployGate/gradle-deploygate-plugin/pull/164)
+  - Changed the minimum required JRE 7 -> 8 and the minimum required Gradle 5.4 -> 6.7.1.
+- Builds will fail if only api token is provided but no app owner name is found. [#172](https://github.com/DeployGate/gradle-deploygate-plugin/pull/172)
+
 ## ver 2.5.0
 
 - Deprecate `visibility` property [#136](https://github.com/DeployGate/gradle-deploygate-plugin/pull/136)
