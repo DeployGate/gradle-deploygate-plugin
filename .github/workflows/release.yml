@@ -9,6 +9,17 @@ on:
 jobs:
   production-release:
     runs-on: ubuntu-latest
+    services:
+      app:
+        image: ghcr.io/deploygate/gradle-plugin-mock-server
+        ports:
+          - 3000/tcp
+        options: >-
+          --health-cmd "curl -fI http://localhost:3000"
+          --health-interval 15s
+          --health-timeout 5s
+          --health-retries 5
+          --health-start-period 20s
     steps:
       - uses: actions/checkout@v3
         with:
@@ -32,6 +43,7 @@ jobs:
       - name: Publish artifacts
         run: ./release.sh
         env:
+          TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_SECRET_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_PASSPHRASE }}
       - name: Slack Notification
