@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.artifacts
 
+import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
 import groovy.transform.PackageScope
 import org.jetbrains.annotations.NotNull
 
@@ -50,6 +51,10 @@ class PackageAppTaskCompat {
     }
 
     static Collection<String> getApkNames(packageAppTask) {
-        return packageAppTask.variantOutputs.get().collect { it.outputFileName.get() }
+        if (AndroidGradlePlugin.hasOutputsHandlerApiOnPackageApplication()) {
+            return packageAppTask.outputsHandler.get().getOutputs { true }.collect { it.outputFileName.get() }
+        } else {
+            return packageAppTask.variantOutputs.get().collect { it.outputFileName.get() }
+        }
     }
 }

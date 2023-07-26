@@ -39,6 +39,14 @@ class AndroidGradlePlugin {
         return AGP_VERSION
     }
 
+    /**
+     * @since AGP 8.1.0 https://android.googlesource.com/platform/tools/base/+/da5cbdf59f91f7480a5d9615a20f766d19c6034a%5E%21/#F32
+     */
+    static boolean hasOutputsHandlerApiOnPackageApplication() {
+        def version = getVersion()
+        return version.major >= 8 && version.minor >= 1
+    }
+
     @NotNull
     static String androidAssembleTaskName(@NotNull String variantName) {
         return "assemble${variantName.capitalize()}"
