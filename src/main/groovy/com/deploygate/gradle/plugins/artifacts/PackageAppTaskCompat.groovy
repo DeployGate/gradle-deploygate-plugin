@@ -52,7 +52,7 @@ class PackageAppTaskCompat {
 
     static Collection<String> getApkNames(packageAppTask) {
         if (AndroidGradlePlugin.hasOutputsHandlerApiOnPackageApplication()) {
-            return packageAppTask.outputsHandler.get().getOutputs { true }.collect { it.outputFileName.get() }
+            return packageAppTask.outputsHandler.get().getOutputs { true }.collect { it.outputFileName }
         } else {
             return packageAppTask.variantOutputs.get().collect { it.outputFileName.get() }
         }
