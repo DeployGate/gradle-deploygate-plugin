@@ -72,25 +72,28 @@ DeployGate Gradle プラグインは非 app モジュールや android-library �
 | Android Gradle Plugin | Gradle DeployGate Plugin |
 |:----------------------|:-------------------------|
 | < 3.0.0               | 1.1.5 (保守終了)           |
-| 3.3.x, 3.4.x, 3.5.x   | \<=2.0.0,\<2.6           |
-| 3.6.x                 | \<=2.1.0,\<2.6           |
-| 4.0.x                 | \<=2.2.0,\<2.6           |
-| 4.1.x                 | \<=2.3.0,\<2.6           |
-| 4.2.x                 | \<=2.4.0                 |
-| 7.0.x (Arctic Fox)    | \<=2.4.0                 |
-| 7.1.x (Bumblebee)     | \<=2.4.0                 |
-| 7.2.x (Chipmunk)      | \<=2.4.0                 |
-| 7.3.x (Dolphin)       | \<=2.4.0                 |
-| 7.4.x (Electric Eel)  | \<=2.4.0                 |
+| 3.3.x, 3.4.x, 3.5.x   | \>=2.0.0,\<2.6           |
+| 3.6.x                 | \>=2.1.0,\<2.6           |
+| 4.0.x                 | \>=2.2.0,\<2.6           |
+| 4.1.x                 | \>=2.3.0,\<2.6           |
+| 4.2.x                 | \>=2.4.0                 |
+| 7.0.x (Arctic Fox)    | \>=2.4.0                 |
+| 7.1.x (Bumblebee)     | \>=2.4.0                 |
+| 7.2.x (Chipmunk)      | \>=2.4.0                 |
+| 7.3.x (Dolphin)       | \>=2.4.0                 |
+| 7.4.x (Electric Eel)  | \>=2.4.0                 |
+| 8.0.x (Flamingo)      | \>=2.6.0                 |
+| 8.1.x (Giraffe)       | \>=2.7.0                 |
 
 ### Canary/Beta サポート情報
+
+> As of 2023/07/27, Hedgehog is not tested yet.
 
  [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) を参考にしてください
 
 | JRE | Android Gradle Plugin    | Gradle DeployGate Plugin |
 |:----|:-------------------------|:-------------------------|
-| 11  | 8.0.x-alpha06 (Flamingo) | 2.5.0 is OK              |
-| 17  | 8.0.x-alpha10 (Flamingo) | 2.5.0 is OK              |
+| 17  | - | -    |
 
 ### Binary compatibility
 

@@ -1,5 +1,9 @@
 # ChangeLog
 
+## ver 2.7.0
+
+- Support Android Studio 8.1 (Giraffe) officially
+
 ## ver 2.6.0
 
 - Support Gradle 8 builds. [#159](https://github.com/DeployGate/gradle-deploygate-plugin/pull/159)

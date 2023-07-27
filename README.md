@@ -84,15 +84,18 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | 7.2.x (Chipmunk)      | \>=2.4.0                     |
 | 7.3.x (Dolphin)       | \>=2.4.0                     |
 | 7.4.x (Electric Eel)  | \>=2.4.0                     |
+| 8.0.x (Flamingo)      | \>=2.6.0                     |
+| 8.1.x (Giraffe)       | \>=2.7.0                     |
 
 ### Canary/Beta support table
+
+> As of 2023/07/27, Hedgehog is not tested yet.
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
 
 | JRE | Android Gradle Plugin    | Gradle DeployGate Plugin |
 |:----|:-------------------------|:-------------------------|
-| 11  | 8.0.x-alpha06 (Flamingo) | 2.5.0 is OK              |
-| 17  | 8.0.x-alpha10 (Flamingo) | 2.5.0 is OK              |
+| 17  | - | -    |
 
 ### Binary compatibility
 
