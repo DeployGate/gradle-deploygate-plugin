@@ -87,7 +87,7 @@ DeployGate Gradle プラグインは非 app モジュールや android-library �
 
 ### Canary/Beta サポート情報
 
-> As of 2023/07/27, Hedgehog is not tested yet.
+> 2023/07/27現在、Hedgehog環境はまだテストをしていません。
 
  [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) を参考にしてください
 
