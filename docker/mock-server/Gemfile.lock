@@ -105,12 +105,12 @@ GEM
       timeout
     net-smtp (0.3.3)
       net-protocol
-    nio4r (2.5.8)
+    nio4r (2.5.9)
     nokogiri (1.14.0-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.14.0-x86_64-linux)
       racc (~> 1.4)
-    puma (5.6.5)
+    puma (5.6.7)
       nio4r (~> 2.0)
     racc (1.6.2)
     rack (2.2.6.4)
@@ -163,7 +163,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap
   debug
-  puma (~> 5.0)
+  puma (~> 5.6)
   rails (~> 7.0.4)
   sqlite3 (~> 1.4)
   tzinfo-data
