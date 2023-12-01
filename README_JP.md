@@ -84,10 +84,11 @@ DeployGate Gradle プラグインは非 app モジュールや android-library �
 | 7.4.x (Electric Eel)  | \>=2.4.0                 |
 | 8.0.x (Flamingo)      | \>=2.6.0                 |
 | 8.1.x (Giraffe)       | \>=2.7.0                 |
+| 8.2.x (Hedgehog)      | \>=2.7.0                 |
 
 ### Canary/Beta サポート情報
 
-> 2023/07/27現在、Hedgehog環境はまだテストをしていません。
+> 2023/12/01現在、Iguana Canary版をテスト中です
 
  [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) を参考にしてください
 
