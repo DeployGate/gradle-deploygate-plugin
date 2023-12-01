@@ -90,7 +90,9 @@ This plugin does not work with non-app modules and/or library modules correctly.
 
 ### Canary/Beta support table
 
-> As of 2023 Dec 1st, Iguana Canary being tested but not for production ready.
+We are not supporting Canary(Alpha) versions because of API stability. Please wait for beta releases or open an issue to support Canary versions.
+
+> As of 2023 Dec 1st, Iguana Canary doesn't work.
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
 
