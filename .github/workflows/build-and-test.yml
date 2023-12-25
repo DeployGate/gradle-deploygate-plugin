@@ -104,6 +104,7 @@ jobs:
           - '7.4.0'
           - '8.0.0'
           - '8.1.0'
+          - '8.2.0'
         include:
           - agp_version: '4.2.0'
             gradle_version: '6.7.1'
@@ -122,11 +123,12 @@ jobs:
           - agp_version: '8.0.0'
             gradle_version: '8.0'
             java_version: '17'
-            runner_gradle_version: '8.0'
           - agp_version: '8.1.0'
             gradle_version: '8.0'
             java_version: '17'
-            runner_gradle_version: '8.0'
+          - agp_version: '8.2.0'
+            gradle_version: '8.3'
+            java_version: '17'
 
     steps:
       - uses: actions/checkout@v3
@@ -135,7 +137,7 @@ jobs:
           java-version: ${{ matrix.java_version }}
       - uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: ${{ matrix.runner_gradle_version || '6.7.1' }}
+          gradle-version: ${{ matrix.gradle_version }}
       - run: gradle testPluginAcceptanceTest
         env:
           TEST_AGP_VERSION: ${{ matrix.agp_version }}

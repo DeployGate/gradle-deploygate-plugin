@@ -86,10 +86,13 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | 7.4.x (Electric Eel)  | \>=2.4.0                     |
 | 8.0.x (Flamingo)      | \>=2.6.0                     |
 | 8.1.x (Giraffe)       | \>=2.7.0                     |
+| 8.2.x (Hedgehog)      | \>=2.7.0                     |
 
 ### Canary/Beta support table
 
-> As of 2023/07/27, Hedgehog is not tested yet.
+We are not supporting Canary(Alpha) versions because of API stability. Please wait for beta releases or open an issue to support Canary versions.
+
+> As of 2023 Dec 1st, Iguana Canary doesn't work.
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
 
