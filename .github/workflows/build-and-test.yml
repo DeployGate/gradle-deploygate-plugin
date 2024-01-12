@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-java
-      - run: ./gradlew publishToMavenLocal test
+      - run: ./gradlew publishToMavenLocal test --no-configuration-cache
         env:
           TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
       - uses: actions/upload-artifact@v3
