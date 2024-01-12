@@ -47,7 +47,7 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
 
     @Inject
     public HttpClient() {
-        this.endpoint = getParameters().getEndpoint().get();
+        this.endpoint = getParameters().getEndpoint().getOrElse(Config.getDEPLOYGATE_ROOT());
 
         List<BasicHeader> headers = new ArrayList<>();
         headers.add(

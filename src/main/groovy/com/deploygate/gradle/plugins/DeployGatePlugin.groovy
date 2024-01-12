@@ -64,7 +64,7 @@ class DeployGatePlugin implements Plugin<Project> {
         }
 
         def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
-            spec.parameters.endpoint.set(environmentVariable(project.providers, "TEST_SERVER_URL").orElse(Config.getDEPLOYGATE_ROOT()))
+            spec.parameters.endpoint.set(environmentVariable(project.providers, "TEST_SERVER_URL"))
         }
 
         def localServerProvider = project.gradle.sharedServices.registerIfAbsent("httpserver", LocalServer) { spec ->

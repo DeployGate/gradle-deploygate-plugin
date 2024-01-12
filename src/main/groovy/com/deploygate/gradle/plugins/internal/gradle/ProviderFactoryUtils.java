@@ -65,6 +65,6 @@ public final class ProviderFactoryUtils {
             }
         }
 
-        return result;
+        return GradleCompat.forUseAtConfigurationTime(result);
     }
 }
