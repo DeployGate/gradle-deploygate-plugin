@@ -10,10 +10,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: master # for ratchet
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
       - run: ./gradlew spotlessApply
       - uses: reviewdog/action-suggester@v1
@@ -34,17 +34,17 @@ jobs:
           --health-retries 5
           --health-start-period 20s
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
       - run: ./gradlew publishToMavenLocal test
         env:
           TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-reports
           path: build/reports/tests/test
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
@@ -64,17 +64,17 @@ jobs:
           --health-retries 5
           --health-start-period 20s
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
       - run: ./gradlew testUnrollAcceptanceTest
         env:
           TEST_SERVER_URL: http://localhost:3000
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-reports
           path: build/reports/tests/testUnrollAcceptanceTest
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
@@ -135,11 +135,11 @@ jobs:
             java_version: '17'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
         with:
           java-version: ${{ matrix.java_version }}
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           gradle-version: ${{ matrix.gradle_version }}
       - run: gradle testPluginAcceptanceTest
@@ -147,12 +147,12 @@ jobs:
           TEST_AGP_VERSION: ${{ matrix.agp_version }}
           TEST_GRADLE_VERSION: ${{ matrix.gradle_version }}
           TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-reports-${{ matrix.agp_version }}-with-${{ matrix.gradle_version }}
           path: build/reports/tests/testPluginAcceptanceTest
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results-${{ matrix.agp_version }}-with-${{ matrix.gradle_version }}

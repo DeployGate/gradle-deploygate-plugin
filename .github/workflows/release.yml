@@ -21,10 +21,10 @@ jobs:
           --health-retries 5
           --health-start-period 20s
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: master
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           if [[ "$(cat src/main/resources/VERSION)" != "${GITHUB_REF#refs/tags/}" ]]; then
             echo "version must keep the consistency" 1>&2
