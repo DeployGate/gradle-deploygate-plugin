@@ -10,10 +10,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: master # for ratchet
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
       - run: ./gradlew spotlessApply
       - uses: reviewdog/action-suggester@v1
@@ -34,7 +34,7 @@ jobs:
           --health-retries 5
           --health-start-period 20s
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
       - run: ./gradlew publishToMavenLocal test
         env:
@@ -64,7 +64,7 @@ jobs:
           --health-retries 5
           --health-start-period 20s
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
       - run: ./gradlew testUnrollAcceptanceTest
         env:
@@ -135,7 +135,7 @@ jobs:
             java_version: '17'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
         with:
           java-version: ${{ matrix.java_version }}
