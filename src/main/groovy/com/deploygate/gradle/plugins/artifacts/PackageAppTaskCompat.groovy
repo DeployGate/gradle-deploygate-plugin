@@ -43,7 +43,11 @@ class PackageAppTaskCompat {
 
     @PackageScope
     static boolean hasSigningConfig(packageAppTask) {
-        return packageAppTask.signingConfigData.resolve() != null
+        if (AndroidGradlePlugin.isInternalSigningConfigData()) {
+            return packageAppTask.signingConfigVersions.any { it.exists() }
+        } else {
+            return packageAppTask.signingConfigData.resolve() != null
+        }
     }
 
     static File getOutputDirectory(packageAppTask) {
