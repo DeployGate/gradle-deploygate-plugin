@@ -33,7 +33,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.OWNER_NAME }}/${{ env.IMAGE_NAME }}
 
-      - uses: docker/build-push-action@v3.3.0
+      - uses: docker/build-push-action@v5.1.0
         with:
           context: ./docker/mock-server
           target: ghcr
