@@ -40,6 +40,14 @@ class AndroidGradlePlugin {
     }
 
     /**
+     * @since AGP 8.3.0 https://cs.android.com/android-studio/platform/tools/base/+/ff361912406f0eafc42b6ff2a293ee8a17ff77ee:build-system/gradle-core/src/main/java/com/android/build/gradle/tasks/PackageAndroidArtifact.kt;dlc=c2e97e2ca61a5575ccfb48f9528a11c38d651841
+     */
+    static boolean isInternalSigningConfigData() {
+        def version = getVersion()
+        return version.major >= 8 && version.minor >= 3
+    }
+
+    /**
      * @since AGP 8.1.0 https://android.googlesource.com/platform/tools/base/+/da5cbdf59f91f7480a5d9615a20f766d19c6034a%5E%21/#F32
      */
     static boolean hasOutputsHandlerApiOnPackageApplication() {

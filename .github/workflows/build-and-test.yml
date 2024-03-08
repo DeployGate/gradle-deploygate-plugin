@@ -105,6 +105,7 @@ jobs:
           - '8.0.0'
           - '8.1.0'
           - '8.2.0'
+          - '8.3.0'
         include:
           - agp_version: '4.2.0'
             gradle_version: '6.7.1'
@@ -127,7 +128,10 @@ jobs:
             gradle_version: '8.0'
             java_version: '17'
           - agp_version: '8.2.0'
-            gradle_version: '8.3'
+            gradle_version: '8.2'
+            java_version: '17'
+          - agp_version: '8.3.0'
+            gradle_version: '8.4'
             java_version: '17'
 
     steps:
