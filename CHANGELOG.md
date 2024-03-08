@@ -1,5 +1,9 @@
 # ChangeLog
 
+## ver 2.8.0
+
+- Support Android Gradle Plugin 8.3.0 (Iguana) with Gradle 8.4
+
 ## ver 2.7.0
 
 - Support Android Studio 8.1 (Giraffe) officially
