@@ -39,3 +39,4 @@ updates:
       interval: "weekly"
     reviewers:
       - DeployGate/gradle-plugin-reviewer
+    open-pull-requests-limit: 3
