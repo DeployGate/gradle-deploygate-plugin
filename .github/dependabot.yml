@@ -28,6 +28,10 @@ updates:
       interval: "weekly"
     reviewers:
       - DeployGate/gradle-plugin-reviewer
+    groups:
+      dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: "gradle"
     directory: "/"
