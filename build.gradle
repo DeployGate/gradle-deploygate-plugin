@@ -177,10 +177,10 @@ dependencies {
 
     if (requireGroovy3) {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
-        testImplementation 'org.spockframework:spock-junit4:2.3-groovy-3.0'
+        testImplementation 'org.spockframework:spock-junit4:2.3-groovy-4.0'
     } else {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-2.5'
-        testImplementation 'org.spockframework:spock-junit4:2.3-groovy-2.5'
+        testImplementation 'org.spockframework:spock-junit4:2.3-groovy-4.0'
     }
 
     // for ApplyPluginSpec
