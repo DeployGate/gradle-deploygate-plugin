@@ -259,12 +259,12 @@ allprojects {
         groovy {
             importOrder()
             excludeJava()
-            greclipse('4.8.0')
+            greclipse('4.26')
             indentWithSpaces(4)
         }
         groovyGradle {
             target '*.gradle'
-            greclipse('4.8.0')
+            greclipse('4.26')
             indentWithSpaces(4)
         }
         format 'misc', {
