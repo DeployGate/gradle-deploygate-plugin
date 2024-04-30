@@ -173,7 +173,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     testImplementation 'org.objenesis:objenesis:3.3'
-    implementation 'net.bytebuddy:byte-buddy:1.14.13'
+    implementation 'net.bytebuddy:byte-buddy:1.14.14'
 
     if (requireGroovy3) {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
