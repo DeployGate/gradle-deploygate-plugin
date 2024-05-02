@@ -1,4 +1,4 @@
-FROM ruby:3.3.0 as dev
+FROM ruby:3.3.1 as dev
 
 ENV RAILS_ENV development
 
