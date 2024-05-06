@@ -172,7 +172,7 @@ dependencies {
     testImplementation gradleTestKit()
     testImplementation 'junit:junit:4.13.2'
 
-    testImplementation 'org.objenesis:objenesis:3.3'
+    testImplementation 'org.objenesis:objenesis:3.4'
     implementation 'net.bytebuddy:byte-buddy:1.14.14'
 
     if (requireGroovy3) {
