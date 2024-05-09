@@ -306,13 +306,10 @@ You can try this plugin locally by following the steps below.
 3. Add mavenLocal to buildscript repository of a test project
 4. Specify the version which you specify at step 1
 
-And also, please make sure your changes pass unit tests and acceptance tests.
+And also, please make sure your changes pass unit tests and acceptance tests. CI also does it.
 
 ```bash
-# please make sure the mock server has been launched
-docker compose build
-docker compose up -d
-
+# please make sure https://github.com/DeployGate/deploygate-mock-server/pkgs/container/deploygate-mock-server has been launched
 ./gradlew test acceptanceTest
 ```
 

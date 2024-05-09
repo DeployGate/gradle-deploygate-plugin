@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       app:
-        image: ghcr.io/deploygate/gradle-plugin-mock-server
+        image: ghcr.io/deploygate/deploygate-mock-server:main
         ports:
           - 3000/tcp
         options: >-
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       app:
-        image: ghcr.io/deploygate/gradle-plugin-mock-server
+        image: ghcr.io/deploygate/deploygate-mock-server:main
         ports:
           - 3000/tcp
         options: >-
@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       app:
-        image: ghcr.io/deploygate/gradle-plugin-mock-server
+        image: ghcr.io/deploygate/deploygate-mock-server:main
         ports:
           - 3000/tcp
         options: >-
