@@ -1,27 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: "bundler"
-    directory: "/docker/mock-server"
-    schedule:
-      interval: "monthly"
-    reviewers:
-      - DeployGate/gradle-plugin-reviewer
-    groups:
-      dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "docker"
-    directory: "/docker/mock-server"
-    schedule:
-      interval: "monthly"
-    reviewers:
-      - DeployGate/gradle-plugin-reviewer
-    groups:
-      dependencies:
-        patterns:
-          - "*"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

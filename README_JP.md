@@ -300,13 +300,10 @@ jitpack.io は初回のリクエストを受けてからスナップショット
 3. テストプロジェクトに mavenLocal を追加します。
 4. ステップ1 で変更したバージョンを指定します。
 
-また変更したあとはユニットテストと受け入れテストが通ることを確認してください。
+また変更したあとはユニットテストと受け入れテストが通ることを確認してください。(CIでも実行されます)
 
 ```bash
-# Mock サーバーを起動させてください
-docker compose build
-docker compose up -d
-
+# https://github.com/DeployGate/deploygate-mock-server/pkgs/container/deploygate-mock-server を起動してください
 ./gradlew test acceptanceTest
 ```
 
