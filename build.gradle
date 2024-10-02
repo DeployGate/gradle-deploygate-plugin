@@ -162,7 +162,7 @@ dependencies {
     compileOnly localGroovy()
     // Don't enable this on the repository because this artifact may include bytecode incompatibility.
     //    compileOnly "com.android.tools.build:gradle:$androidGradleVersion"
-    implementation 'org.jetbrains:annotations:24.1.0'
+    implementation 'org.jetbrains:annotations:25.0.0'
     implementation 'com.google.guava:guava-annotations:r03'
 
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
