@@ -71,23 +71,23 @@ This plugin does not work with non-app modules and/or library modules correctly.
 
 ## Version Compatibility
 
-| Android Gradle Plugin | Gradle DeployGate Plugin     |
-|:----------------------|:-----------------------------|
-| < 3.0.0               | 1.1.5 (No longer maintained) |
-| 3.3.x, 3.4.x, 3.5.x   | \>=2.0.0,\<2.6               |
-| 3.6.x                 | \>=2.1.0,\<2.6               |
-| 4.0.x                 | \>=2.2.0,\<2.6               |
-| 4.1.x                 | \>=2.3.0,\<2.6               |
-| 4.2.x                 | \>=2.4.0                     |
-| 7.0.x (Arctic Fox)    | \>=2.4.0                     |
-| 7.1.x (Bumblebee)     | \>=2.4.0                     |
-| 7.2.x (Chipmunk)      | \>=2.4.0                     |
-| 7.3.x (Dolphin)       | \>=2.4.0                     |
-| 7.4.x (Electric Eel)  | \>=2.4.0                     |
-| 8.0.x (Flamingo)      | \>=2.6.0                     |
-| 8.1.x (Giraffe)       | \>=2.7.0                     |
-| 8.2.x (Hedgehog)      | \>=2.7.0                     |
-| 8.3.x (Iguana)        | \>=2.8.0                     |
+| Android Gradle Plugin      | Gradle DeployGate Plugin     |
+|:---------------------------|:-----------------------------|
+| < 3.0.0                    | 1.1.5 (No longer maintained) |
+| 3.3.x, 3.4.x, 3.5.x        | \>=2.0.0,\<2.6               |
+| 3.6.x                      | \>=2.1.0,\<2.6               |
+| 4.0.x                      | \>=2.2.0,\<2.6               |
+| 4.1.x                      | \>=2.3.0,\<2.6               |
+| 4.2.x                      | \>=2.4.0                     |
+| 7.0.x (Arctic Fox)         | \>=2.4.0                     |
+| 7.1.x (Bumblebee)          | \>=2.4.0                     |
+| 7.2.x (Chipmunk)           | \>=2.4.0                     |
+| 7.3.x (Dolphin)            | \>=2.4.0                     |
+| 7.4.x (Electric Eel)       | \>=2.4.0                     |
+| 8.0.x (Flamingo)           | \>=2.6.0                     |
+| 8.1.x (Giraffe)            | \>=2.7.0                     |
+| 8.2.x (Hedgehog)           | \>=2.7.0                     |
+| 8.3.x (Iguana)             | \>=2.8.0                     |
 
 ### Canary/Beta support table
 
@@ -97,9 +97,9 @@ We are not supporting Canary(Alpha) versions because of API stability. Please wa
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
 
-| JRE | Android Gradle Plugin    | Gradle DeployGate Plugin |
-|:----|:-------------------------|:-------------------------|
-| 17  | - | -    |
+| JRE | Android Gradle Plugin | Gradle DeployGate Plugin |
+|:----|:----------------------|:-------------------------|
+| 17  | -                     | -                        |
 
 ### Binary compatibility
 
@@ -317,16 +317,16 @@ And also, please make sure your changes pass unit tests and acceptance tests. CI
 
 We have deprecated some syntax and introduced the new syntax based on the table below.
 
-Deprecated | New
-:---|:----
-*userName* | Use **appOwnerName**
-*token* | Use **apiToken**
-*apks* closure | Use **deployments** closure
-*noAssemble* | Use **skipAssemble**
-*distributionKey* | Use **key** in **distribution** closure
-*releaseNote* | Use **releaseNote** in **distribution** closure
-*DEPLOYGATE_USER_NAME* env | Use **DEPLOYGATE_APP_OWNER_NAME** instead
-*DEPLOYGATE_RELEASE_NOTE* env | Use **DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE** instead
+| Deprecated                    | New                                                  |
+|:------------------------------|:-----------------------------------------------------|
+| *userName*                    | Use **appOwnerName**                                 |
+| *token*                       | Use **apiToken**                                     |
+| *apks* closure                | Use **deployments** closure                          |
+| *noAssemble*                  | Use **skipAssemble**                                 |
+| *distributionKey*             | Use **key** in **distribution** closure              |
+| *releaseNote*                 | Use **releaseNote** in **distribution** closure      |
+| *DEPLOYGATE_USER_NAME* env    | Use **DEPLOYGATE_APP_OWNER_NAME** instead            |
+| *DEPLOYGATE_RELEASE_NOTE* env | Use **DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE** instead |
 
 *If both of v1 and v2 variables are specified, v2 variables will be used.*
 
