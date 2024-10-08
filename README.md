@@ -88,12 +88,16 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | 8.1.x (Giraffe)            | \>=2.7.0                     |
 | 8.2.x (Hedgehog)           | \>=2.7.0                     |
 | 8.3.x (Iguana)             | \>=2.8.0                     |
+| 8.4.x (Jellyfish)          | \>=2.9.0                     |
+| 8.5.x (Koala)              | \>=2.9.0                     |
+| 8.6.x (Koala Feature Drop) | \>=2.9.0                     |
+| 8.7.x (Ladybug)            | \>=2.9.0                     |
 
 ### Canary/Beta support table
 
 We are not supporting Canary(Alpha) versions because of API stability. Please wait for beta releases or open an issue to support Canary versions.
 
-> As of 2024 Mar 8th, Jellyfish is not tested yet.
+> As of 2024 Oct 8th, Ladybug Feature Drop is not tested yet.
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
 
