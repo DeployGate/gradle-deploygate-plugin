@@ -47,7 +47,8 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_SECRET_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_PASSPHRASE }}
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
+        # we use specific version(v2.2.1) for avoid nested dependency
+        uses: rtCamp/action-slack-notify@b24d75fe0e728a4bf9fc42ee217caa686d141ee8 # v2.2.1
         env:
           SLACK_TITLE: 'Gradle Plugin Release'
           SLACK_MESSAGE: "${{ github.ref }} has been published to Sonatype. ref: https://oss.sonatype.org/"
