@@ -20,7 +20,9 @@ class TestSystemEnv extends ExternalResource {
 
     @Override
     protected void after() {
-        System.metaClass.static.getenv = null
+        System.metaClass.static.getenv = { String name ->
+            realEnv[name]
+        }
     }
 
     def setEnv(Map<String, Object> env) {
