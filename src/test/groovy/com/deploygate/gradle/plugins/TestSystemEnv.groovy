@@ -5,12 +5,16 @@ import org.junit.rules.ExternalResource
 class TestSystemEnv extends ExternalResource {
     private Map<String, Object> envStub = new HashMap<String, Object>()
 
-    def realEnv = System.getenv()
+    private def realEnv = System.getenv()
 
     @Override
     protected void before() throws Throwable {
         System.metaClass.static.getenv = { String name ->
-            envStub[name] as String
+            if (envStub.containsKey(name)) {
+                envStub[name] as String
+            } else {
+                realEnv[name]
+            }
         }
     }
 
