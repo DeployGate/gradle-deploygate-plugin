@@ -38,7 +38,7 @@ jobs:
           cat<<EOF >> gradle.properties
           systemProp.org.gradle.internal.http.socketTimeout=120000
           nexusUsername=${{ secrets.SHARED_NEXUS_TOKEN_USERNAME }}
-          nexusPassword=${{ secrets.SHARED_NEXUS_TOKEN_USERNAME }}
+          nexusPassword=${{ secrets.SHARED_NEXUS_TOKEN_PASSWORD }}
           EOF
       - name: Publish artifacts
         run: ./release.sh
