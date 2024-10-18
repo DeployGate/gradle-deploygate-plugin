@@ -69,35 +69,39 @@ DeployGate Gradle プラグインは非 app モジュールや android-library �
 
 ## Version Compatibility
 
-| Android Gradle Plugin | Gradle DeployGate Plugin |
-|:----------------------|:-------------------------|
-| < 3.0.0               | 1.1.5 (保守終了)           |
-| 3.3.x, 3.4.x, 3.5.x   | \>=2.0.0,\<2.6           |
-| 3.6.x                 | \>=2.1.0,\<2.6           |
-| 4.0.x                 | \>=2.2.0,\<2.6           |
-| 4.1.x                 | \>=2.3.0,\<2.6           |
-| 4.2.x                 | \>=2.4.0                 |
-| 7.0.x (Arctic Fox)    | \>=2.4.0                 |
-| 7.1.x (Bumblebee)     | \>=2.4.0                 |
-| 7.2.x (Chipmunk)      | \>=2.4.0                 |
-| 7.3.x (Dolphin)       | \>=2.4.0                 |
-| 7.4.x (Electric Eel)  | \>=2.4.0                 |
-| 8.0.x (Flamingo)      | \>=2.6.0                 |
-| 8.1.x (Giraffe)       | \>=2.7.0                 |
-| 8.2.x (Hedgehog)      | \>=2.7.0                 |
-| 8.3.x (Iguana)        | \>=2.8.0                 |
+| Android Gradle Plugin      | Gradle DeployGate Plugin |
+|:---------------------------|:-------------------------|
+| < 3.0.0                    | 1.1.5 (保守終了)             |
+| 3.3.x, 3.4.x, 3.5.x        | \>=2.0.0,\<2.6           |
+| 3.6.x                      | \>=2.1.0,\<2.6           |
+| 4.0.x                      | \>=2.2.0,\<2.6           |
+| 4.1.x                      | \>=2.3.0,\<2.6           |
+| 4.2.x                      | \>=2.4.0                 |
+| 7.0.x (Arctic Fox)         | \>=2.4.0                 |
+| 7.1.x (Bumblebee)          | \>=2.4.0                 |
+| 7.2.x (Chipmunk)           | \>=2.4.0                 |
+| 7.3.x (Dolphin)            | \>=2.4.0                 |
+| 7.4.x (Electric Eel)       | \>=2.4.0                 |
+| 8.0.x (Flamingo)           | \>=2.6.0                 |
+| 8.1.x (Giraffe)            | \>=2.7.0                 |
+| 8.2.x (Hedgehog)           | \>=2.7.0                 |
+| 8.3.x (Iguana)             | \>=2.8.0                 |
+| 8.4.x (Jellyfish)          | \>=2.8.0                 |
+| 8.5.x (Koala)              | \>=2.8.0                 |
+| 8.6.x (Koala Feature Drop) | \>=2.8.0                 |
+| 8.7.x (Ladybug)            | \>=2.8.0                 |
 
 ### Canary/Beta サポート情報
 
 API仕様が頻繁に変わる可能性があることから、Canary(Alpha) バージョンのサポートは積極的に行っていません。Beta 版リリースをお待ちいただくか、Issue を起票してください。
 
-> 2024/03/08現在、Jellyfish環境はまだテストをしていません。
+> 2024/10/08現在、Ladybug Feature Drop環境はまだテストをしていません。
 
  [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) を参考にしてください
 
-| JRE | Android Gradle Plugin    | Gradle DeployGate Plugin |
-|:----|:-------------------------|:-------------------------|
-| 17  | - | -    |
+| JRE | Android Gradle Plugin | Gradle DeployGate Plugin |
+|:----|:----------------------|:-------------------------|
+| 17  | -                     | -                        |
 
 ### Binary compatibility
 
@@ -311,16 +315,16 @@ jitpack.io は初回のリクエストを受けてからスナップショット
 
 いくつかの記述方法を非推奨とし、新しい記述方法を導入しています。変更点は次の表の通りです。
 
-非推奨 | 新しく推奨される記述方法
-:---|:----
-*userName* | **appOwnerName**
-*token* | **apiToken**
-*apks* closure | **deployments** closure
-*noAssemble* | **skipAssemble**
-*distributionKey* | **distribution** closure の **key**
-*releaseNote* | **distribution** closure の **releaseNote**
-*DEPLOYGATE_USER_NAME* env | **DEPLOYGATE_APP_OWNER_NAME**
-*DEPLOYGATE_RELEASE_NOTE* env | **DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE**
+| 非推奨                           | 新しく推奨される記述方法                               |
+|:------------------------------|:-------------------------------------------|
+| *userName*                    | **appOwnerName**                           |
+| *token*                       | **apiToken**                               |
+| *apks* closure                | **deployments** closure                    |
+| *noAssemble*                  | **skipAssemble**                           |
+| *distributionKey*             | **distribution** closure の **key**         |
+| *releaseNote*                 | **distribution** closure の **releaseNote** |
+| *DEPLOYGATE_USER_NAME* env    | **DEPLOYGATE_APP_OWNER_NAME**              |
+| *DEPLOYGATE_RELEASE_NOTE* env | **DEPLOYGATE_DISTRIBUTION_RELEASE_NOTE**   |
 
 *非推奨となった記述と新しい記述が混在する場合、新しい記述が基本的には優先されます。*
 

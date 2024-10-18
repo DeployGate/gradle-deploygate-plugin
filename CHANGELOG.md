@@ -1,5 +1,13 @@
 # ChangeLog
 
+## ver 2.9.0
+
+- Support Android Gradle Plugin of below:
+  - 8.4.x (Jellyfish) with Gradle 8.6
+  - 8.5.x (Koala) with Gradle 8.7
+  - 8.6.x (Koala Feature Drop) with Gradle 8.7
+  - 8.7.x (Ladybug) with Gradle 8.9
+
 ## ver 2.8.0
 
 - Support Android Gradle Plugin 8.3.0 (Iguana) with Gradle 8.4
