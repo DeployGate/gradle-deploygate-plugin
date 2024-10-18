@@ -86,10 +86,10 @@ DeployGate Gradle プラグインは非 app モジュールや android-library �
 | 8.1.x (Giraffe)            | \>=2.7.0                 |
 | 8.2.x (Hedgehog)           | \>=2.7.0                 |
 | 8.3.x (Iguana)             | \>=2.8.0                 |
-| 8.4.x (Jellyfish)          | \>=2.9.0                 |
-| 8.5.x (Koala)              | \>=2.9.0                 |
-| 8.6.x (Koala Feature Drop) | \>=2.9.0                 |
-| 8.7.x (Ladybug)            | \>=2.9.0                 |
+| 8.4.x (Jellyfish)          | \>=2.8.0                 |
+| 8.5.x (Koala)              | \>=2.8.0                 |
+| 8.6.x (Koala Feature Drop) | \>=2.8.0                 |
+| 8.7.x (Ladybug)            | \>=2.8.0                 |
 
 ### Canary/Beta サポート情報
 
