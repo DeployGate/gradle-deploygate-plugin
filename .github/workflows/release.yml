@@ -8,7 +8,7 @@ on:
 
 jobs:
   production-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       app:
         image: ghcr.io/deploygate/deploygate-mock-server:main
