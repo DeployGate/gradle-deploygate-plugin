@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,7 +21,7 @@ jobs:
           tool_name: spotless
 
   unit-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       app:
         image: ghcr.io/deploygate/deploygate-mock-server:main
@@ -51,7 +51,7 @@ jobs:
           path: build/test-results/tests/test
 
   acceptance-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       app:
         image: ghcr.io/deploygate/deploygate-mock-server:main
@@ -81,7 +81,7 @@ jobs:
           path: build/test-results/tests/testUnrollAcceptanceTest
 
   acceptance-test-runtime-env:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       app:
         image: ghcr.io/deploygate/deploygate-mock-server:main
