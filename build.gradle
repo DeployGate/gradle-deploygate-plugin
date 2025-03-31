@@ -165,7 +165,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:26.0.2'
     implementation 'com.google.guava:guava-annotations:r03'
 
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.2'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.3'
     implementation 'com.google.code.gson:gson:2.12.1'
     implementation 'javax.annotation:javax.annotation-api:1.3.2' // for jdk 11 or over
 
