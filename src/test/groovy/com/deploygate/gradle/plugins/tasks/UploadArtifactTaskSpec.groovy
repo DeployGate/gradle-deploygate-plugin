@@ -26,6 +26,7 @@ class UploadArtifactTaskSpec extends Specification {
         UploadArtifactTaskStub(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory, @NotNull ProjectLayout projectLayout, @NotNull InputParams inputParams) {
             super(objectFactory, projectLayout)
             this.inputParamsProvider = providerFactory.provider { inputParams }
+            this.endpoint.set("https://deploygate.com")
         }
     }
 
@@ -46,9 +47,19 @@ class UploadArtifactTaskSpec extends Specification {
         project.extensions.add("deploygate", deploygate)
 
         and:
+        def artifactFileProvider = project.providers.provider {
+            def f = new File(project.buildDir, "not_found")
+            f.exists() ? f : null
+        }
         def inputParams = new UploadArtifactTask.InputParams(
-                variantName: "dep1",
-                artifactFilePath: new File(project.buildDir, "not_found").absolutePath
+                "dep1",
+                false,
+                false,
+                new File(project.buildDir, "not_found").absolutePath,
+                null,
+                null,
+                null,
+                artifactFileProvider
                 )
 
         when: "apkFile must exist"
