@@ -15,15 +15,16 @@ import org.jetbrains.annotations.VisibleForTesting
 abstract class UploadApkTask extends UploadArtifactTask {
     @NotNull
     @VisibleForTesting
-    static InputParams createInputParams(@NotNull ApkInfo apk, @NotNull DeploymentConfiguration deployment) {
+    static InputParams createInputParams(@NotNull ApkInfo apk, @NotNull DeploymentConfiguration deployment, @NotNull Provider<File> artifactFileProvider) {
         return new InputParams(
-                variantName: apk.variantName,
-                artifactFilePath: deployment.sourceFilePath.getOrElse(apk.apkFile?.absolutePath),
-                isSigningReady: apk.isSigningReady(),
-                isUniversalApk: apk.isUniversalApk(),
-                message: deployment.message.getOrNull(),
-                distributionKey: deployment.distributionKey.getOrNull(),
-                releaseNote: deployment.distributionReleaseNote.getOrNull()
+                apk.variantName,
+                apk.isSigningReady(),
+                apk.isUniversalApk(),
+                deployment.sourceFilePath.getOrElse(apk.apkFile?.absolutePath),
+                deployment.message.getOrNull(),
+                deployment.distributionKey.getOrNull(),
+                deployment.distributionReleaseNote.getOrNull(),
+                artifactFileProvider
                 )
     }
 
@@ -39,20 +40,26 @@ abstract class UploadApkTask extends UploadArtifactTask {
     @Internal
     @Override
     Provider<InputParams> getInputParamsProvider() {
-        return apkInfo.map { apk -> createInputParams(apk, deployment) }
+        return apkInfo.map { apk -> 
+            def artifactFileProvider = deployment.sourceFilePath.map { path ->
+                def f = new File(path ?: apk.apkFile?.absolutePath)
+                f.exists() ? f : null
+            }
+            createInputParams(apk, deployment, artifactFileProvider) 
+        }
     }
 
     @Internal
     @Override
     String getDescription() {
-        def inputParams = inputParamsProvider.get()
-
-        if (inputParams.isSigningReady) {
-            return "Deploy assembled ${inputParams.variantName} to DeployGate"
-        } else {
-            // require signing config to build a signed APKs
-            return "Deploy assembled ${inputParams.variantName} to DeployGate (requires valid signingConfig setting)"
-        }
+        return inputParamsProvider.map { inputParams ->
+            if (inputParams.isSigningReady) {
+                return "Deploy assembled ${inputParams.variantName} to DeployGate"
+            } else {
+                // require signing config to build a signed APKs
+                return "Deploy assembled ${inputParams.variantName} to DeployGate (requires valid signingConfig setting)"
+            }
+        }.getOrElse("Deploy assembled variant to DeployGate")
     }
 
     @TaskAction

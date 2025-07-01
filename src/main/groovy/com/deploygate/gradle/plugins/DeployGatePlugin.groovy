@@ -116,6 +116,7 @@ class DeployGatePlugin implements Plugin<Project> {
                 task.deployment.copyFrom(deployment)
                 task.apkInfo.set(new DefaultPresetApkInfo(deployment.name))
                 task.httpClient.set(httpClientProvider)
+                task.endpoint.set(httpClientProvider.map { it.endpoint })
                 task.usesService(httpClientProvider)
                 task.dependsOn(loginTaskProvider)
             }
@@ -129,6 +130,7 @@ class DeployGatePlugin implements Plugin<Project> {
                 task.deployment.copyFrom(deployment)
                 task.aabInfo.set(new DefaultPresetAabInfo(deployment.name))
                 task.httpClient.set(httpClientProvider)
+                task.endpoint.set(httpClientProvider.map { it.endpoint })
                 task.usesService(httpClientProvider)
                 task.dependsOn(loginTaskProvider)
             }
@@ -143,6 +145,7 @@ class DeployGatePlugin implements Plugin<Project> {
 
                     task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
                     task.httpClient.set(httpClientProvider)
+                    task.endpoint.set(httpClientProvider.map { it.endpoint })
                     task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {
@@ -157,6 +160,7 @@ class DeployGatePlugin implements Plugin<Project> {
 
                     task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.buildDir) })
                     task.httpClient.set(httpClientProvider)
+                    task.endpoint.set(httpClientProvider.map { it.endpoint })
                     task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {

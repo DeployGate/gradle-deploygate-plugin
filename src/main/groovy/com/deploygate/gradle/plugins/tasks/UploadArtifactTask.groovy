@@ -17,6 +17,7 @@ import org.gradle.api.tasks.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
+@CacheableTask
 abstract class UploadArtifactTask extends DefaultTask {
     static class InputParams {
         @Input
@@ -28,13 +29,8 @@ abstract class UploadArtifactTask extends DefaultTask {
         @Input
         boolean isUniversalApk
 
-        @InputFile
-        @Optional
-        final Closure<File> artifactFileProvider = {
-            // workaround of OptionalInputFile: https://github.com/gradle/gradle/issues/2016
-            def f = new File(artifactFilePath)
-            f.exists() ? f : null
-        }
+        @Internal
+        final Provider<File> artifactFileProvider
 
         /**
          * must be an absolute path
@@ -57,7 +53,20 @@ abstract class UploadArtifactTask extends DefaultTask {
         @Internal
         @Nullable
         File getArtifactFile() {
-            return artifactFileProvider.call()
+            return artifactFileProvider.getOrNull()
+        }
+
+        InputParams(String variantName, boolean isSigningReady, boolean isUniversalApk, 
+                   String artifactFilePath, String message, String distributionKey, 
+                   String releaseNote, Provider<File> artifactFileProvider) {
+            this.variantName = variantName
+            this.isSigningReady = isSigningReady
+            this.isUniversalApk = isUniversalApk
+            this.artifactFilePath = artifactFilePath
+            this.message = message
+            this.distributionKey = distributionKey
+            this.releaseNote = releaseNote
+            this.artifactFileProvider = artifactFileProvider
         }
     }
 
@@ -69,6 +78,10 @@ abstract class UploadArtifactTask extends DefaultTask {
 
     @Internal
     final Property<HttpClient> httpClient
+
+    @Input
+    @Optional
+    abstract Property<String> getEndpoint()
 
     @OutputFile
     final Provider<RegularFile> response
@@ -116,7 +129,7 @@ abstract class UploadArtifactTask extends DefaultTask {
             def hasNotified = httpClient.get().lifecycleNotificationClient.notifyOnSuccessOfArtifactUpload(uploadResponse.typedResponse.application.path)
 
             if (!hasNotified && (Config.shouldOpenAppDetailAfterUpload() || uploadResponse.typedResponse.application.revision == 1)) {
-                BrowserUtils.openBrowser "${project.deploygate.endpoint}${uploadResponse.typedResponse.application.path}"
+                BrowserUtils.openBrowser "${endpoint.get()}${uploadResponse.typedResponse.application.path}"
             }
         } catch (Throwable e) {
             logger.debug(e.message, e)

@@ -15,15 +15,16 @@ import org.jetbrains.annotations.VisibleForTesting
 abstract class UploadAabTask extends UploadArtifactTask {
     @NotNull
     @VisibleForTesting
-    static InputParams createInputParams(@NotNull AabInfo aab, @NotNull DeploymentConfiguration deployment) {
+    static InputParams createInputParams(@NotNull AabInfo aab, @NotNull DeploymentConfiguration deployment, @NotNull Provider<File> artifactFileProvider) {
         return new InputParams(
-                variantName: aab.variantName,
-                artifactFilePath: deployment.sourceFilePath.getOrElse(aab.aabFile?.absolutePath),
-                isSigningReady: false,
-                isUniversalApk: false,
-                message: deployment.message.getOrNull(),
-                distributionKey: deployment.distributionKey.getOrNull(),
-                releaseNote: deployment.distributionReleaseNote.getOrNull()
+                aab.variantName,
+                false,
+                false,
+                deployment.sourceFilePath.getOrElse(aab.aabFile?.absolutePath),
+                deployment.message.getOrNull(),
+                deployment.distributionKey.getOrNull(),
+                deployment.distributionReleaseNote.getOrNull(),
+                artifactFileProvider
                 )
     }
 
@@ -39,7 +40,13 @@ abstract class UploadAabTask extends UploadArtifactTask {
     @Internal
     @Override
     Provider<InputParams> getInputParamsProvider() {
-        return aabInfo.map { aab -> createInputParams(aab, deployment) }
+        return aabInfo.map { aab -> 
+            def artifactFileProvider = deployment.sourceFilePath.map { path ->
+                def f = new File(path ?: aab.aabFile?.absolutePath)
+                f.exists() ? f : null
+            }
+            createInputParams(aab, deployment, artifactFileProvider) 
+        }
     }
 
     @TaskAction
@@ -52,6 +59,6 @@ abstract class UploadAabTask extends UploadArtifactTask {
     @Internal
     @Override
     String getDescription() {
-        return "Deploy bundled ${inputParamsProvider.get().variantName} to DeployGate"
+        return "Deploy bundled ${inputParamsProvider.map { it.variantName }.getOrElse("variant")} to DeployGate"
     }
 }
