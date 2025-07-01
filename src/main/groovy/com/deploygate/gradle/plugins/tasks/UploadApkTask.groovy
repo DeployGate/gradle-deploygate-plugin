@@ -17,14 +17,14 @@ abstract class UploadApkTask extends UploadArtifactTask {
     @VisibleForTesting
     static InputParams createInputParams(@NotNull ApkInfo apk, @NotNull DeploymentConfiguration deployment, @NotNull Provider<File> artifactFileProvider) {
         return new InputParams(
-                apk.variantName,
-                apk.isSigningReady(),
-                apk.isUniversalApk(),
-                deployment.sourceFilePath.getOrElse(apk.apkFile?.absolutePath),
-                deployment.message.getOrNull(),
-                deployment.distributionKey.getOrNull(),
-                deployment.distributionReleaseNote.getOrNull(),
-                artifactFileProvider
+                variantName: apk.variantName,
+                artifactFilePath: deployment.sourceFilePath.getOrElse(apk.apkFile?.absolutePath),
+                isSigningReady: apk.isSigningReady(),
+                isUniversalApk: apk.isUniversalApk(),
+                message: deployment.message.getOrNull(),
+                distributionKey: deployment.distributionKey.getOrNull(),
+                releaseNote: deployment.distributionReleaseNote.getOrNull(),
+                artifactFileProvider: artifactFileProvider
                 )
     }
 
@@ -40,12 +40,12 @@ abstract class UploadApkTask extends UploadArtifactTask {
     @Internal
     @Override
     Provider<InputParams> getInputParamsProvider() {
-        return apkInfo.map { apk -> 
+        return apkInfo.map { apk ->
             def artifactFileProvider = deployment.sourceFilePath.map { path ->
                 def f = new File(path ?: apk.apkFile?.absolutePath)
                 f.exists() ? f : null
             }
-            createInputParams(apk, deployment, artifactFileProvider) 
+            createInputParams(apk, deployment, artifactFileProvider)
         }
     }
 
