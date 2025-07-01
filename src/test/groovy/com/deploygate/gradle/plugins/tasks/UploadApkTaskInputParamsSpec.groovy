@@ -37,7 +37,11 @@ class UploadApkTaskInputParamsSpec extends Specification {
         def apkInfo = new DirectApkInfo("dep1", apkFile, signingReady, universalApk)
 
         and:
-        def inputParams = UploadApkTask.createInputParams(apkInfo, deployment)
+        def artifactFileProvider = project.providers.provider {
+            def f = new File(deployment.sourceFilePath.getOrElse(apkInfo.apkFile?.absolutePath))
+            f.exists() ? f : null
+        }
+        def inputParams = UploadApkTask.createInputParams(apkInfo, deployment, artifactFileProvider)
 
         expect:
         inputParams.message == message
@@ -62,7 +66,11 @@ class UploadApkTaskInputParamsSpec extends Specification {
         def apkInfo = new DirectApkInfo("dep1", apkFile, false, false)
 
         and:
-        def inputParams = UploadApkTask.createInputParams(apkInfo, deployment)
+        def artifactFileProvider = project.providers.provider {
+            def f = new File(deployment.sourceFilePath.getOrElse(apkInfo.apkFile?.absolutePath))
+            f.exists() ? f : null
+        }
+        def inputParams = UploadApkTask.createInputParams(apkInfo, deployment, artifactFileProvider)
 
         expect:
         inputParams.artifactFilePath == (sourceFile ?: apkFile).absolutePath

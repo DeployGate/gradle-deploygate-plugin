@@ -8,6 +8,7 @@ import javax.inject.Inject
 import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Internal
@@ -21,12 +22,25 @@ class UploadArtifactTaskSpec extends Specification {
     static class UploadArtifactTaskStub extends UploadArtifactTask {
         @Internal
         final Provider<InputParams> inputParamsProvider
+        
+        private final Property<String> endpointProperty
 
         @Inject
         UploadArtifactTaskStub(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory, @NotNull ProjectLayout projectLayout, @NotNull InputParams inputParams) {
             super(objectFactory, projectLayout)
             this.inputParamsProvider = providerFactory.provider { inputParams }
-            this.endpoint.set("https://deploygate.com")
+            this.endpointProperty = objectFactory.property(String)
+            this.endpointProperty.set("https://deploygate.com")
+        }
+
+        @Override
+        Provider<InputParams> getInputParamsProvider() {
+            return inputParamsProvider
+        }
+
+        @Override
+        Property<String> getEndpoint() {
+            return endpointProperty
         }
     }
 

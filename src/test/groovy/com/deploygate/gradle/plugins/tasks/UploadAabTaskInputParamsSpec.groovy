@@ -37,7 +37,11 @@ class UploadAabTaskInputParamsSpec extends Specification {
         def aabInfo = new DirectAabInfo("dep1", aabFile)
 
         and:
-        def inputParams = UploadAabTask.createInputParams(aabInfo, deployment)
+        def artifactFileProvider = project.providers.provider {
+            def f = new File(deployment.sourceFilePath.getOrElse(aabInfo.aabFile?.absolutePath))
+            f.exists() ? f : null
+        }
+        def inputParams = UploadAabTask.createInputParams(aabInfo, deployment, artifactFileProvider)
 
         expect:
         inputParams.message == message
@@ -60,7 +64,11 @@ class UploadAabTaskInputParamsSpec extends Specification {
         def aabInfo = new DirectAabInfo("dep1", aabFile)
 
         and:
-        def inputParams = UploadAabTask.createInputParams(aabInfo, deployment)
+        def artifactFileProvider = project.providers.provider {
+            def f = new File(deployment.sourceFilePath.getOrElse(aabInfo.aabFile?.absolutePath))
+            f.exists() ? f : null
+        }
+        def inputParams = UploadAabTask.createInputParams(aabInfo, deployment, artifactFileProvider)
 
         expect:
         inputParams.artifactFilePath == (sourceFile ?: aabFile).absolutePath
