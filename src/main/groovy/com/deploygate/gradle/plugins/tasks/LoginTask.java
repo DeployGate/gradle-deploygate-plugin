@@ -173,7 +173,7 @@ public abstract class LoginTask extends DefaultTask {
                             + " persists.");
         }
 
-        System.out.printf(Locale.US, "Welcome %s!%n", store.getName());
+        getLogger().lifecycle("Welcome {}!", store.getName());
 
         // We can set the values unless they are found because of the idempotency.
         setIfAbsent(credentials.getAppOwnerName(), store.getName());
@@ -232,9 +232,9 @@ public abstract class LoginTask extends DefaultTask {
 
         if (!BrowserUtils.openBrowser(url)) {
             getLogger().error("Could not open a browser on current environment.");
-            System.out.println(
+            getLogger().lifecycle(
                     "Please log in to DeployGate by opening the following URL on your browser:");
-            System.out.println(url);
+            getLogger().lifecycle(url);
         }
     }
 }

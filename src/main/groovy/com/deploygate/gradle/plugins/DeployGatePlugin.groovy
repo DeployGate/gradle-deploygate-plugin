@@ -58,9 +58,9 @@ class DeployGatePlugin implements Plugin<Project> {
         GradleCompat.init(project)
 
         // the presence of the value is same to the existence of the directory.
+        // Defer file operations to execution time for Configuration Cache compatibility
         Provider<String> credentialDirPathProvider = project.providers.systemProperty("user.home").map { home ->
-            File f = new File(home, '.dg')
-            (f.directory || f.mkdirs()) ? f.absolutePath : null
+            new File(home, '.dg').absolutePath
         }
 
         def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
@@ -116,6 +116,7 @@ class DeployGatePlugin implements Plugin<Project> {
                 task.deployment.copyFrom(deployment)
                 task.apkInfo.set(new DefaultPresetApkInfo(deployment.name))
                 task.httpClient.set(httpClientProvider)
+                task.endpoint.set(project.deploygate.endpoint)
                 task.usesService(httpClientProvider)
                 task.dependsOn(loginTaskProvider)
             }
@@ -129,6 +130,7 @@ class DeployGatePlugin implements Plugin<Project> {
                 task.deployment.copyFrom(deployment)
                 task.aabInfo.set(new DefaultPresetAabInfo(deployment.name))
                 task.httpClient.set(httpClientProvider)
+                task.endpoint.set(project.deploygate.endpoint)
                 task.usesService(httpClientProvider)
                 task.dependsOn(loginTaskProvider)
             }
@@ -143,6 +145,7 @@ class DeployGatePlugin implements Plugin<Project> {
 
                     task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
                     task.httpClient.set(httpClientProvider)
+                    task.endpoint.set(project.deploygate.endpoint)
                     task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {
@@ -155,8 +158,9 @@ class DeployGatePlugin implements Plugin<Project> {
                 namedOrRegister(project, Constants.uploadAabTaskName(variantProxy.name), UploadAabTask).configure { task ->
                     task.credentials.set(loginTaskProvider.map { it.credentials })
 
-                    task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.buildDir) })
+                    task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.layout.buildDirectory.get().asFile) })
                     task.httpClient.set(httpClientProvider)
+                    task.endpoint.set(project.deploygate.endpoint)
                     task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {

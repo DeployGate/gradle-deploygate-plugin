@@ -70,6 +70,9 @@ abstract class UploadArtifactTask extends DefaultTask {
     @Internal
     final Property<HttpClient> httpClient
 
+    @Input
+    final Property<String> endpoint
+
     @OutputFile
     final Provider<RegularFile> response
 
@@ -80,6 +83,7 @@ abstract class UploadArtifactTask extends DefaultTask {
         credentials = objectFactory.property(Credentials)
         deployment = objectFactory.newInstance(DeploymentConfiguration)
         httpClient = objectFactory.property(HttpClient)
+        endpoint = objectFactory.property(String)
 
         response = projectLayout.buildDirectory.file([
             "deploygate",
@@ -116,7 +120,7 @@ abstract class UploadArtifactTask extends DefaultTask {
             def hasNotified = httpClient.get().lifecycleNotificationClient.notifyOnSuccessOfArtifactUpload(uploadResponse.typedResponse.application.path)
 
             if (!hasNotified && (Config.shouldOpenAppDetailAfterUpload() || uploadResponse.typedResponse.application.revision == 1)) {
-                BrowserUtils.openBrowser "${project.deploygate.endpoint}${uploadResponse.typedResponse.application.path}"
+                BrowserUtils.openBrowser "${endpoint.get()}${uploadResponse.typedResponse.application.path}"
             }
         } catch (Throwable e) {
             logger.debug(e.message, e)
