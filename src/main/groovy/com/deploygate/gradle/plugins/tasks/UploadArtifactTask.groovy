@@ -73,6 +73,10 @@ abstract class UploadArtifactTask extends DefaultTask {
     @Input
     final Property<String> endpoint
 
+    @Input
+    @Optional
+    final Property<Boolean> openBrowserAfterUpload
+
     @OutputFile
     final Provider<RegularFile> response
 
@@ -84,6 +88,7 @@ abstract class UploadArtifactTask extends DefaultTask {
         deployment = objectFactory.newInstance(DeploymentConfiguration)
         httpClient = objectFactory.property(HttpClient)
         endpoint = objectFactory.property(String)
+        openBrowserAfterUpload = objectFactory.property(Boolean)
 
         response = projectLayout.buildDirectory.file([
             "deploygate",
@@ -119,7 +124,8 @@ abstract class UploadArtifactTask extends DefaultTask {
 
             def hasNotified = httpClient.get().lifecycleNotificationClient.notifyOnSuccessOfArtifactUpload(uploadResponse.typedResponse.application.path)
 
-            if (!hasNotified && (Config.shouldOpenAppDetailAfterUpload() || uploadResponse.typedResponse.application.revision == 1)) {
+            def shouldOpenBrowser = openBrowserAfterUpload.getOrElse(false).get()
+            if (!hasNotified && (shouldOpenBrowser || uploadResponse.typedResponse.application.revision == 1)) {
                 BrowserUtils.openBrowser "${endpoint.get()}${uploadResponse.typedResponse.application.path}"
             }
         } catch (Throwable e) {

@@ -232,8 +232,10 @@ public abstract class LoginTask extends DefaultTask {
 
         if (!BrowserUtils.openBrowser(url)) {
             getLogger().error("Could not open a browser on current environment.");
-            getLogger().lifecycle(
-                    "Please log in to DeployGate by opening the following URL on your browser:");
+            getLogger()
+                    .lifecycle(
+                            "Please log in to DeployGate by opening the following URL on your"
+                                    + " browser:");
             getLogger().lifecycle(url);
         }
     }

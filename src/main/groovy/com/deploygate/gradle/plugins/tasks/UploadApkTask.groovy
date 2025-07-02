@@ -35,6 +35,8 @@ abstract class UploadApkTask extends UploadArtifactTask {
     UploadApkTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
         super(objectFactory, projectLayout)
         apkInfo = objectFactory.property(ApkInfo)
+        // Set default description that can be overridden during configuration
+        setDescription("Deploy assembled APK to DeployGate")
     }
 
     @Internal
@@ -46,14 +48,8 @@ abstract class UploadApkTask extends UploadArtifactTask {
     @Internal
     @Override
     String getDescription() {
-        def inputParams = inputParamsProvider.get()
-
-        if (inputParams.isSigningReady) {
-            return "Deploy assembled ${inputParams.variantName} to DeployGate"
-        } else {
-            // require signing config to build a signed APKs
-            return "Deploy assembled ${inputParams.variantName} to DeployGate (requires valid signingConfig setting)"
-        }
+        // Return null to use the description set during task configuration
+        return null
     }
 
     @TaskAction

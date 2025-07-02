@@ -71,7 +71,7 @@ class AndroidGradlePlugin {
      * @param classLoader might be based on AGP's class loader
      * @return
      */
-    private static String getVersionString(ClassLoader classLoader) {
+    static String getVersionString(ClassLoader classLoader) {
         try {
             return classLoader.loadClass("com.android.Version").getField("ANDROID_GRADLE_PLUGIN_VERSION").get(null)
         } catch (Throwable ignored) {

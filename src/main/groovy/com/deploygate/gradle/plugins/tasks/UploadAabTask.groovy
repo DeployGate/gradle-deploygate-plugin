@@ -35,6 +35,8 @@ abstract class UploadAabTask extends UploadArtifactTask {
     UploadAabTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
         super(objectFactory, projectLayout)
         aabInfo = objectFactory.property(AabInfo)
+        // Set default description that can be overridden during configuration
+        setDescription("Deploy bundled AAB to DeployGate")
     }
 
     @Internal
@@ -53,6 +55,7 @@ abstract class UploadAabTask extends UploadArtifactTask {
     @Internal
     @Override
     String getDescription() {
-        return "Deploy bundled ${inputParamsProvider.get().variantName} to DeployGate"
+        // Return null to use the description set during task configuration
+        return null
     }
 }
