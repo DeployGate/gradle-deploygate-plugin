@@ -6,6 +6,8 @@ import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.and
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidBundleTaskName
 import static com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils.environmentVariable
 
+import com.deploygate.gradle.plugins.artifacts.AabInfo
+import com.deploygate.gradle.plugins.artifacts.ApkInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
@@ -76,6 +78,9 @@ class DeployGatePlugin implements Plugin<Project> {
         def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
             spec.parameters.endpoint.set(environmentVariable(project.providers, "TEST_SERVER_URL").orElse(Config.getDEPLOYGATE_ROOT()))
             spec.parameters.agpVersion.set(agpVersionProvider)
+            spec.parameters.pluginVersion.set(project.providers.provider { Config.VERSION })
+            spec.parameters.pluginVersionCode.set(project.providers.provider { Config.VERSION_CODE.toString() })
+            spec.parameters.pluginVersionName.set(project.providers.provider { Config.VERSION_NAME })
         }
 
         def localServerProvider = project.gradle.sharedServices.registerIfAbsent("httpserver", LocalServer) { spec ->
@@ -168,7 +173,7 @@ class DeployGatePlugin implements Plugin<Project> {
                     task.description = "Deploy assembled ${variantProxy.name} APK to DeployGate"
                     task.credentials.set(loginTaskProvider.map { it.credentials })
 
-                    task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
+                    task.apkInfo.set(createApkInfoProvider(variantProxy, agpVersionProvider))
                     task.httpClient.set(httpClientProvider)
                     task.endpoint.set(endpointProvider)
                     task.openBrowserAfterUpload.set(openBrowserProvider)
@@ -185,7 +190,7 @@ class DeployGatePlugin implements Plugin<Project> {
                     task.description = "Deploy bundled ${variantProxy.name} AAB to DeployGate"
                     task.credentials.set(loginTaskProvider.map { it.credentials })
 
-                    task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.layout.buildDirectory.get().asFile) })
+                    task.aabInfo.set(createAabInfoProvider(variantProxy, agpVersionProvider, project))
                     task.httpClient.set(httpClientProvider)
                     task.endpoint.set(endpointProvider)
                     task.openBrowserAfterUpload.set(openBrowserProvider)
@@ -213,5 +218,43 @@ class DeployGatePlugin implements Plugin<Project> {
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         // TODO we should use ExtensionSyntax as the 1st argument but we need to investigate the expected side effects first.
         project.extensions.create(DeployGateExtension, EXTENSION_NAME, DeployGateExtension, deployments)
+    }
+
+    /**
+     * Creates a provider for APK info that properly chains the package task provider
+     * with the AGP version provider for configuration cache compatibility.
+     *
+     * @param variantProxy The application variant proxy
+     * @param agpVersionProvider Provider for the AGP version string
+     * @return Provider for ApkInfo
+     */
+    private static Provider<ApkInfo> createApkInfoProvider(
+            @NotNull IApplicationVariantImpl variantProxy,
+            @NotNull Provider<String> agpVersionProvider) {
+        return variantProxy.packageApplicationTaskProvider().flatMap { packageTask ->
+            agpVersionProvider.map { agpVersion ->
+                getApkInfo(packageTask, variantProxy.name, agpVersion)
+            }
+        }
+    }
+
+    /**
+     * Creates a provider for AAB info that properly chains the package task provider
+     * with the AGP version provider for configuration cache compatibility.
+     *
+     * @param variantProxy The application variant proxy
+     * @param agpVersionProvider Provider for the AGP version string
+     * @param project The project instance for accessing build directory
+     * @return Provider for AabInfo
+     */
+    private static Provider<AabInfo> createAabInfoProvider(
+            @NotNull IApplicationVariantImpl variantProxy,
+            @NotNull Provider<String> agpVersionProvider,
+            @NotNull Project project) {
+        return variantProxy.packageApplicationTaskProvider().flatMap { packageTask ->
+            agpVersionProvider.map { agpVersion ->
+                getAabInfo(packageTask, variantProxy.name, project.layout.buildDirectory.get().asFile, agpVersion)
+            }
+        }
     }
 }

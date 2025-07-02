@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.tasks
 
+import com.deploygate.gradle.plugins.TestHelper
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore
@@ -20,12 +21,24 @@ import spock.lang.Specification
 class UploadArtifactTaskSpec extends Specification {
     static class UploadArtifactTaskStub extends UploadArtifactTask {
         @Internal
-        final Provider<InputParams> inputParamsProvider
+        Provider<InputParams> inputParamsProvider
+
+        private final ProviderFactory providerFactory
 
         @Inject
-        UploadArtifactTaskStub(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory, @NotNull ProjectLayout projectLayout, @NotNull InputParams inputParams) {
+        UploadArtifactTaskStub(@NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory, @NotNull ProjectLayout projectLayout) {
             super(objectFactory, projectLayout)
+            this.providerFactory = providerFactory
+            this.inputParamsProvider = providerFactory.provider { null }
+        }
+
+        void setInputParams(InputParams inputParams) {
             this.inputParamsProvider = providerFactory.provider { inputParams }
+        }
+
+        @Override
+        ProviderFactory getProviderFactory() {
+            return providerFactory
         }
     }
 
@@ -52,7 +65,9 @@ class UploadArtifactTaskSpec extends Specification {
                 )
 
         when: "apkFile must exist"
-        def task = project.tasks.create("UploadArtifactTaskStub2", UploadArtifactTaskStub, inputParams)
+        def task = project.tasks.create("UploadArtifactTaskStub2", UploadArtifactTaskStub) { t ->
+            t.setInputParams(inputParams)
+        }
 
         and:
         task.doUpload(inputParams)

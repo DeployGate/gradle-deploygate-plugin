@@ -36,6 +36,8 @@ public abstract class LoginTask extends DefaultTask {
 
     @NotNull private final Credentials credentials;
 
+    @NotNull private final ProviderFactory providerFactory;
+
     @Inject
     public LoginTask(
             @NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory) {
@@ -53,6 +55,8 @@ public abstract class LoginTask extends DefaultTask {
         apiToken = getExplicitApiToken().orElse(apiTokenFromEnvVars);
 
         credentials = objectFactory.newInstance(Credentials.class);
+
+        this.providerFactory = providerFactory;
 
         setDescription(
                 "Check the configured credentials and launch the authentication flow if they are"
@@ -187,7 +191,7 @@ public abstract class LoginTask extends DefaultTask {
      */
     @VisibleForTesting
     boolean setupCredential() {
-        if (BrowserUtils.hasBrowser()) {
+        if (BrowserUtils.hasBrowser(providerFactory)) {
             return setupBrowser();
         } else {
             return setupTerminal();
@@ -230,7 +234,7 @@ public abstract class LoginTask extends DefaultTask {
 
         String url = getHttpClient().get().buildURI(params, "cli", "login").toString();
 
-        if (!BrowserUtils.openBrowser(url)) {
+        if (!BrowserUtils.openBrowser(url, providerFactory)) {
             getLogger().error("Could not open a browser on current environment.");
             getLogger()
                     .lifecycle(

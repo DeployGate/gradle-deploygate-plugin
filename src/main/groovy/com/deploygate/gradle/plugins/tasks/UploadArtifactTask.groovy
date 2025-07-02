@@ -13,6 +13,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
@@ -80,6 +81,9 @@ abstract class UploadArtifactTask extends DefaultTask {
     @OutputFile
     final Provider<RegularFile> response
 
+    @javax.inject.Inject
+    abstract ProviderFactory getProviderFactory()
+
     UploadArtifactTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
         super()
         group = Constants.TASK_GROUP_NAME
@@ -126,7 +130,7 @@ abstract class UploadArtifactTask extends DefaultTask {
 
             def shouldOpenBrowser = openBrowserAfterUpload.getOrElse(false).get()
             if (!hasNotified && (shouldOpenBrowser || uploadResponse.typedResponse.application.revision == 1)) {
-                BrowserUtils.openBrowser "${endpoint.get()}${uploadResponse.typedResponse.application.path}"
+                BrowserUtils.openBrowser("${endpoint.get()}${uploadResponse.typedResponse.application.path}", providerFactory)
             }
         } catch (Throwable e) {
             logger.debug(e.message, e)
