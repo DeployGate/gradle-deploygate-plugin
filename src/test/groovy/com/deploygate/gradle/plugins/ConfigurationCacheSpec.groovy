@@ -22,19 +22,54 @@ class ConfigurationCacheSpec extends Specification {
     def setup() {
         buildFile = testProjectDir.newFile('build.gradle')
         settingsFile = testProjectDir.newFile('settings.gradle')
+        def localPropertiesFile = testProjectDir.newFile('local.properties')
 
         settingsFile << '''
             rootProject.name = 'test-project'
         '''
+        
+        // Set Android SDK location
+        def androidHome = System.getenv("ANDROID_HOME") ?: "${System.getProperty('user.home')}/Android/Sdk"
+        localPropertiesFile << "sdk.dir=${androidHome}"
+    }
+
+    /**
+     * Creates the plugin classpath for GradleRunner.
+     * This method loads the plugin classpath from the test resources.
+     */
+    private List<File> createPluginClasspath() {
+        def pluginClasspathResource = getClass().classLoader.getResource("plugin-classpath.txt")
+        
+        if (pluginClasspathResource == null) {
+            throw new IllegalStateException(
+                "Did not find plugin classpath resource, run `createClasspathManifest` gradle task.")
+        }
+        
+        return pluginClasspathResource.readLines().collect { new File(it) }
     }
 
     @Unroll
     def "plugin supports configuration cache with #taskName task"() {
         given: "A project with the DeployGate plugin applied"
+        // Add Android plugin repository
         buildFile << """
-            plugins {
-                id 'com.android.application'
-                id 'deploygate'
+            buildscript {
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+                dependencies {
+                    classpath 'com.android.tools.build:gradle:4.2.0'
+                    classpath files(${createPluginClasspath().collect { "'${it.absolutePath}'" }.join(', ')})
+                }
+            }
+            
+            apply plugin: 'com.android.application'
+            apply plugin: 'deploygate'
+
+            repositories {
+                google()
+                mavenCentral()
             }
 
             android {
@@ -48,6 +83,12 @@ class ConfigurationCacheSpec extends Specification {
                     versionCode 1
                     versionName "1.0"
                 }
+                
+                buildTypes {
+                    release {
+                        minifyEnabled false
+                    }
+                }
             }
 
             deploygate {
@@ -58,6 +99,9 @@ class ConfigurationCacheSpec extends Specification {
                     debug {
                         skipAssemble = true
                     }
+                    release {
+                        skipAssemble = true
+                    }
                 }
             }
         """
@@ -65,7 +109,7 @@ class ConfigurationCacheSpec extends Specification {
         when: "Running the task with configuration cache enabled"
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withPluginClasspath()
+                .withPluginClasspath(createPluginClasspath())
                 .withArguments('--configuration-cache', taskName, '--dry-run')
                 .build()
 
@@ -76,7 +120,7 @@ class ConfigurationCacheSpec extends Specification {
         when: "Running the same task again to reuse the configuration cache"
         def cachedResult = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withPluginClasspath()
+                .withPluginClasspath(createPluginClasspath())
                 .withArguments('--configuration-cache', taskName, '--dry-run')
                 .build()
 
@@ -88,17 +132,31 @@ class ConfigurationCacheSpec extends Specification {
         taskName << [
             'loginDeployGate',
             'logoutDeployGate',
-            'uploadDeployGateDebugApk',
-            'uploadDeployGateDebugAab'
+            'uploadDeployGateDebug',
+            'uploadDeployGateRelease'
         ]
     }
 
     def "plugin properly handles environment variables with configuration cache"() {
         given: "A project using environment variables"
         buildFile << """
-            plugins {
-                id 'com.android.application'
-                id 'deploygate'
+            buildscript {
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+                dependencies {
+                    classpath 'com.android.tools.build:gradle:4.2.0'
+                    classpath files(${createPluginClasspath().collect { "'${it.absolutePath}'" }.join(', ')})
+                }
+            }
+            
+            apply plugin: 'com.android.application'
+            apply plugin: 'deploygate'
+
+            repositories {
+                google()
+                mavenCentral()
             }
 
             android {
@@ -127,7 +185,7 @@ class ConfigurationCacheSpec extends Specification {
         when: "Running with configuration cache"
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withPluginClasspath()
+                .withPluginClasspath(createPluginClasspath())
                 .withEnvironment(env)
                 .withArguments('--configuration-cache', 'loginDeployGate', '--dry-run')
                 .build()
@@ -140,9 +198,23 @@ class ConfigurationCacheSpec extends Specification {
     def "plugin BuildServices work correctly with configuration cache"() {
         given: "A project that uses HttpClient BuildService"
         buildFile << """
-            plugins {
-                id 'com.android.application'
-                id 'deploygate'
+            buildscript {
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+                dependencies {
+                    classpath 'com.android.tools.build:gradle:4.2.0'
+                    classpath files(${createPluginClasspath().collect { "'${it.absolutePath}'" }.join(', ')})
+                }
+            }
+            
+            apply plugin: 'com.android.application'
+            apply plugin: 'deploygate'
+
+            repositories {
+                google()
+                mavenCentral()
             }
 
             android {
@@ -172,7 +244,7 @@ class ConfigurationCacheSpec extends Specification {
         when: "Running custom task with configuration cache"
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withPluginClasspath()
+                .withPluginClasspath(createPluginClasspath())
                 .withArguments('--configuration-cache', 'testBuildService', '--dry-run')
                 .build()
 
@@ -184,9 +256,23 @@ class ConfigurationCacheSpec extends Specification {
     def "provider chains work correctly with configuration cache"() {
         given: "A project with custom deployments"
         buildFile << """
-            plugins {
-                id 'com.android.application'
-                id 'deploygate'
+            buildscript {
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+                dependencies {
+                    classpath 'com.android.tools.build:gradle:4.2.0'
+                    classpath files(${createPluginClasspath().collect { "'${it.absolutePath}'" }.join(', ')})
+                }
+            }
+            
+            apply plugin: 'com.android.application'
+            apply plugin: 'deploygate'
+
+            repositories {
+                google()
+                mavenCentral()
             }
 
             android {
@@ -226,8 +312,8 @@ class ConfigurationCacheSpec extends Specification {
         when: "Running deployment task with configuration cache"
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withPluginClasspath()
-                .withArguments('--configuration-cache', 'uploadDeployGateCustomReleaseApk', '--dry-run')
+                .withPluginClasspath(createPluginClasspath())
+                .withArguments('--configuration-cache', 'uploadDeployGateCustomRelease', '--dry-run')
                 .build()
 
         then: "Complex provider chains are handled correctly"

@@ -2,6 +2,7 @@ package com.deploygate.gradle.plugins.internal.utils
 
 import static com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils.environmentVariable
 
+import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.jetbrains.annotations.NotNull
@@ -54,7 +55,7 @@ class BrowserUtils {
      * @since 3.0.0
      */
     static boolean openBrowser(@NotNull String url, @NotNull ProviderFactory providers) {
-        def osNameProvider = providers.systemProperty("os.name")
+        def osNameProvider = GradleCompat.forUseAtConfigurationTime(providers.systemProperty("os.name"))
         def displayProvider = environmentVariable(providers, "DISPLAY")
         def ciProvider = environmentVariable(providers, "CI")
         def jenkinsUrlProvider = environmentVariable(providers, "JENKINS_URL")
@@ -70,7 +71,7 @@ class BrowserUtils {
      * @since 3.0.0
      */
     static boolean hasBrowser(@NotNull ProviderFactory providers) {
-        def osNameProvider = providers.systemProperty("os.name")
+        def osNameProvider = GradleCompat.forUseAtConfigurationTime(providers.systemProperty("os.name"))
         def displayProvider = environmentVariable(providers, "DISPLAY")
         def ciProvider = environmentVariable(providers, "CI")
         def jenkinsUrlProvider = environmentVariable(providers, "JENKINS_URL")
