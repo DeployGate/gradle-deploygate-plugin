@@ -31,6 +31,9 @@ android {
 
 task printAGPVersion() {
     doLast {
-        println AndroidGradlePlugin.getVersion().toArtifactString()
+        def agpPlugin = project.plugins.findPlugin("com.android.application")
+        def agpVersionString = AndroidGradlePlugin.getVersionString(agpPlugin.class.classLoader)
+        def versionObj = AndroidGradlePlugin.getVersion(agpVersionString)
+        println versionObj.toArtifactString()
     }
 }
