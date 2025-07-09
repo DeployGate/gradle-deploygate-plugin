@@ -19,7 +19,7 @@ class BrowserUtilsSpec extends Specification {
             ->
             [waitFor: { -> 0 }]
         }
-        BrowserUtils.metaClass.static.hasBrowser = { -> hasBrowser }
+        BrowserUtils.metaClass.static.hasBrowserLegacy = { -> hasBrowser }
         BrowserUtils.metaClass.static.isExecutableOnMacOS = { -> onMacOS }
         BrowserUtils.metaClass.static.isExecutableOnWindows = { -> onWindows }
         BrowserUtils.metaClass.static.isExecutableOnLinux = { -> onLinux }

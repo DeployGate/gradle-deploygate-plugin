@@ -79,17 +79,17 @@ class BrowserUtilsConfigurationCacheSpec extends Specification {
     }
 
     def "provider chains are properly constructed"() {
-        given: "Individual providers wrapped for configuration time"
-        def osNameProvider = GradleCompat.forUseAtConfigurationTime(providers.systemProperty("os.name"))
-        def displayProvider = GradleCompat.forUseAtConfigurationTime(providers.environmentVariable("DISPLAY"))
-        def ciProvider = GradleCompat.forUseAtConfigurationTime(providers.environmentVariable("CI"))
-        def jenkinsUrlProvider = GradleCompat.forUseAtConfigurationTime(providers.environmentVariable("JENKINS_URL"))
+        given: "Mock providers that don't access actual environment"
+        def osNameProvider = providers.provider { "Mac OS X" }
+        def displayProvider = providers.provider { ":0" }
+        def ciProvider = providers.provider { "false" }
+        def jenkinsUrlProvider = providers.provider { null }
 
         when: "Using provider-based overload"
         def result = BrowserUtils.hasBrowser(osNameProvider, displayProvider, ciProvider, jenkinsUrlProvider)
 
         then: "Result is computed correctly"
-        result != null
+        result == true
     }
 
     def "CI environment detection works with providers"() {
