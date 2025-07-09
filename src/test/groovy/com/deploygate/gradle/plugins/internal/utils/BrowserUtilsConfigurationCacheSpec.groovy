@@ -34,10 +34,10 @@ class BrowserUtilsConfigurationCacheSpec extends Specification {
         // The result will depend on the test environment (CI vs local, OS, etc.)
         result != null
         // In most test environments, this will be false due to CI detection or missing display
-        result == !BrowserUtils.isCiEnvironment() && 
-                  (BrowserUtils.isExecutableOnMacOS() || 
-                   BrowserUtils.isExecutableOnWindows() || 
-                   BrowserUtils.isExecutableOnLinux())
+        result == !BrowserUtils.isCiEnvironment() &&
+                (BrowserUtils.isExecutableOnMacOS() ||
+                BrowserUtils.isExecutableOnWindows() ||
+                BrowserUtils.isExecutableOnLinux())
     }
 
     def "openBrowser with ProviderFactory executes correctly"() {
