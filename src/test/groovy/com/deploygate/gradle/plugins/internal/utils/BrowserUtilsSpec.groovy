@@ -19,10 +19,19 @@ class BrowserUtilsSpec extends Specification {
             ->
             [waitFor: { -> 0 }]
         }
+        // Mock the CI environment to be false for testing browser functionality
+        BrowserUtils.metaClass.static.isCiEnvironment = { -> false }
         BrowserUtils.metaClass.static.hasBrowserLegacy = { -> hasBrowser }
         BrowserUtils.metaClass.static.isExecutableOnMacOS = { -> onMacOS }
         BrowserUtils.metaClass.static.isExecutableOnWindows = { -> onWindows }
         BrowserUtils.metaClass.static.isExecutableOnLinux = { -> onLinux }
+        BrowserUtils.metaClass.static.getOS_NAME = {
+            ->
+            if (onMacOS) return "mac"
+            if (onWindows) return "windows"
+            if (onLinux) return "linux"
+            return "unknown"
+        }
 
         expect:
         BrowserUtils.openBrowser(url) == result

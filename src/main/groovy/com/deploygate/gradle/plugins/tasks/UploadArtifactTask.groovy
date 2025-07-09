@@ -128,7 +128,7 @@ abstract class UploadArtifactTask extends DefaultTask {
 
             def hasNotified = httpClient.get().lifecycleNotificationClient.notifyOnSuccessOfArtifactUpload(uploadResponse.typedResponse.application.path)
 
-            def shouldOpenBrowser = openBrowserAfterUpload.getOrElse(false).get()
+            def shouldOpenBrowser = openBrowserAfterUpload.getOrElse(false)
             if (!hasNotified && (shouldOpenBrowser || uploadResponse.typedResponse.application.revision == 1)) {
                 BrowserUtils.openBrowser("${endpoint.get()}${uploadResponse.typedResponse.application.path}", providerFactory)
             }

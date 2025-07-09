@@ -23,21 +23,28 @@ class BrowserUtilsConfigurationCacheSpec extends Specification {
         providers = project.providers
     }
 
-    def "hasBrowser with ProviderFactory returns expected result"() {
-        given: "Provider factory from test project"
-        // In unit tests, we can evaluate providers directly as we're not in configuration phase
+    @Unroll
+    def "hasBrowser with ProviderFactory works correctly in different environments"() {
+        given: "Mock providers with controlled values"
+        def osNameProvider = providers.provider { osName }
+        def displayProvider = providers.provider { display }
+        def ciProvider = providers.provider { ci }
+        def jenkinsUrlProvider = providers.provider { jenkinsUrl }
 
         when: "Checking for browser availability"
-        def result = BrowserUtils.hasBrowser(providers)
+        def result = BrowserUtils.hasBrowser(osNameProvider, displayProvider, ciProvider, jenkinsUrlProvider)
 
-        then: "Result is based on current environment"
-        // The result will depend on the test environment (CI vs local, OS, etc.)
-        result != null
-        // In most test environments, this will be false due to CI detection or missing display
-        result == !BrowserUtils.isCiEnvironment() &&
-                (BrowserUtils.isExecutableOnMacOS() ||
-                BrowserUtils.isExecutableOnWindows() ||
-                BrowserUtils.isExecutableOnLinux())
+        then: "Result matches expected behavior"
+        result == expectedResult
+
+        where:
+        osName      | display | ci      | jenkinsUrl    | expectedResult
+        "Mac OS X"  | null    | "false" | null          | true
+        "Windows"   | null    | "false" | null          | true
+        "Linux"     | ":0"    | "false" | null          | true
+        "Linux"     | null    | "false" | null          | false
+        "Mac OS X"  | null    | "true"  | null          | false
+        "Windows"   | null    | "false" | "http://ci"   | false
     }
 
     def "openBrowser with ProviderFactory executes correctly"() {
