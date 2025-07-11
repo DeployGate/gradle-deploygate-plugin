@@ -129,12 +129,13 @@ class DeployGatePlugin implements Plugin<Project> {
             project.tasks.named(Constants.SUFFIX_AAB_TASK_NAME).configure { task ->
                 task.dependsOn(Constants.uploadAabTaskName(deployment.name))
             }
-
+            
             project.tasks.register(Constants.uploadApkTaskName(deployment.name), UploadApkTask) { task ->
                 task.description = "Deploy assembled ${deployment.name} APK to DeployGate"
+                task.group = Constants.TASK_GROUP_NAME
 
                 if (!deployment.skipAssemble) {
-                    task.logger.debug("${deployment.name} required assmble but ignored")
+                    task.logger.debug("${deployment.name} required assemble but ignored")
                 }
 
                 task.credentials.set(loginTaskProvider.map { it.credentials })
@@ -149,9 +150,10 @@ class DeployGatePlugin implements Plugin<Project> {
 
             project.tasks.register(Constants.uploadAabTaskName(deployment.name), UploadAabTask) { task ->
                 task.description = "Deploy bundled ${deployment.name} AAB to DeployGate"
+                task.group = Constants.TASK_GROUP_NAME
 
                 if (!deployment.skipAssemble) {
-                    task.logger.debug("${deployment.name} required assmble but ignored")
+                    task.logger.debug("${deployment.name} required assemble but ignored")
                 }
 
                 task.credentials.set(loginTaskProvider.map { it.credentials })

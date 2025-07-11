@@ -35,21 +35,12 @@ abstract class UploadApkTask extends UploadArtifactTask {
     UploadApkTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
         super(objectFactory, projectLayout)
         apkInfo = objectFactory.property(ApkInfo)
-        // Set default description that can be overridden during configuration
-        setDescription("Deploy assembled APK to DeployGate")
     }
 
     @Internal
     @Override
     Provider<InputParams> getInputParamsProvider() {
         return apkInfo.map { apk -> createInputParams(apk, deployment) }
-    }
-
-    @Internal
-    @Override
-    String getDescription() {
-        // Return null to use the description set during task configuration
-        return null
     }
 
     @TaskAction
