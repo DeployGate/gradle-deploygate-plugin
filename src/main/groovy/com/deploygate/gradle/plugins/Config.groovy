@@ -27,8 +27,4 @@ class Config {
             VERSION_NAME = "unavailable"
         }
     }
-
-    static boolean shouldOpenAppDetailAfterUpload() {
-        return System.getenv(DeployGatePlugin.ENV_NAME_OPEN_APP_DETAIL_AFTER_UPLOAD)
-    }
 }

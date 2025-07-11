@@ -13,6 +13,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
@@ -70,8 +71,18 @@ abstract class UploadArtifactTask extends DefaultTask {
     @Internal
     final Property<HttpClient> httpClient
 
+    @Input
+    final Property<String> endpoint
+
+    @Input
+    @Optional
+    final Property<Boolean> openBrowserAfterUpload
+
     @OutputFile
     final Provider<RegularFile> response
+
+    @javax.inject.Inject
+    abstract ProviderFactory getProviderFactory()
 
     UploadArtifactTask(@NotNull ObjectFactory objectFactory, @NotNull ProjectLayout projectLayout) {
         super()
@@ -80,6 +91,8 @@ abstract class UploadArtifactTask extends DefaultTask {
         credentials = objectFactory.property(Credentials)
         deployment = objectFactory.newInstance(DeploymentConfiguration)
         httpClient = objectFactory.property(HttpClient)
+        endpoint = objectFactory.property(String)
+        openBrowserAfterUpload = objectFactory.property(Boolean)
 
         response = projectLayout.buildDirectory.file([
             "deploygate",
@@ -115,8 +128,9 @@ abstract class UploadArtifactTask extends DefaultTask {
 
             def hasNotified = httpClient.get().lifecycleNotificationClient.notifyOnSuccessOfArtifactUpload(uploadResponse.typedResponse.application.path)
 
-            if (!hasNotified && (Config.shouldOpenAppDetailAfterUpload() || uploadResponse.typedResponse.application.revision == 1)) {
-                BrowserUtils.openBrowser "${project.deploygate.endpoint}${uploadResponse.typedResponse.application.path}"
+            def shouldOpenBrowser = openBrowserAfterUpload.getOrElse(false)
+            if (!hasNotified && (shouldOpenBrowser || uploadResponse.typedResponse.application.revision == 1)) {
+                BrowserUtils.openBrowser("${endpoint.get()}${uploadResponse.typedResponse.application.path}", providerFactory)
             }
         } catch (Throwable e) {
             logger.debug(e.message, e)

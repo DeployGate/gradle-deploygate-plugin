@@ -6,6 +6,8 @@ import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.and
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidBundleTaskName
 import static com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils.environmentVariable
 
+import com.deploygate.gradle.plugins.artifacts.AabInfo
+import com.deploygate.gradle.plugins.artifacts.ApkInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
@@ -55,16 +57,30 @@ class DeployGatePlugin implements Plugin<Project> {
 
         setupExtension(project)
 
-        GradleCompat.init(project)
-
         // the presence of the value is same to the existence of the directory.
+        // Defer file operations to execution time for Configuration Cache compatibility
         Provider<String> credentialDirPathProvider = project.providers.systemProperty("user.home").map { home ->
-            File f = new File(home, '.dg')
-            (f.directory || f.mkdirs()) ? f.absolutePath : null
+            new File(home, '.dg').absolutePath
+        }
+
+        // Detect AGP version for HttpClient
+        def agpVersionProvider = project.providers.provider {
+            try {
+                def agpPlugin = project.plugins.findPlugin("com.android.application")
+                if (agpPlugin) {
+                    return AndroidGradlePlugin.getVersionString(agpPlugin.class.classLoader)
+                }
+            } catch (Throwable ignored) {
+            }
+            return "unknown"
         }
 
         def httpClientProvider = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
             spec.parameters.endpoint.set(environmentVariable(project.providers, "TEST_SERVER_URL").orElse(Config.getDEPLOYGATE_ROOT()))
+            spec.parameters.agpVersion.set(agpVersionProvider)
+            spec.parameters.pluginVersion.set(project.providers.provider { Config.VERSION })
+            spec.parameters.pluginVersionCode.set(project.providers.provider { Config.VERSION_CODE.toString() })
+            spec.parameters.pluginVersionName.set(project.providers.provider { Config.VERSION_NAME })
         }
 
         def localServerProvider = project.gradle.sharedServices.registerIfAbsent("httpserver", LocalServer) { spec ->
@@ -72,9 +88,16 @@ class DeployGatePlugin implements Plugin<Project> {
             spec.parameters.credentialsDirPath.set(credentialDirPathProvider)
         }
 
+        // Use Provider API for configuration cache compatibility
+        def extension = project.extensions.getByName(EXTENSION_NAME) as DeployGateExtension
+        def appOwnerNameProvider = project.providers.provider { extension.appOwnerName }
+        def apiTokenProvider = project.providers.provider { extension.apiToken }
+        def endpointProvider = project.providers.provider { extension.endpoint }
+        def openBrowserProvider = environmentVariable(project.providers, ENV_NAME_OPEN_APP_DETAIL_AFTER_UPLOAD).map { it?.toBoolean() ?: false }
+
         def loginTaskProvider = project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
-            task.explicitAppOwnerName.set(project.deploygate.appOwnerName)
-            task.explicitApiToken.set(project.deploygate.apiToken)
+            task.explicitAppOwnerName.set(appOwnerNameProvider)
+            task.explicitApiToken.set(apiTokenProvider)
             task.credentialsDirPath.set(credentialDirPathProvider)
             task.httpClient.set(httpClientProvider)
             task.localServer.set(localServerProvider)
@@ -98,7 +121,7 @@ class DeployGatePlugin implements Plugin<Project> {
             task.group = Constants.TASK_GROUP_NAME
         }
 
-        project.deploygate.deployments.configureEach { NamedDeployment deployment ->
+        extension.deployments.configureEach { NamedDeployment deployment ->
             project.tasks.named(Constants.SUFFIX_APK_TASK_NAME).configure { task ->
                 task.dependsOn(Constants.uploadApkTaskName(deployment.name))
             }
@@ -106,29 +129,39 @@ class DeployGatePlugin implements Plugin<Project> {
             project.tasks.named(Constants.SUFFIX_AAB_TASK_NAME).configure { task ->
                 task.dependsOn(Constants.uploadAabTaskName(deployment.name))
             }
-
+            
             project.tasks.register(Constants.uploadApkTaskName(deployment.name), UploadApkTask) { task ->
+                task.description = "Deploy assembled ${deployment.name} APK to DeployGate"
+                task.group = Constants.TASK_GROUP_NAME
+
                 if (!deployment.skipAssemble) {
-                    task.logger.debug("${deployment.name} required assmble but ignored")
+                    task.logger.debug("${deployment.name} required assemble but ignored")
                 }
 
                 task.credentials.set(loginTaskProvider.map { it.credentials })
                 task.deployment.copyFrom(deployment)
                 task.apkInfo.set(new DefaultPresetApkInfo(deployment.name))
                 task.httpClient.set(httpClientProvider)
+                task.endpoint.set(endpointProvider)
+                task.openBrowserAfterUpload.set(openBrowserProvider)
                 task.usesService(httpClientProvider)
                 task.dependsOn(loginTaskProvider)
             }
 
             project.tasks.register(Constants.uploadAabTaskName(deployment.name), UploadAabTask) { task ->
+                task.description = "Deploy bundled ${deployment.name} AAB to DeployGate"
+                task.group = Constants.TASK_GROUP_NAME
+
                 if (!deployment.skipAssemble) {
-                    task.logger.debug("${deployment.name} required assmble but ignored")
+                    task.logger.debug("${deployment.name} required assemble but ignored")
                 }
 
                 task.credentials.set(loginTaskProvider.map { it.credentials })
                 task.deployment.copyFrom(deployment)
                 task.aabInfo.set(new DefaultPresetAabInfo(deployment.name))
                 task.httpClient.set(httpClientProvider)
+                task.endpoint.set(endpointProvider)
+                task.openBrowserAfterUpload.set(openBrowserProvider)
                 task.usesService(httpClientProvider)
                 task.dependsOn(loginTaskProvider)
             }
@@ -139,10 +172,13 @@ class DeployGatePlugin implements Plugin<Project> {
                 def variantProxy = new IApplicationVariantImpl(variant)
 
                 namedOrRegister(project, Constants.uploadApkTaskName(variantProxy.name), UploadApkTask).configure { task ->
+                    task.description = "Deploy assembled ${variantProxy.name} APK to DeployGate"
                     task.credentials.set(loginTaskProvider.map { it.credentials })
 
-                    task.apkInfo.set(variantProxy.packageApplicationTaskProvider().map {getApkInfo(it, variantProxy.name) })
+                    task.apkInfo.set(createApkInfoProvider(variantProxy, agpVersionProvider))
                     task.httpClient.set(httpClientProvider)
+                    task.endpoint.set(endpointProvider)
+                    task.openBrowserAfterUpload.set(openBrowserProvider)
                     task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {
@@ -153,10 +189,13 @@ class DeployGatePlugin implements Plugin<Project> {
                 }
 
                 namedOrRegister(project, Constants.uploadAabTaskName(variantProxy.name), UploadAabTask).configure { task ->
+                    task.description = "Deploy bundled ${variantProxy.name} AAB to DeployGate"
                     task.credentials.set(loginTaskProvider.map { it.credentials })
 
-                    task.aabInfo.set(variantProxy.packageApplicationTaskProvider().map {getAabInfo(it, variantProxy.name, project.buildDir) })
+                    task.aabInfo.set(createAabInfoProvider(variantProxy, agpVersionProvider, project))
                     task.httpClient.set(httpClientProvider)
+                    task.endpoint.set(endpointProvider)
+                    task.openBrowserAfterUpload.set(openBrowserProvider)
                     task.usesService(httpClientProvider)
 
                     if (deployment.skipAssemble.get()) {
@@ -181,5 +220,43 @@ class DeployGatePlugin implements Plugin<Project> {
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         // TODO we should use ExtensionSyntax as the 1st argument but we need to investigate the expected side effects first.
         project.extensions.create(DeployGateExtension, EXTENSION_NAME, DeployGateExtension, deployments)
+    }
+
+    /**
+     * Creates a provider for APK info that properly chains the package task provider
+     * with the AGP version provider for configuration cache compatibility.
+     *
+     * @param variantProxy The application variant proxy
+     * @param agpVersionProvider Provider for the AGP version string
+     * @return Provider for ApkInfo
+     */
+    private static Provider<ApkInfo> createApkInfoProvider(
+            @NotNull IApplicationVariantImpl variantProxy,
+            @NotNull Provider<String> agpVersionProvider) {
+        return variantProxy.packageApplicationTaskProvider().flatMap { packageTask ->
+            agpVersionProvider.map { agpVersion ->
+                getApkInfo(packageTask, variantProxy.name, agpVersion)
+            }
+        }
+    }
+
+    /**
+     * Creates a provider for AAB info that properly chains the package task provider
+     * with the AGP version provider for configuration cache compatibility.
+     *
+     * @param variantProxy The application variant proxy
+     * @param agpVersionProvider Provider for the AGP version string
+     * @param project The project instance for accessing build directory
+     * @return Provider for AabInfo
+     */
+    private static Provider<AabInfo> createAabInfoProvider(
+            @NotNull IApplicationVariantImpl variantProxy,
+            @NotNull Provider<String> agpVersionProvider,
+            @NotNull Project project) {
+        return variantProxy.packageApplicationTaskProvider().flatMap { packageTask ->
+            agpVersionProvider.map { agpVersion ->
+                getAabInfo(packageTask, variantProxy.name, project.layout.buildDirectory.get().asFile, agpVersion)
+            }
+        }
     }
 }

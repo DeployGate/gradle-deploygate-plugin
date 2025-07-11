@@ -10,6 +10,8 @@ class DeployGateExtension implements ExtensionSyntax {
 
     String appOwnerName
 
+    String endpoint = 'https://deploygate.com'
+
     @NotNull
     private final NamedDomainObjectContainer<NamedDeployment> deployments
 

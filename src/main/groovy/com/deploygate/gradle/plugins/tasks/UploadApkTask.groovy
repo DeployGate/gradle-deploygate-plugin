@@ -8,6 +8,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.VisibleForTesting
@@ -27,7 +28,7 @@ abstract class UploadApkTask extends UploadArtifactTask {
                 )
     }
 
-    @Internal
+    @Nested
     final Property<ApkInfo> apkInfo
 
     @Inject
@@ -40,19 +41,6 @@ abstract class UploadApkTask extends UploadArtifactTask {
     @Override
     Provider<InputParams> getInputParamsProvider() {
         return apkInfo.map { apk -> createInputParams(apk, deployment) }
-    }
-
-    @Internal
-    @Override
-    String getDescription() {
-        def inputParams = inputParamsProvider.get()
-
-        if (inputParams.isSigningReady) {
-            return "Deploy assembled ${inputParams.variantName} to DeployGate"
-        } else {
-            // require signing config to build a signed APKs
-            return "Deploy assembled ${inputParams.variantName} to DeployGate (requires valid signingConfig setting)"
-        }
     }
 
     @TaskAction

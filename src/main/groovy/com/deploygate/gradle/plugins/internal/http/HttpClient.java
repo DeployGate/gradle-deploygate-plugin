@@ -1,7 +1,5 @@
 package com.deploygate.gradle.plugins.internal.http;
 
-import com.deploygate.gradle.plugins.Config;
-import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin;
 import com.deploygate.gradle.plugins.tasks.inputs.Credentials;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,6 +38,14 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
 
     interface Params extends BuildServiceParameters {
         Property<String> getEndpoint();
+
+        Property<String> getAgpVersion();
+
+        Property<String> getPluginVersion();
+
+        Property<String> getPluginVersionCode();
+
+        Property<String> getPluginVersionName();
     }
 
     @NotNull private final org.apache.hc.client5.http.classic.HttpClient httpClient;
@@ -50,17 +56,15 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
         this.endpoint = getParameters().getEndpoint().get();
 
         List<BasicHeader> headers = new ArrayList<>();
+        String versionCode = getParameters().getPluginVersionCode().get();
+        String version = getParameters().getPluginVersion().get();
+        String versionName = getParameters().getPluginVersionName().get();
+
+        headers.add(new BasicHeader("X-DEPLOYGATE-CLIENT-ID", "gradle-plugin/" + versionCode));
         headers.add(
-                new BasicHeader(
-                        "X-DEPLOYGATE-CLIENT-ID", "gradle-plugin/" + Config.getVERSION_CODE()));
-        headers.add(
-                new BasicHeader(
-                        "X-DEPLOYGATE-CLIENT-VERSION-NAME",
-                        Config.getVERSION() + "-" + Config.getVERSION_NAME()));
-        headers.add(
-                new BasicHeader(
-                        "X-DEPLOYGATE-GRADLE-PLUGIN-AGP-VERSION",
-                        String.valueOf(AndroidGradlePlugin.getVersion())));
+                new BasicHeader("X-DEPLOYGATE-CLIENT-VERSION-NAME", version + "-" + versionName));
+        String agpVersion = getParameters().getAgpVersion().getOrElse("unknown");
+        headers.add(new BasicHeader("X-DEPLOYGATE-GRADLE-PLUGIN-AGP-VERSION", agpVersion));
 
         RequestConfig requestConfig =
                 RequestConfig.custom()
@@ -74,7 +78,9 @@ public abstract class HttpClient implements BuildService<HttpClient.Params>, Aut
         this.httpClient =
                 HttpClientBuilder.create()
                         .useSystemProperties()
-                        .setUserAgent("gradle-deploygate-plugin/" + Config.getVERSION())
+                        .setUserAgent(
+                                "gradle-deploygate-plugin/"
+                                        + getParameters().getPluginVersion().get())
                         .setDefaultHeaders(headers)
                         .setDefaultRequestConfig(requestConfig)
                         .build();
