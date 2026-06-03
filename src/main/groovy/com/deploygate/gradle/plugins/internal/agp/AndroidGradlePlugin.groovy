@@ -49,7 +49,7 @@ class AndroidGradlePlugin {
      */
     static boolean isInternalSigningConfigData(@NotNull String versionString) {
         def version = getVersion(versionString)
-        return version.major >= 8 && version.minor >= 3
+        return version != null && version >= VersionString.tryParse("8.3.0")
     }
 
     /**
@@ -62,7 +62,7 @@ class AndroidGradlePlugin {
      */
     static boolean hasOutputsHandlerApiOnPackageApplication(@NotNull String versionString) {
         def version = getVersion(versionString)
-        return version.major >= 8 && version.minor >= 1
+        return version != null && version >= VersionString.tryParse("8.1.0")
     }
 
     @NotNull
