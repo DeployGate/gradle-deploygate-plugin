@@ -1,41 +1,45 @@
 android {
-    namespace = "com.deploygate.example"
+    try {
+        namespace = "com.deploygate.example"
+    } catch (ignore) {
+        // 7.2.0 or lower
+    }
 
     compileSdk = 30
     defaultConfig {
-        applicationId = "com.deploygate.example"
-        minSdk = 21
-        targetSdk = 30
-        versionCode = 1
-        versionName = "1.0"
+        applicationId "com.deploygate.example"
+        minSdkVersion 21
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
     }
     buildTypes {
         debug {
-            debuggable = true
+            debuggable true
         }
         release {
-            minifyEnabled = false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
         }
     }
 
-    flavorDimensions += ["dim1", "dim2"]
+    flavorDimensions "dim1", "dim2"
     productFlavors {
         flavor1 {
-            dimension = "dim1"
-            applicationIdSuffix = ".p1"
+            dimension "dim1"
+            applicationIdSuffix ".p1"
         }
         flavor2 {
-            dimension = "dim1"
-            applicationIdSuffix = ".p2"
+            dimension "dim1"
+            applicationIdSuffix ".p2"
         }
         flavor3 {
-            dimension = "dim2"
-            applicationIdSuffix = ".p3"
+            dimension "dim2"
+            applicationIdSuffix ".p3"
         }
         flavor4 {
-            dimension = "dim2"
-            applicationIdSuffix = ".p4"
+            dimension "dim2"
+            applicationIdSuffix ".p4"
         }
     }
 }
