@@ -174,19 +174,23 @@ class DeployGatePlugin implements Plugin<Project> {
             androidComponents.onVariants(androidComponents.selector().all(), { variant ->
                 def variantName = variant.name
 
+                def buildDirectory = project.layout.buildDirectory
+
                 namedOrRegister(project, Constants.uploadApkTaskName(variantName), UploadApkTask).configure { task ->
                     task.description = "Deploy assembled ${variantName} APK to DeployGate"
                     task.credentials.set(loginTaskProvider.map { it.credentials })
-
-                    task.apkInfo.set(VariantArtifacts.apkInfoProvider(variant))
                     task.httpClient.set(httpClientProvider)
                     task.endpoint.set(endpointProvider)
                     task.openBrowserAfterUpload.set(openBrowserProvider)
                     task.usesService(httpClientProvider)
 
                     if (task.deployment.skipAssemble.get()) {
+                        // Do not depend on (or trigger) the build; read the separately-built APK
+                        // from AGP's conventional output directory.
+                        task.apkInfo.set(VariantArtifacts.apkInfoFromConventionalOutput(variant, buildDirectory))
                         task.dependsOn(loginTaskProvider)
                     } else {
+                        task.apkInfo.set(VariantArtifacts.apkInfoProvider(variant))
                         task.dependsOn(androidAssembleTaskName(variantName), loginTaskProvider)
                     }
                 }
@@ -194,16 +198,18 @@ class DeployGatePlugin implements Plugin<Project> {
                 namedOrRegister(project, Constants.uploadAabTaskName(variantName), UploadAabTask).configure { task ->
                     task.description = "Deploy bundled ${variantName} AAB to DeployGate"
                     task.credentials.set(loginTaskProvider.map { it.credentials })
-
-                    task.aabInfo.set(VariantArtifacts.aabInfoProvider(variant))
                     task.httpClient.set(httpClientProvider)
                     task.endpoint.set(endpointProvider)
                     task.openBrowserAfterUpload.set(openBrowserProvider)
                     task.usesService(httpClientProvider)
 
                     if (task.deployment.skipAssemble.get()) {
+                        // Do not depend on (or trigger) the build; read the separately-built AAB
+                        // from AGP's conventional output directory.
+                        task.aabInfo.set(VariantArtifacts.aabInfoFromConventionalOutput(variant, buildDirectory))
                         task.dependsOn(loginTaskProvider)
                     } else {
+                        task.aabInfo.set(VariantArtifacts.aabInfoProvider(variant))
                         task.dependsOn(androidBundleTaskName(variantName), loginTaskProvider)
                     }
                 }

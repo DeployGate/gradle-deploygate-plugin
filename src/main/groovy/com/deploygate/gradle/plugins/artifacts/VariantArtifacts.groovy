@@ -1,5 +1,6 @@
 package com.deploygate.gradle.plugins.artifacts
 
+import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.jetbrains.annotations.NotNull
 
@@ -11,6 +12,16 @@ import org.jetbrains.annotations.NotNull
  * AGP classes are loaded by a classloader that is separate from this plugin's, so everything here
  * is accessed dynamically (no compile-time references to AGP types) and the artifact type constants
  * are looked up through the variant's own classloader.
+ *
+ * Two resolution modes exist:
+ * <ul>
+ *   <li><b>assembled</b> ({@link #apkInfoProvider}/{@link #aabInfoProvider}) — wires the strict
+ *       Artifacts API provider; the caller must make the upload task depend on the assemble/bundle
+ *       task so the artifact is produced before it is queried.</li>
+ *   <li><b>preset/skipAssemble</b> ({@link #apkInfoFromConventionalOutput}/{@link #aabInfoFromConventionalOutput})
+ *       — reads from AGP's conventional output directory without depending on (or triggering) the
+ *       build, so a separately-built artifact can be uploaded.</li>
+ * </ul>
  */
 class VariantArtifacts {
     private VariantArtifacts() {
@@ -24,14 +35,7 @@ class VariantArtifacts {
         def apkArtifactType = singleArtifact(variant, 'APK')
 
         return artifacts.get(apkArtifactType).map { apkDirectory ->
-            def builtArtifacts = loader.load(apkDirectory)
-            def elements = builtArtifacts?.elements ?: []
-            File apkFile = elements.isEmpty() ? null : new File(elements.iterator().next().outputFile)
-            // DeployGate only accepts a single universal APK; multiple elements imply split APKs.
-            boolean universal = elements.size() == 1
-            // Signing readiness is no longer pre-checked here: the public API does not expose it,
-            // and DeployGate rejects unsigned uploads server-side.
-            return new DirectApkInfo(variantName, apkFile, true, universal)
+            return toApkInfo(variantName, loader, apkDirectory)
         }
     }
 
@@ -43,6 +47,52 @@ class VariantArtifacts {
         return variant.artifacts.get(bundleArtifactType).map { aabRegularFile ->
             return new DirectAabInfo(variantName, aabRegularFile.asFile)
         }
+    }
+
+    @NotNull
+    static Provider<ApkInfo> apkInfoFromConventionalOutput(@NotNull /* ApplicationVariant */ variant, @NotNull Provider<Directory> buildDirectory) {
+        def variantName = variant.name
+        def loader = variant.artifacts.getBuiltArtifactsLoader()
+        def relativePath = apkOutputRelativePath(variant)
+
+        return buildDirectory.map { buildDir ->
+            return toApkInfo(variantName, loader, buildDir.dir(relativePath))
+        }
+    }
+
+    @NotNull
+    static Provider<AabInfo> aabInfoFromConventionalOutput(@NotNull /* ApplicationVariant */ variant, @NotNull Provider<Directory> buildDirectory) {
+        def variantName = variant.name
+
+        return buildDirectory.map { buildDir ->
+            def bundleDir = buildDir.dir("outputs/bundle/${variantName}").asFile
+            File aabFile = bundleDir.listFiles()?.find { it.name.endsWith(".aab") }
+            return new DirectAabInfo(variantName, aabFile)
+        }
+    }
+
+    private static ApkInfo toApkInfo(@NotNull String variantName, @NotNull loader, @NotNull Directory apkDirectory) {
+        def builtArtifacts = loader.load(apkDirectory)
+        def elements = builtArtifacts?.elements ?: []
+        File apkFile = elements.isEmpty() ? null : new File(elements.iterator().next().outputFile)
+        // DeployGate only accepts a single universal APK; multiple elements imply split APKs.
+        boolean universal = elements.size() == 1
+        // Signing readiness is no longer pre-checked here: the public API does not expose it,
+        // and DeployGate rejects unsigned uploads server-side.
+        return new DirectApkInfo(variantName, apkFile, true, universal)
+    }
+
+    /**
+     * AGP places APKs under {@code build/outputs/apk/<flavorName>/<buildType>} (the flavor segment is
+     * omitted when the variant has no product flavors).
+     */
+    private static String apkOutputRelativePath(@NotNull variant) {
+        def flavorName = variant.flavorName
+        def buildType = variant.buildType
+        if (flavorName) {
+            return "outputs/apk/${flavorName}/${buildType}"
+        }
+        return "outputs/apk/${buildType}"
     }
 
     /**
