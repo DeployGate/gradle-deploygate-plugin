@@ -1,20 +1,16 @@
 package com.deploygate.gradle.plugins
 
-import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getAabInfo
-import static com.deploygate.gradle.plugins.artifacts.PackageAppTaskCompat.getApkInfo
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidAssembleTaskName
 import static com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin.androidBundleTaskName
 import static com.deploygate.gradle.plugins.internal.gradle.ProviderFactoryUtils.environmentVariable
 
-import com.deploygate.gradle.plugins.artifacts.AabInfo
-import com.deploygate.gradle.plugins.artifacts.ApkInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetAabInfo
 import com.deploygate.gradle.plugins.artifacts.DefaultPresetApkInfo
+import com.deploygate.gradle.plugins.artifacts.VariantArtifacts
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.DeprecationLogger
 import com.deploygate.gradle.plugins.internal.agp.AndroidGradlePlugin
-import com.deploygate.gradle.plugins.internal.agp.IApplicationVariantImpl
 import com.deploygate.gradle.plugins.internal.gradle.GradleCompat
 import com.deploygate.gradle.plugins.internal.http.HttpClient
 import com.deploygate.gradle.plugins.internal.http.LocalServer
@@ -23,12 +19,12 @@ import com.deploygate.gradle.plugins.tasks.LoginTask
 import com.deploygate.gradle.plugins.tasks.LogoutTask
 import com.deploygate.gradle.plugins.tasks.UploadAabTask
 import com.deploygate.gradle.plugins.tasks.UploadApkTask
+import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.annotations.NotNull
@@ -172,20 +168,17 @@ class DeployGatePlugin implements Plugin<Project> {
         }
 
         AndroidGradlePlugin.ifPresent(project) {
-            // AGP is guaranteed applied inside ifPresent, so resolve its version eagerly here. The
-            // variant artifact task inputs below then capture only this resolved String and the
-            // buildDirectory Provider, never the Project, keeping them configuration-cache compatible.
-            def agpVersion = agpVersionProvider.get()
-            def buildDirProvider = project.layout.buildDirectory
+            // Accessed dynamically: AGP's androidComponents extension lives on a separate classloader.
+            def androidComponents = project.extensions.getByName("androidComponents")
 
-            project.android.applicationVariants.configureEach { /* ApplicationVariant */ variant ->
-                def variantProxy = new IApplicationVariantImpl(variant)
+            androidComponents.onVariants(androidComponents.selector().all(), { variant ->
+                def variantName = variant.name
 
-                namedOrRegister(project, Constants.uploadApkTaskName(variantProxy.name), UploadApkTask).configure { task ->
-                    task.description = "Deploy assembled ${variantProxy.name} APK to DeployGate"
+                namedOrRegister(project, Constants.uploadApkTaskName(variantName), UploadApkTask).configure { task ->
+                    task.description = "Deploy assembled ${variantName} APK to DeployGate"
                     task.credentials.set(loginTaskProvider.map { it.credentials })
 
-                    task.apkInfo.set(createApkInfoProvider(variantProxy, agpVersion))
+                    task.apkInfo.set(VariantArtifacts.apkInfoProvider(variant))
                     task.httpClient.set(httpClientProvider)
                     task.endpoint.set(endpointProvider)
                     task.openBrowserAfterUpload.set(openBrowserProvider)
@@ -194,15 +187,15 @@ class DeployGatePlugin implements Plugin<Project> {
                     if (task.deployment.skipAssemble.get()) {
                         task.dependsOn(loginTaskProvider)
                     } else {
-                        task.dependsOn(androidAssembleTaskName(variantProxy.name), loginTaskProvider)
+                        task.dependsOn(androidAssembleTaskName(variantName), loginTaskProvider)
                     }
                 }
 
-                namedOrRegister(project, Constants.uploadAabTaskName(variantProxy.name), UploadAabTask).configure { task ->
-                    task.description = "Deploy bundled ${variantProxy.name} AAB to DeployGate"
+                namedOrRegister(project, Constants.uploadAabTaskName(variantName), UploadAabTask).configure { task ->
+                    task.description = "Deploy bundled ${variantName} AAB to DeployGate"
                     task.credentials.set(loginTaskProvider.map { it.credentials })
 
-                    task.aabInfo.set(createAabInfoProvider(variantProxy, agpVersion, buildDirProvider))
+                    task.aabInfo.set(VariantArtifacts.aabInfoProvider(variant))
                     task.httpClient.set(httpClientProvider)
                     task.endpoint.set(endpointProvider)
                     task.openBrowserAfterUpload.set(openBrowserProvider)
@@ -211,10 +204,10 @@ class DeployGatePlugin implements Plugin<Project> {
                     if (task.deployment.skipAssemble.get()) {
                         task.dependsOn(loginTaskProvider)
                     } else {
-                        task.dependsOn(androidBundleTaskName(variantProxy.name), loginTaskProvider)
+                        task.dependsOn(androidBundleTaskName(variantName), loginTaskProvider)
                     }
                 }
-            }
+            } as Action)
         }
     }
 
@@ -230,41 +223,5 @@ class DeployGatePlugin implements Plugin<Project> {
         NamedDomainObjectContainer<NamedDeployment> deployments = project.container(NamedDeployment)
         // TODO we should use ExtensionSyntax as the 1st argument but we need to investigate the expected side effects first.
         project.extensions.create(DeployGateExtension, EXTENSION_NAME, DeployGateExtension, deployments)
-    }
-
-    /**
-     * Creates a provider for APK info that properly chains the package task provider
-     * with the AGP version provider for configuration cache compatibility.
-     *
-     * @param variantProxy The application variant proxy
-     * @param agpVersion The resolved AGP version string
-     * @return Provider for ApkInfo
-     */
-    private static Provider<ApkInfo> createApkInfoProvider(
-            @NotNull IApplicationVariantImpl variantProxy,
-            @NotNull String agpVersion) {
-        return variantProxy.packageApplicationTaskProvider().map { packageTask ->
-            getApkInfo(packageTask, variantProxy.name, agpVersion)
-        }
-    }
-
-    /**
-     * Creates a provider for AAB info that properly chains the package task provider
-     * with the AGP version provider for configuration cache compatibility.
-     *
-     * @param variantProxy The application variant proxy
-     * @param agpVersion The resolved AGP version string
-     * @param buildDirProvider Provider for the project build directory
-     * @return Provider for AabInfo
-     */
-    private static Provider<AabInfo> createAabInfoProvider(
-            @NotNull IApplicationVariantImpl variantProxy,
-            @NotNull String agpVersion,
-            @NotNull Provider<Directory> buildDirProvider) {
-        return variantProxy.packageApplicationTaskProvider().flatMap { packageTask ->
-            buildDirProvider.map { buildDir ->
-                getAabInfo(packageTask, variantProxy.name, buildDir.asFile, agpVersion)
-            }
-        }
     }
 }
