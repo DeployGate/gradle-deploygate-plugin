@@ -77,12 +77,12 @@ class ConfigurationCacheSpec extends Specification {
 
             android {
                 namespace = 'com.example.test'
-                compileSdk = 36
+                compileSdk = 31
 
                 defaultConfig {
                     applicationId = "com.example.test"
                     minSdk = 21
-                    targetSdk = 36
+                    targetSdk = 31
                     versionCode = 1
                     versionName = "1.0"
                 }
@@ -250,12 +250,12 @@ return """
 
             android {
                 namespace = 'com.example.test'
-                compileSdk = 36
+                compileSdk = 31
 
                 defaultConfig {
                     applicationId = "com.example.test"
                     minSdk = 21
-                    targetSdk = 36
+                    targetSdk = 31
                     versionCode = 1
                     versionName = "1.0"
                 }

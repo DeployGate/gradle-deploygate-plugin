@@ -1,11 +1,11 @@
 android {
     namespace = "com.deploygate.example"
 
-    compileSdk = 36
+    compileSdk = 31
     defaultConfig {
         applicationId = "com.deploygate.example"
         minSdk = 21
-        targetSdk = 36
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
     }
