@@ -106,6 +106,8 @@ ext {
 
     requireJava11 = VersionString.parse("7.4.0") <= androidGradleVersion
     requireGroovy3 = VersionString.parse("7.0") <= gradleVersion
+    // Gradle 9.0+ bundles Groovy 4, which needs the matching Spock variant.
+    requireGroovy4 = VersionString.parse("9.0") <= gradleVersion
 }
 
 sourceSets {
@@ -147,14 +149,18 @@ task createClasspathManifest {
     }
 }
 
-if (requireJava11) {
-    // since this version, android gradle plugin artifact is targeting Java 11 and we are using it in testing dependencies.
-    // We need to change target compatibility only for testing.
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_11
-} else {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+// Gradle 9 removed the project-level sourceCompatibility/targetCompatibility convention,
+// so these must be configured on the `java` extension.
+java {
+    if (requireJava11) {
+        // since this version, android gradle plugin artifact is targeting Java 11 and we are using it in testing dependencies.
+        // We need to change target compatibility only for testing.
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_11
+    } else {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -170,12 +176,17 @@ dependencies {
     implementation 'javax.annotation:javax.annotation-api:1.3.2' // for jdk 11 or over
 
     testImplementation gradleTestKit()
+    // Gradle 9 no longer puts the JUnit Platform launcher on the test runtime classpath automatically.
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'junit:junit:4.13.2'
 
     testImplementation 'org.objenesis:objenesis:3.4'
     implementation 'net.bytebuddy:byte-buddy:1.15.11'
 
-    if (requireGroovy3) {
+    if (requireGroovy4) {
+        testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+        testImplementation 'org.spockframework:spock-junit4:2.3-groovy-4.0'
+    } else if (requireGroovy3) {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
         testImplementation 'org.spockframework:spock-junit4:2.3-groovy-3.0'
     } else {
@@ -187,9 +198,12 @@ dependencies {
     testRuntimeOnly "com.android.tools.build:gradle:$androidGradleVersion"
     testRuntimeOnly files(createClasspathManifest)
 
-    // We can remove this workaround when upgrading Gradle to 7.5
     // https://github.com/gradle/gradle/issues/16774#issuecomment-853407822
-    testRuntimeOnly(files(services.get(ModuleRegistry).getModule("gradle-tooling-api-builders").classpath.asFiles.first()))
+    // This workaround is only needed before Gradle 7.5, and the internal API it relies on
+    // (ModuleRegistry#getModule(...).classpath) was removed in Gradle 9.
+    if (gradleVersion < VersionString.parse("7.5")) {
+        testRuntimeOnly(files(services.get(ModuleRegistry).getModule("gradle-tooling-api-builders").classpath.asFiles.first()))
+    }
 }
 
 tasks.create("testUnrollAcceptanceTest", Test) {
@@ -206,6 +220,13 @@ tasks.create("testPluginAcceptanceTest", Test) {
 
 project.tasks.withType(Test).configureEach {
     useJUnitPlatform()
+
+    // ProjectBuilder (used by unit specs) injects synthetic classes via reflection into java.base,
+    // which the JDK module system blocks unless these packages are opened to the test worker JVM.
+    jvmArgs(
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--add-opens=java.base/java.util=ALL-UNNAMED",
+            )
 
     testLogging {
         events "passed", "skipped", "failed"
