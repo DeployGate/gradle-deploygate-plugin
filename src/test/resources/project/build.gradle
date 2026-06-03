@@ -8,11 +8,11 @@ plugins {
 android {
     namespace = "com.deploygate.example"
 
-    compileSdk = 31
+    compileSdk = 30
     defaultConfig {
         applicationId = "com.deploygate.example"
         minSdk = 21
-        targetSdk = 31
+        targetSdk = 30
         versionCode = 1
         versionName = "1.0"
     }
