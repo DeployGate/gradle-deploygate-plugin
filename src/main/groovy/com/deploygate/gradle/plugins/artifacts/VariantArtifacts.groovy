@@ -66,7 +66,7 @@ class VariantArtifacts {
 
         return buildDirectory.map { buildDir ->
             def bundleDir = buildDir.dir("outputs/bundle/${variantName}").asFile
-            File aabFile = bundleDir.listFiles()?.find { it.name.endsWith(".aab") }
+            File aabFile = bundleDir.listFiles()?.find { it.isFile() && it.name.endsWith(".aab") }
             return new DirectAabInfo(variantName, aabFile)
         }
     }
@@ -100,7 +100,8 @@ class VariantArtifacts {
      * via the variant's classloader, since AGP lives on a different classloader than this plugin.
      */
     private static Object singleArtifact(@NotNull variant, @NotNull String name) {
-        return variant.class.classLoader
+        // getClass() (not .class) avoids dynamic property interception on decorated AGP objects.
+        return variant.getClass().classLoader
                 .loadClass("com.android.build.api.artifact.SingleArtifact\$${name}")
                 .INSTANCE
     }
