@@ -74,12 +74,21 @@ class VariantArtifacts {
     private static ApkInfo toApkInfo(@NotNull String variantName, @NotNull loader, @NotNull Directory apkDirectory) {
         def builtArtifacts = loader.load(apkDirectory)
         def elements = builtArtifacts?.elements ?: []
-        File apkFile = elements.isEmpty() ? null : new File(elements.iterator().next().outputFile)
+        File apkFile = elements.isEmpty() ? null : resolveOutputFile(apkDirectory, elements.iterator().next().outputFile)
         // DeployGate only accepts a single universal APK; multiple elements imply split APKs.
         boolean universal = elements.size() == 1
         // Signing readiness is no longer pre-checked here: the public API does not expose it,
         // and DeployGate rejects unsigned uploads server-side.
         return new DirectApkInfo(variantName, apkFile, true, universal)
+    }
+
+    /**
+     * {@code BuiltArtifact.outputFile} is an absolute path on supported AGP versions, but resolve it
+     * against the artifact directory defensively in case a relative path is ever returned.
+     */
+    private static File resolveOutputFile(@NotNull Directory apkDirectory, @NotNull String outputFile) {
+        def file = new File(outputFile)
+        return file.isAbsolute() ? file : new File(apkDirectory.asFile, outputFile)
     }
 
     /**

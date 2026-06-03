@@ -33,6 +33,12 @@ abstract class UploadArtifactTask extends DefaultTask {
         @Optional
         final Closure<File> artifactFileProvider = {
             // workaround of OptionalInputFile: https://github.com/gradle/gradle/issues/2016
+            if (artifactFilePath == null) {
+                // No artifact path (e.g. a skipAssemble deployment whose artifact wasn't built and no
+                // sourceFile was given). Returning null lets doUpload throw a clear "not found" error
+                // instead of an NPE from new File(null).
+                return null
+            }
             def f = new File(artifactFilePath)
             f.exists() ? f : null
         }
