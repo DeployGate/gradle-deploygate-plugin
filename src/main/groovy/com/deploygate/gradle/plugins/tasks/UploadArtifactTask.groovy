@@ -91,8 +91,11 @@ abstract class UploadArtifactTask extends DefaultTask {
         credentials = objectFactory.property(Credentials)
         deployment = objectFactory.newInstance(DeploymentConfiguration)
         httpClient = objectFactory.property(HttpClient)
-        endpoint = objectFactory.property(String)
-        openBrowserAfterUpload = objectFactory.property(Boolean)
+        // Safe conventions so a manually-created task (or one not fully wired by the plugin) does not
+        // throw when endpoint.get() is reached (e.g. the revision == 1 branch runs even when
+        // openBrowserAfterUpload is false).
+        endpoint = objectFactory.property(String).convention(Config.DEPLOYGATE_ROOT)
+        openBrowserAfterUpload = objectFactory.property(Boolean).convention(false)
 
         response = projectLayout.buildDirectory.file([
             "deploygate",
