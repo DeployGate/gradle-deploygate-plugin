@@ -1,6 +1,5 @@
 package com.deploygate.gradle.plugins.tasks
 
-import com.deploygate.gradle.plugins.TestHelper
 import com.deploygate.gradle.plugins.dsl.DeployGateExtension
 import com.deploygate.gradle.plugins.dsl.NamedDeployment
 import com.deploygate.gradle.plugins.internal.credentials.CliCredentialStore

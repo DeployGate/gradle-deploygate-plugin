@@ -93,11 +93,10 @@ class DeployGatePlugin implements Plugin<Project> {
         def appOwnerNameProvider = project.providers.provider { extension.appOwnerName }
         def apiTokenProvider = project.providers.provider { extension.apiToken }
         def endpointProvider = project.providers.provider { extension.endpoint }
-        // Treat common truthy tokens as enabled. String#toBoolean() only accepts "true", which would
-        // silently ignore DEPLOYGATE_OPEN_BROWSER=1/yes/on; checking non-emptiness alone would wrongly
-        // enable it for DEPLOYGATE_OPEN_BROWSER=false.
+        // Preserve the original Groovy truthiness of Config.shouldOpenAppDetailAfterUpload():
+        // any non-empty value enables it, null/empty disables it.
         def openBrowserProvider = environmentVariable(project.providers, ENV_NAME_OPEN_APP_DETAIL_AFTER_UPLOAD)
-                .map { it != null && it.trim().toLowerCase() in ['1', 'true', 'yes', 'on'] }
+                .map { it != null && !it.trim().isEmpty() }
 
         def loginTaskProvider = project.tasks.register(Constants.LOGIN_TASK_NAME, LoginTask) { task ->
             task.explicitAppOwnerName.set(appOwnerNameProvider)
