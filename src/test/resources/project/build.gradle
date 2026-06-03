@@ -6,25 +6,20 @@ plugins {
 }
 
 android {
-    try {
-        namespace = "com.deploygate.example"
-    } catch (ignore) {
-        // 7.2.0 or lower
-    }
+    namespace = "com.deploygate.example"
 
-    compileSdkVersion 29
-    buildToolsVersion '29.0.2'
+    compileSdk = 36
     defaultConfig {
-        applicationId "com.deploygate.example"
-        minSdkVersion 14
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        applicationId = "com.deploygate.example"
+        minSdk = 21
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
