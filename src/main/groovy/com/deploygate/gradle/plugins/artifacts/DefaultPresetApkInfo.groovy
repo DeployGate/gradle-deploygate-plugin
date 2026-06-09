@@ -4,6 +4,6 @@ import org.jetbrains.annotations.NotNull
 
 class DefaultPresetApkInfo extends DirectApkInfo {
     DefaultPresetApkInfo(@NotNull String variantName) {
-        super(variantName, null, true, true)
+        super(variantName, null, true)
     }
 }

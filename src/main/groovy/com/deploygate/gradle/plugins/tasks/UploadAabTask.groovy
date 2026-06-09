@@ -20,7 +20,6 @@ abstract class UploadAabTask extends UploadArtifactTask {
         return new InputParams(
                 variantName: aab.variantName,
                 artifactFilePath: deployment.sourceFilePath.getOrElse(aab.aabFile?.absolutePath),
-                isSigningReady: false,
                 isUniversalApk: false,
                 message: deployment.message.getOrNull(),
                 distributionKey: deployment.distributionKey.getOrNull(),

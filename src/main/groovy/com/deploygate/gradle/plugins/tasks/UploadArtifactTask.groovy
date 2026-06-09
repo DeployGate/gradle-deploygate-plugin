@@ -24,9 +24,6 @@ abstract class UploadArtifactTask extends DefaultTask {
         String variantName
 
         @Input
-        boolean isSigningReady
-
-        @Input
         boolean isUniversalApk
 
         @InputFile

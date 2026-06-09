@@ -75,11 +75,12 @@ class VariantArtifacts {
         def builtArtifacts = loader.load(apkDirectory)
         def elements = builtArtifacts?.elements ?: []
         File apkFile = elements.isEmpty() ? null : resolveOutputFile(apkDirectory, elements.iterator().next().outputFile)
-        // DeployGate only accepts a single universal APK; multiple elements imply split APKs.
-        boolean universal = elements.size() == 1
-        // Signing readiness is no longer pre-checked here: the public API does not expose it,
-        // and DeployGate rejects unsigned uploads server-side.
-        return new DirectApkInfo(variantName, apkFile, true, universal)
+        // DeployGate only accepts a single universal APK; more than one element implies split APKs.
+        // An empty result means the APK has not been built yet (apkFile stays null) rather than a
+        // split build, so it is not flagged non-universal here — the null artifact surfaces the
+        // clearer "artifact was not found" error downstream instead of a misleading non-universal one.
+        boolean universal = elements.size() <= 1
+        return new DirectApkInfo(variantName, apkFile, universal)
     }
 
     /**

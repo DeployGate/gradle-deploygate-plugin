@@ -110,7 +110,7 @@ class ConfigurationCacheSpec extends Specification {
         """
 
 when: "Running the task with configuration cache enabled"
-def gradleVersion = System.getenv("TEST_GRADLE_VERSION")
+def gradleVersion = System.getenv("TEST_GRADLE_VERSION") ?: "8.9"
 def result = GradleRunner.create()
         .withProjectDir(testProjectDir.root)
         .withGradleVersion(gradleVersion)
@@ -273,7 +273,7 @@ ${trailingConfiguration}
 private GradleRunner configurationCacheRunner(String taskName) {
 return GradleRunner.create()
         .withProjectDir(testProjectDir.root)
-        .withGradleVersion(System.getenv("TEST_GRADLE_VERSION"))
+        .withGradleVersion(System.getenv("TEST_GRADLE_VERSION") ?: "8.9")
         .withPluginClasspath(createPluginClasspath())
         .withArguments('--configuration-cache', taskName, '--dry-run')
 }

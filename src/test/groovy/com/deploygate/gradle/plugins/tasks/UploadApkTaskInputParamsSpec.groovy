@@ -34,7 +34,7 @@ class UploadApkTaskInputParamsSpec extends Specification {
         deployment.skipAssemble.set(skipAssemble)
 
         and:
-        def apkInfo = new DirectApkInfo("dep1", apkFile, signingReady, universalApk)
+        def apkInfo = new DirectApkInfo("dep1", apkFile, universalApk)
 
         and:
         def inputParams = UploadApkTask.createInputParams(apkInfo, deployment)
@@ -43,13 +43,12 @@ class UploadApkTaskInputParamsSpec extends Specification {
         inputParams.message == message
         inputParams.distributionKey == distributionKey
         inputParams.releaseNote == distributionReleaseNote
-        inputParams.isSigningReady == signingReady
         inputParams.isUniversalApk == universalApk
 
         where:
-        message   | distributionKey   | distributionReleaseNote   | skipAssemble | signingReady | universalApk | apkFile
-        null      | null              | null                      | false        | false        | false        | new File("build.gradle")
-        "message" | "distributionKey" | "distributionReleaseNote" | true         | true         | true         | new File("build.gradle")
+        message   | distributionKey   | distributionReleaseNote   | skipAssemble | universalApk | apkFile
+        null      | null              | null                      | false        | false        | new File("build.gradle")
+        "message" | "distributionKey" | "distributionReleaseNote" | true         | true         | new File("build.gradle")
     }
 
     @Unroll
@@ -59,7 +58,7 @@ class UploadApkTaskInputParamsSpec extends Specification {
         deployment.sourceFilePath.set(sourceFile?.absolutePath)
 
         and:
-        def apkInfo = new DirectApkInfo("dep1", apkFile, false, false)
+        def apkInfo = new DirectApkInfo("dep1", apkFile, false)
 
         and:
         def inputParams = UploadApkTask.createInputParams(apkInfo, deployment)

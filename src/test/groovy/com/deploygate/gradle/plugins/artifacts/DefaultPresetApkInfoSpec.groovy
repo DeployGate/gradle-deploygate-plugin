@@ -11,7 +11,6 @@ class DefaultPresetApkInfoSpec extends Specification {
         def presetApkInfo = new DefaultPresetApkInfo(variantName)
         presetApkInfo.variantName == variantName
         presetApkInfo.apkFile == null
-        presetApkInfo.signingReady
         presetApkInfo.universalApk
 
         where:
