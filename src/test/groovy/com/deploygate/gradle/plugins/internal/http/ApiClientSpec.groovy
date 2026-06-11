@@ -29,7 +29,11 @@ class ApiClientSpec extends Specification {
         credentials.appOwnerName.set(appOwnerName)
         credentials.apiToken.set(apiToken)
         def client = project.gradle.sharedServices.registerIfAbsent("httpclient", HttpClient) { spec ->
-            spec.parameters.endpoint.set(System.getenv("TEST_SERVER_URL"))
+            spec.parameters.endpoint.set(System.getenv("TEST_SERVER_URL") ?: "https://deploygate.com")
+            spec.parameters.agpVersion.set("unknown")
+            spec.parameters.pluginVersion.set("test")
+            spec.parameters.pluginVersionCode.set("1")
+            spec.parameters.pluginVersionName.set("test")
         }.get().getApiClient(credentials)
 
         and:

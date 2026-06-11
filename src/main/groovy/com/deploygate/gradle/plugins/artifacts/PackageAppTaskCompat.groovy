@@ -9,12 +9,12 @@ class PackageAppTaskCompat {
     }
 
     @NotNull
-    static ApkInfo getApkInfo(@NotNull /* PackageApplication */ packageAppTask, @NotNull String variantName) {
+    static ApkInfo getApkInfo(@NotNull /* PackageApplication */ packageAppTask, @NotNull String variantName, @NotNull String agpVersion) {
         // outputScope is retrieved by the reflection
-        Collection<String> apkNames = getApkNames(packageAppTask)
+        Collection<String> apkNames = getApkNames(packageAppTask, agpVersion)
         File outputDir = getOutputDirectory(packageAppTask)
         boolean isUniversal = apkNames.size() == 1
-        boolean isSigningReady = hasSigningConfig(packageAppTask)
+        boolean isSigningReady = hasSigningConfig(packageAppTask, agpVersion)
 
         return new DirectApkInfo(
                 variantName,
@@ -25,12 +25,12 @@ class PackageAppTaskCompat {
     }
 
     @NotNull
-    static AabInfo getAabInfo(@NotNull /* PackageApplication */ packageAppTask, @NotNull String variantName, @NotNull File buildDir) {
+    static AabInfo getAabInfo(@NotNull /* PackageApplication */ packageAppTask, @NotNull String variantName, @NotNull File buildDir, @NotNull String agpVersion) {
         final String aabName
 
         // TODO Use Artifact API
         // outputScope is retrieved by the reflection
-        Collection<String> apkNames = getApkNames(packageAppTask)
+        Collection<String> apkNames = getApkNames(packageAppTask, agpVersion)
         aabName = ((String) apkNames[0]).replaceFirst("\\.apk\$", ".aab")
 
         def outputDir = new File(buildDir, "outputs/bundle/${variantName}")
@@ -42,8 +42,8 @@ class PackageAppTaskCompat {
     }
 
     @PackageScope
-    static boolean hasSigningConfig(packageAppTask) {
-        if (AndroidGradlePlugin.isInternalSigningConfigData()) {
+    static boolean hasSigningConfig(packageAppTask, String agpVersion) {
+        if (AndroidGradlePlugin.isInternalSigningConfigData(agpVersion)) {
             return packageAppTask.signingConfigVersions.any { it.exists() }
         } else {
             return packageAppTask.signingConfigData.resolve() != null
@@ -54,8 +54,8 @@ class PackageAppTaskCompat {
         return packageAppTask.outputDirectory.getAsFile().get()
     }
 
-    static Collection<String> getApkNames(packageAppTask) {
-        if (AndroidGradlePlugin.hasOutputsHandlerApiOnPackageApplication()) {
+    static Collection<String> getApkNames(packageAppTask, String agpVersion) {
+        if (AndroidGradlePlugin.hasOutputsHandlerApiOnPackageApplication(agpVersion)) {
             return packageAppTask.outputsHandler.get().getOutputs { true }.collect { it.outputFileName }
         } else {
             return packageAppTask.variantOutputs.get().collect { it.outputFileName.get() }

@@ -1,5 +1,9 @@
 # ChangeLog
 
+## Unreleased
+
+- Support Gradle's configuration cache. [#272](https://github.com/DeployGate/gradle-deploygate-plugin/pull/272)
+
 ## ver 2.9.0
 
 - Support Android Gradle Plugin of below:

@@ -36,6 +36,8 @@ public abstract class LoginTask extends DefaultTask {
 
     @NotNull private final Credentials credentials;
 
+    @NotNull private final ProviderFactory providerFactory;
+
     @Inject
     public LoginTask(
             @NotNull ObjectFactory objectFactory, @NotNull ProviderFactory providerFactory) {
@@ -53,6 +55,8 @@ public abstract class LoginTask extends DefaultTask {
         apiToken = getExplicitApiToken().orElse(apiTokenFromEnvVars);
 
         credentials = objectFactory.newInstance(Credentials.class);
+
+        this.providerFactory = providerFactory;
 
         setDescription(
                 "Check the configured credentials and launch the authentication flow if they are"
@@ -173,7 +177,7 @@ public abstract class LoginTask extends DefaultTask {
                             + " persists.");
         }
 
-        System.out.printf(Locale.US, "Welcome %s!%n", store.getName());
+        getLogger().lifecycle("Welcome {}!", store.getName());
 
         // We can set the values unless they are found because of the idempotency.
         setIfAbsent(credentials.getAppOwnerName(), store.getName());
@@ -187,7 +191,7 @@ public abstract class LoginTask extends DefaultTask {
      */
     @VisibleForTesting
     boolean setupCredential() {
-        if (BrowserUtils.hasBrowser()) {
+        if (BrowserUtils.hasBrowser(providerFactory)) {
             return setupBrowser();
         } else {
             return setupTerminal();
@@ -230,11 +234,13 @@ public abstract class LoginTask extends DefaultTask {
 
         String url = getHttpClient().get().buildURI(params, "cli", "login").toString();
 
-        if (!BrowserUtils.openBrowser(url)) {
+        if (!BrowserUtils.openBrowser(url, providerFactory)) {
             getLogger().error("Could not open a browser on current environment.");
-            System.out.println(
-                    "Please log in to DeployGate by opening the following URL on your browser:");
-            System.out.println(url);
+            getLogger()
+                    .lifecycle(
+                            "Please log in to DeployGate by opening the following URL on your"
+                                    + " browser:");
+            getLogger().lifecycle(url);
         }
     }
 }

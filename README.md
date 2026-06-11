@@ -92,12 +92,19 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | 8.5.x (Koala)              | \>=2.8.0                     |
 | 8.6.x (Koala Feature Drop) | \>=2.8.0                     |
 | 8.7.x (Ladybug)            | \>=2.8.0                     |
+| 8.8.x                      | \>=2.10.0                    |
+| 8.9.x                      | \>=2.10.0                    |
+| 8.10.x                     | \>=2.10.0                    |
+| 8.11.x                     | \>=2.10.0                    |
+| 8.12.x                     | \>=2.10.0                    |
+| 8.13.x                     | \>=2.10.0                    |
 
 ### Canary/Beta support table
 
 We are not supporting Canary(Alpha) versions because of API stability. Please wait for beta releases or open an issue to support Canary versions.
 
-> As of 2024 Oct 8th, Ladybug Feature Drop is not tested yet.
+> As of 2026 Jun 3rd, the latest tested AGP is 8.13.0 (with Gradle 8.13).
+> AGP 9.x should work (the plugin resolves its APIs at runtime), but it is not yet verified in CI; please open an issue if you hit a problem.
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
 
