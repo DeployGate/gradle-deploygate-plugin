@@ -1,6 +1,6 @@
 #  Gradle DeployGate Plugin
 
-[![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
+[![Build Status](https://github.com/DeployGate/gradle-deploygate-plugin/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/DeployGate/gradle-deploygate-plugin/actions/workflows/build-and-test.yml)
 [ ![Download](https://img.shields.io/maven-central/v/com.deploygate/gradle) ](https://search.maven.org/artifact/com.deploygate/gradle)
 
 DeployGate Gradle プラグインです。DeployGate 経由でアプリを配信するための Gradle タスクが簡単に設定できます。
@@ -110,10 +110,6 @@ API仕様が頻繁に変わる可能性があることから、Canary(Alpha) バ
 > 2026/06/03現在、テスト済みの最新 AGP は 9.2.0 (Gradle 9.4.1) です。
 
  [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) を参考にしてください
-
-| JRE | Android Gradle Plugin | Gradle DeployGate Plugin |
-|:----|:----------------------|:-------------------------|
-| 17  | -                     | -                        |
 
 ### Binary compatibility
 
@@ -304,7 +300,7 @@ jitpack.io は初回のリクエストを受けてからスナップショット
 
 ### 要求
 
-- JRE 11+
+- JRE 11+ (AGP 8.0+ / Gradle 9 のテストマトリクスを実行する場合は JRE 17+)
 - Docker (テスト用の機能のみ)
 
 ### Steps
@@ -321,7 +317,7 @@ jitpack.io は初回のリクエストを受けてからスナップショット
 
 ```bash
 # https://github.com/DeployGate/deploygate-mock-server/pkgs/container/deploygate-mock-server を起動してください
-./gradlew test acceptanceTest
+./gradlew test testUnrollAcceptanceTest testPluginAcceptanceTest
 ```
 
 ## <a name="migrate-v2">v1 から v2 への移行</a>
@@ -412,7 +408,7 @@ deploygate {
 
 # License
 
-Copyright 2015-2019 DeployGate Inc.
+Copyright 2015-2026 DeployGate Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

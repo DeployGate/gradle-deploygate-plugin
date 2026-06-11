@@ -1,6 +1,6 @@
 #  Gradle DeployGate Plugin
 
-[![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
+[![Build Status](https://github.com/DeployGate/gradle-deploygate-plugin/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/DeployGate/gradle-deploygate-plugin/actions/workflows/build-and-test.yml)
 [ ![Download](https://img.shields.io/maven-central/v/com.deploygate/gradle) ](https://search.maven.org/artifact/com.deploygate/gradle)
 
 This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
@@ -112,10 +112,6 @@ We are not supporting Canary(Alpha) versions because of API stability. Please wa
 > As of 2026 Jun 3rd, the latest tested AGP is 9.2.0 (with Gradle 9.4.1).
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
-
-| JRE | Android Gradle Plugin | Gradle DeployGate Plugin |
-|:----|:----------------------|:-------------------------|
-| 17  | -                     | -                        |
 
 ### Binary compatibility
 
@@ -310,7 +306,7 @@ If you get a time-out error from jitpack, then please run your task again.
 
 ### Requirements
 
-- JRE 11+
+- JRE 11+ (JRE 17+ to run the AGP 8.0+ / Gradle 9 test matrix)
 - Docker (only for testing)
 
 ### Steps
@@ -327,7 +323,7 @@ And also, please make sure your changes pass unit tests and acceptance tests. CI
 
 ```bash
 # please make sure https://github.com/DeployGate/deploygate-mock-server/pkgs/container/deploygate-mock-server has been launched
-./gradlew test acceptanceTest
+./gradlew test testUnrollAcceptanceTest testPluginAcceptanceTest
 ```
 
 ## <a name="migrate-v2">Migrate from v1 to v2</a>
@@ -417,7 +413,7 @@ See [CHANGELOG.md](./CHANGELOG.md)
 
 # License
 
-Copyright 2015-2020 DeployGate Inc.
+Copyright 2015-2026 DeployGate Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
