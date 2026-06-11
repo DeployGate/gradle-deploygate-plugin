@@ -78,7 +78,7 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | 3.6.x                      | \>=2.1.0,\<2.6               |
 | 4.0.x                      | \>=2.2.0,\<2.6               |
 | 4.1.x                      | \>=2.3.0,\<2.6               |
-| 4.2.x                      | \>=2.4.0                     |
+| 4.2.x                      | \>=2.4.0,\<2.10.0            |
 | 7.0.x (Arctic Fox)         | \>=2.4.0                     |
 | 7.1.x (Bumblebee)          | \>=2.4.0                     |
 | 7.2.x (Chipmunk)           | \>=2.4.0                     |
@@ -98,13 +98,18 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | 8.11.x                     | \>=2.10.0                    |
 | 8.12.x                     | \>=2.10.0                    |
 | 8.13.x                     | \>=2.10.0                    |
+| 9.0.x                      | \>=2.10.0                    |
+| 9.1.x                      | \>=2.10.0                    |
+| 9.2.x                      | \>=2.10.0                    |
+
+> **Gradle DeployGate Plugin 2.10.0** migrated to AGP's public `androidComponents`/Artifacts API and
+> therefore requires **AGP 7.0+** and **Gradle 7.0+**. To use AGP 4.2.x–6.x, stay on 2.9.x or earlier.
 
 ### Canary/Beta support table
 
 We are not supporting Canary(Alpha) versions because of API stability. Please wait for beta releases or open an issue to support Canary versions.
 
-> As of 2026 Jun 3rd, the latest tested AGP is 8.13.0 (with Gradle 8.13).
-> AGP 9.x should work (the plugin resolves its APIs at runtime), but it is not yet verified in CI; please open an issue if you hit a problem.
+> As of 2026 Jun 3rd, the latest tested AGP is 9.2.0 (with Gradle 9.4.1).
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
 
@@ -125,6 +130,7 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 |:-------------------------|:-----------------------|
 | \<2.6                    | 5.4                    |
 | \>=2.6.0                 | 6.7.1                  |
+| \>=2.10.0                | 7.0                    |
 
 ## Usage
 

@@ -25,25 +25,6 @@ class UploadApkTaskSpec extends Specification {
         GradleCompat.init(project)
     }
 
-    def "doUpload should reject unsigned apk"() {
-        setup:
-        def deploygate = new DeployGateExtension(project.container(NamedDeployment))
-        project.extensions.add("deploygate", deploygate)
-
-        and:
-        def task = project.tasks.create("UploadApkTask", UploadApkTask)
-        task.deployment.sourceFilePath.set(new File(project.buildDir, "not_found").absolutePath)
-
-        when: "signing is required"
-        task.apkInfo.set(new DirectApkInfo("dep1", null, false, true))
-
-        and:
-        task.execute()
-
-        then:
-        thrown(IllegalStateException)
-    }
-
     def "doUpload should reject non universal apk"() {
         setup:
         def deploygate = new DeployGateExtension(project.container(NamedDeployment))
@@ -54,7 +35,7 @@ class UploadApkTaskSpec extends Specification {
         task.deployment.sourceFilePath.set(new File(project.buildDir, "not_found").absolutePath)
 
         when: "universal apk is required"
-        task.apkInfo.set(new DirectApkInfo("dep1", null, true, false))
+        task.apkInfo.set(new DirectApkInfo("dep1", null, false))
 
         and:
         task.execute()

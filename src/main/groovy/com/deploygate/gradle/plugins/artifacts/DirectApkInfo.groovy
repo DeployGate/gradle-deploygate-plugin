@@ -10,13 +10,11 @@ class DirectApkInfo implements ApkInfo {
     private final String variantName
     @Nullable
     private final File apkFile
-    private final boolean signingReady
     private final boolean universalApk
 
-    DirectApkInfo(@NotNull String variantName, @Nullable File apkFile, boolean signingReady, boolean universalApk) {
+    DirectApkInfo(@NotNull String variantName, @Nullable File apkFile, boolean universalApk) {
         this.variantName = variantName
         this.apkFile = apkFile
-        this.signingReady = signingReady
         this.universalApk = universalApk
 
         if (!variantName) {
@@ -34,11 +32,6 @@ class DirectApkInfo implements ApkInfo {
     @Nullable
     File getApkFile() {
         return apkFile
-    }
-
-    @Override
-    boolean isSigningReady() {
-        return signingReady
     }
 
     @Override

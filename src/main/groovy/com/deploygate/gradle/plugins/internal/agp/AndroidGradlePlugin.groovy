@@ -39,32 +39,6 @@ class AndroidGradlePlugin {
         return VersionString.tryParse(versionString)
     }
 
-    /**
-     * Checks if AGP uses internal signing config data structure.
-     * This change was introduced in AGP 8.3.0.
-     *
-     * @param versionString The AGP version string
-     * @return true if AGP version is 8.3.0 or higher
-     * @since AGP 8.3.0 https://cs.android.com/android-studio/platform/tools/base/+/ff361912406f0eafc42b6ff2a293ee8a17ff77ee:build-system/gradle-core/src/main/java/com/android/build/gradle/tasks/PackageAndroidArtifact.kt;dlc=c2e97e2ca61a5575ccfb48f9528a11c38d651841
-     */
-    static boolean isInternalSigningConfigData(@NotNull String versionString) {
-        def version = getVersion(versionString)
-        return version != null && version >= VersionString.tryParse("8.3.0")
-    }
-
-    /**
-     * Checks if AGP has the OutputsHandler API on PackageApplication task.
-     * This API was introduced in AGP 8.1.0.
-     *
-     * @param versionString The AGP version string
-     * @return true if AGP version is 8.1.0 or higher
-     * @since AGP 8.1.0 https://android.googlesource.com/platform/tools/base/+/da5cbdf59f91f7480a5d9615a20f766d19c6034a%5E%21/#F32
-     */
-    static boolean hasOutputsHandlerApiOnPackageApplication(@NotNull String versionString) {
-        def version = getVersion(versionString)
-        return version != null && version >= VersionString.tryParse("8.1.0")
-    }
-
     @NotNull
     static String androidAssembleTaskName(@NotNull String variantName) {
         return "assemble${variantName.capitalize()}"

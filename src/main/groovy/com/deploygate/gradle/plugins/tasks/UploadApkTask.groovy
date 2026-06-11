@@ -20,7 +20,6 @@ abstract class UploadApkTask extends UploadArtifactTask {
         return new InputParams(
                 variantName: apk.variantName,
                 artifactFilePath: deployment.sourceFilePath.getOrElse(apk.apkFile?.absolutePath),
-                isSigningReady: apk.isSigningReady(),
                 isUniversalApk: apk.isUniversalApk(),
                 message: deployment.message.getOrNull(),
                 distributionKey: deployment.distributionKey.getOrNull(),
@@ -46,10 +45,6 @@ abstract class UploadApkTask extends UploadArtifactTask {
     @TaskAction
     void execute() {
         def inputParams = inputParamsProvider.get()
-
-        if (!inputParams.isSigningReady) {
-            throw new IllegalStateException('Cannot upload a build without code signature to DeployGate')
-        }
 
         if (!inputParams.isUniversalApk) {
             throw new IllegalStateException('Cannot upload non-universal apk to DeployGate')

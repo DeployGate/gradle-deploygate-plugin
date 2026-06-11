@@ -20,8 +20,5 @@ interface ApkInfo {
     File getApkFile()
 
     @Input
-    boolean isSigningReady()
-
-    @Input
     boolean isUniversalApk()
 }

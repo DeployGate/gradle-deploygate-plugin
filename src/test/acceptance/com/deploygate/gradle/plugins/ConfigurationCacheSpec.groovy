@@ -51,6 +51,7 @@ class ConfigurationCacheSpec extends Specification {
     @Unroll
     def "plugin supports configuration cache with #taskName task"() {
         given: "A project with the DeployGate plugin applied"
+        def agpVersion = System.getenv("TEST_AGP_VERSION") ?: "8.7.0"
         // Add Android plugin repository
         buildFile << """
             buildscript {
@@ -59,13 +60,13 @@ class ConfigurationCacheSpec extends Specification {
                     mavenCentral()
                 }
                 dependencies {
-                    classpath 'com.android.tools.build:gradle:4.2.0'
+                    classpath 'com.android.tools.build:gradle:${agpVersion}'
                     classpath files(${createPluginClasspath().collect { "'${it.absolutePath}'"
             }.join(', ')
         })
                 }
             }
-            
+
             apply plugin: 'com.android.application'
             apply plugin: 'deploygate'
 
@@ -75,20 +76,20 @@ class ConfigurationCacheSpec extends Specification {
             }
 
             android {
-                namespace 'com.example.test'
-                compileSdkVersion 33
-                
+                namespace = 'com.example.test'
+                compileSdk = 30
+
                 defaultConfig {
-                    applicationId "com.example.test"
-                    minSdkVersion 21
-                    targetSdkVersion 33
-                    versionCode 1
-                    versionName "1.0"
+                    applicationId = "com.example.test"
+                    minSdk = 21
+                    targetSdk = 30
+                    versionCode = 1
+                    versionName = "1.0"
                 }
-                
+
                 buildTypes {
                     release {
-                        minifyEnabled false
+                        minifyEnabled = false
                     }
                 }
             }
@@ -109,8 +110,10 @@ class ConfigurationCacheSpec extends Specification {
         """
 
 when: "Running the task with configuration cache enabled"
+def gradleVersion = System.getenv("TEST_GRADLE_VERSION") ?: "8.9"
 def result = GradleRunner.create()
         .withProjectDir(testProjectDir.root)
+        .withGradleVersion(gradleVersion)
         .withPluginClasspath(createPluginClasspath())
         .withArguments('--configuration-cache', taskName, '--dry-run')
         .build()
@@ -122,6 +125,7 @@ result.output.contains('Configuration cache entry stored')
 when: "Running the same task again to reuse the configuration cache"
 def cachedResult = GradleRunner.create()
         .withProjectDir(testProjectDir.root)
+        .withGradleVersion(gradleVersion)
         .withPluginClasspath(createPluginClasspath())
         .withArguments('--configuration-cache', taskName, '--dry-run')
         .build()
@@ -141,58 +145,23 @@ taskName << [
 
 def "plugin properly handles environment variables with configuration cache"() {
 given: "A project using environment variables"
-buildFile << """
-            buildscript {
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-                dependencies {
-                    classpath 'com.android.tools.build:gradle:4.2.0'
-                    classpath files(${createPluginClasspath().collect { "'${it.absolutePath}'"
-    }.join(', ')
-})
-                }
-            }
-            
-            apply plugin: 'com.android.application'
-            apply plugin: 'deploygate'
-
-            repositories {
-                google()
-                mavenCentral()
-            }
-
-            android {
-                namespace 'com.example.test'
-                compileSdkVersion 33
-                
-                defaultConfig {
-                    applicationId "com.example.test"
-                    minSdkVersion 21
-                    targetSdkVersion 33
-                }
-            }
-
+buildFile << androidProject("""
             deploygate {
                 // These will be read from environment variables
             }
-        """
+        """)
 
 and: "Environment variables are set"
 def env = [
-'DEPLOYGATE_APP_OWNER_NAME': 'env-owner',
-'DEPLOYGATE_API_TOKEN': 'env-token',
-'DEPLOYGATE_OPEN_BROWSER': 'false'
+    'DEPLOYGATE_APP_OWNER_NAME': 'env-owner',
+    'DEPLOYGATE_API_TOKEN': 'env-token',
+    'DEPLOYGATE_OPEN_BROWSER': 'false'
 ]
 
 when: "Running with configuration cache"
-def result = GradleRunner.create()
-.withProjectDir(testProjectDir.root)
-.withPluginClasspath(createPluginClasspath())
-.withEnvironment(env)
-.withArguments('--configuration-cache', 'loginDeployGate', '--dry-run')
-.build()
+def result = configurationCacheRunner('loginDeployGate')
+        .withEnvironment(env)
+        .build()
 
 then: "Environment variables are properly handled"
 result.output.contains('Configuration cache entry stored')
@@ -201,39 +170,7 @@ result.output.contains('Configuration cache entry stored')
 
 def "plugin BuildServices work correctly with configuration cache"() {
 given: "A project that uses HttpClient BuildService"
-buildFile << """
-            buildscript {
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-                dependencies {
-                    classpath 'com.android.tools.build:gradle:4.2.0'
-                    classpath files(${createPluginClasspath().collect { "'${it.absolutePath}'"
-}.join(', ')
-})
-                }
-            }
-            
-            apply plugin: 'com.android.application'
-            apply plugin: 'deploygate'
-
-            repositories {
-                google()
-                mavenCentral()
-            }
-
-            android {
-                namespace 'com.example.test'
-                compileSdkVersion 33
-                
-                defaultConfig {
-                    applicationId "com.example.test"
-                    minSdkVersion 21
-                    targetSdkVersion 33
-                }
-            }
-
+buildFile << androidProject("""
             deploygate {
                 appOwnerName = "test-owner"
                 apiToken = "test-token"
@@ -245,14 +182,10 @@ buildFile << """
                 }
                 dependsOn 'loginDeployGate'
             }
-        """
+        """)
 
 when: "Running custom task with configuration cache"
-def result = GradleRunner.create()
-.withProjectDir(testProjectDir.root)
-.withPluginClasspath(createPluginClasspath())
-.withArguments('--configuration-cache', 'testBuildService', '--dry-run')
-.build()
+def result = configurationCacheRunner('testBuildService').build()
 
 then: "BuildServices are properly registered and reused"
 result.output.contains('Configuration cache entry stored')
@@ -261,49 +194,11 @@ result.output.contains('Configuration cache entry stored')
 
 def "provider chains work correctly with configuration cache"() {
 given: "A project with custom deployments"
-buildFile << """
-            buildscript {
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-                dependencies {
-                    classpath 'com.android.tools.build:gradle:4.2.0'
-                    classpath files(${createPluginClasspath().collect { "'${it.absolutePath}'"
-}.join(', ')
-})
-                }
-            }
-            
-            apply plugin: 'com.android.application'
-            apply plugin: 'deploygate'
-
-            repositories {
-                google()
-                mavenCentral()
-            }
-
-            android {
-                namespace 'com.example.test'
-                compileSdkVersion 33
-                
-                defaultConfig {
-                    applicationId "com.example.test"
-                    minSdkVersion 21
-                    targetSdkVersion 33
-                }
-                
-                buildTypes {
-                    release {
-                        minifyEnabled false
-                    }
-                }
-            }
-
+buildFile << androidProject("""
             deploygate {
                 appOwnerName = "test-owner"
                 apiToken = "test-token"
-                
+
                 deployments {
                     customRelease {
                         message = "Custom release build"
@@ -315,17 +210,71 @@ buildFile << """
                     }
                 }
             }
-        """
+        """)
 
 when: "Running deployment task with configuration cache"
-def result = GradleRunner.create()
-.withProjectDir(testProjectDir.root)
-.withPluginClasspath(createPluginClasspath())
-.withArguments('--configuration-cache', 'uploadDeployGateCustomRelease', '--dry-run')
-.build()
+def result = configurationCacheRunner('uploadDeployGateCustomRelease').build()
 
 then: "Complex provider chains are handled correctly"
 result.output.contains('Configuration cache entry stored')
 !result.output.contains('Configuration cache problems found')
+}
+
+/**
+ * Builds an inline Android application project that applies the deploygate plugin, parameterized by
+ * the AGP version under test and using the new DSL so it is valid on AGP 7.0+ (including AGP 9.x).
+ * The caller supplies the trailing deploygate {} (and any extra) configuration.
+ */
+private String androidProject(String trailingConfiguration) {
+def agpVersion = System.getenv("TEST_AGP_VERSION") ?: "8.7.0"
+def pluginClasspath = createPluginClasspath().collect { "'${it.absolutePath}'" }.join(', ')
+return """
+            buildscript {
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+                dependencies {
+                    classpath 'com.android.tools.build:gradle:${agpVersion}'
+                    classpath files(${pluginClasspath})
+                }
+            }
+
+            apply plugin: 'com.android.application'
+            apply plugin: 'deploygate'
+
+            repositories {
+                google()
+                mavenCentral()
+            }
+
+            android {
+                namespace = 'com.example.test'
+                compileSdk = 30
+
+                defaultConfig {
+                    applicationId = "com.example.test"
+                    minSdk = 21
+                    targetSdk = 30
+                    versionCode = 1
+                    versionName = "1.0"
+                }
+
+                buildTypes {
+                    release {
+                        minifyEnabled = false
+                    }
+                }
+            }
+${trailingConfiguration}
+        """
+}
+
+private GradleRunner configurationCacheRunner(String taskName) {
+return GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withGradleVersion(System.getenv("TEST_GRADLE_VERSION") ?: "8.9")
+        .withPluginClasspath(createPluginClasspath())
+        .withArguments('--configuration-cache', taskName, '--dry-run')
 }
 }
