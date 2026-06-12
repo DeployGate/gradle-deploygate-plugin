@@ -79,11 +79,11 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | 4.0.x                         | \>=2.2.0,\<2.6               |
 | 4.1.x                         | \>=2.3.0,\<2.6               |
 | 4.2.x                         | \>=2.4.0,\<2.10.0            |
-| 7.0.x (Arctic Fox)            | \>=2.4.0                     |
-| 7.1.x (Bumblebee)             | \>=2.4.0                     |
-| 7.2.x (Chipmunk)              | \>=2.4.0                     |
-| 7.3.x (Dolphin)               | \>=2.4.0                     |
-| 7.4.x (Electric Eel)          | \>=2.4.0                     |
+| 7.0.x (Arctic Fox)            | \>=2.4.0,\<2.10.0            |
+| 7.1.x (Bumblebee)             | \>=2.4.0,\<2.10.0            |
+| 7.2.x (Chipmunk)              | \>=2.4.0,\<2.10.0            |
+| 7.3.x (Dolphin)               | \>=2.4.0,\<2.10.0            |
+| 7.4.x (Electric Eel)          | \>=2.4.0,\<2.10.0            |
 | 8.0.x (Flamingo)              | \>=2.6.0                     |
 | 8.1.x (Giraffe)               | \>=2.7.0                     |
 | 8.2.x (Hedgehog)              | \>=2.7.0                     |
@@ -103,7 +103,7 @@ This plugin does not work with non-app modules and/or library modules correctly.
 | 9.2.x                         | \>=2.10.0                    |
 
 > **Gradle DeployGate Plugin 2.10.0** migrated to AGP's public `androidComponents`/Artifacts API and
-> therefore requires **AGP 7.0+** and **Gradle 7.0+**. To use AGP 4.2.x–6.x, stay on 2.9.x or earlier.
+> therefore requires **AGP 8.0+**, **Gradle 8.0+**, and **JDK 17**. To use AGP 4.2.x–7.4.x, stay on 2.9.x or earlier.
 
 ### Canary/Beta support table
 
@@ -119,6 +119,7 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 |:-------------------------|:--------------------|
 | \<2.6                    | 7                   |
 | \>=2.6.0                 | 8                   |
+| \>=2.10.0                | 17                  |
 
 ### Gradle compatibility
 
@@ -126,7 +127,7 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 |:-------------------------|:-----------------------|
 | \<2.6                    | 5.4                    |
 | \>=2.6.0                 | 6.7.1                  |
-| \>=2.10.0                | 7.0                    |
+| \>=2.10.0                | 8.0                    |
 
 ## Usage
 
@@ -306,7 +307,7 @@ If you get a time-out error from jitpack, then please run your task again.
 
 ### Requirements
 
-- JRE 11+ (JRE 17+ to run the AGP 8.0+ / Gradle 9 test matrix)
+- JRE 17+
 - Docker (only for testing)
 
 ### Steps

@@ -17,8 +17,8 @@
 
 ### Breaking Changes
 
-- Drop support for Android Gradle Plugin 4.2.x and Gradle 6.7.x. [#283](https://github.com/DeployGate/gradle-deploygate-plugin/pull/283)
-  - The minimum required Android Gradle Plugin is now 7.0 (was 4.2.0) and the minimum required Gradle is now 7.0 (was 6.7.1). To keep using AGP 4.2.x or Gradle 6.x, stay on 2.9.x or earlier.
+- Drop support for Android Gradle Plugin 4.2.x–7.4.x and Gradle 6.x–7.x.
+  - The minimum required Android Gradle Plugin is now **8.0** (was 4.2.0), the minimum required Gradle is now **8.0** (was 6.7.1), and **JDK 17** is required. To keep using AGP 4.2.x–7.4.x or Gradle 6.x–7.x, stay on 2.9.x or earlier.
 
 ## ver 2.9.0
 
