@@ -1,6 +1,6 @@
 #  Gradle DeployGate Plugin
 
-[![Build Status](https://travis-ci.org/DeployGate/gradle-deploygate-plugin.png?branch=master)](https://travis-ci.org/DeployGate/gradle-deploygate-plugin)
+[![Build Status](https://github.com/DeployGate/gradle-deploygate-plugin/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/DeployGate/gradle-deploygate-plugin/actions/workflows/build-and-test.yml)
 [ ![Download](https://img.shields.io/maven-central/v/com.deploygate/gradle) ](https://search.maven.org/artifact/com.deploygate/gradle)
 
 This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task.
@@ -71,39 +71,39 @@ This plugin does not work with non-app modules and/or library modules correctly.
 
 ## Version Compatibility
 
-| Android Gradle Plugin      | Gradle DeployGate Plugin     |
-|:---------------------------|:-----------------------------|
-| < 3.0.0                    | 1.1.5 (No longer maintained) |
-| 3.3.x, 3.4.x, 3.5.x        | \>=2.0.0,\<2.6               |
-| 3.6.x                      | \>=2.1.0,\<2.6               |
-| 4.0.x                      | \>=2.2.0,\<2.6               |
-| 4.1.x                      | \>=2.3.0,\<2.6               |
-| 4.2.x                      | \>=2.4.0,\<2.10.0            |
-| 7.0.x (Arctic Fox)         | \>=2.4.0                     |
-| 7.1.x (Bumblebee)          | \>=2.4.0                     |
-| 7.2.x (Chipmunk)           | \>=2.4.0                     |
-| 7.3.x (Dolphin)            | \>=2.4.0                     |
-| 7.4.x (Electric Eel)       | \>=2.4.0                     |
-| 8.0.x (Flamingo)           | \>=2.6.0                     |
-| 8.1.x (Giraffe)            | \>=2.7.0                     |
-| 8.2.x (Hedgehog)           | \>=2.7.0                     |
-| 8.3.x (Iguana)             | \>=2.8.0                     |
-| 8.4.x (Jellyfish)          | \>=2.8.0                     |
-| 8.5.x (Koala)              | \>=2.8.0                     |
-| 8.6.x (Koala Feature Drop) | \>=2.8.0                     |
-| 8.7.x (Ladybug)            | \>=2.8.0                     |
-| 8.8.x                      | \>=2.10.0                    |
-| 8.9.x                      | \>=2.10.0                    |
-| 8.10.x                     | \>=2.10.0                    |
-| 8.11.x                     | \>=2.10.0                    |
-| 8.12.x                     | \>=2.10.0                    |
-| 8.13.x                     | \>=2.10.0                    |
-| 9.0.x                      | \>=2.10.0                    |
-| 9.1.x                      | \>=2.10.0                    |
-| 9.2.x                      | \>=2.10.0                    |
+| Android Gradle Plugin         | Gradle DeployGate Plugin     |
+|:-----------------------------|:----------------------------|
+| < 3.0.0                       | 1.1.5 (No longer maintained) |
+| 3.3.x, 3.4.x, 3.5.x           | \>=2.0.0,\<2.6               |
+| 3.6.x                         | \>=2.1.0,\<2.6               |
+| 4.0.x                         | \>=2.2.0,\<2.6               |
+| 4.1.x                         | \>=2.3.0,\<2.6               |
+| 4.2.x                         | \>=2.4.0,\<2.10.0            |
+| 7.0.x (Arctic Fox)            | \>=2.4.0,\<2.10.0            |
+| 7.1.x (Bumblebee)             | \>=2.4.0,\<2.10.0            |
+| 7.2.x (Chipmunk)              | \>=2.4.0,\<2.10.0            |
+| 7.3.x (Dolphin)               | \>=2.4.0,\<2.10.0            |
+| 7.4.x (Electric Eel)          | \>=2.4.0,\<2.10.0            |
+| 8.0.x (Flamingo)              | \>=2.6.0                     |
+| 8.1.x (Giraffe)               | \>=2.7.0                     |
+| 8.2.x (Hedgehog)              | \>=2.7.0                     |
+| 8.3.x (Iguana)                | \>=2.8.0                     |
+| 8.4.x (Jellyfish)             | \>=2.8.0                     |
+| 8.5.x (Koala)                 | \>=2.8.0                     |
+| 8.6.x (Koala Feature Drop)    | \>=2.8.0                     |
+| 8.7.x (Ladybug)               | \>=2.8.0                     |
+| 8.8.x (Ladybug Feature Drop)  | \>=2.10.0                    |
+| 8.9.x (Meerkat)               | \>=2.10.0                    |
+| 8.10.x (Meerkat Feature Drop) | \>=2.10.0                    |
+| 8.11.x (Narwhal)              | \>=2.10.0                    |
+| 8.12.x (Narwhal Feature Drop) | \>=2.10.0                    |
+| 8.13.x (Otter)                | \>=2.10.0                    |
+| 9.0.x                         | \>=2.10.0                    |
+| 9.1.x                         | \>=2.10.0                    |
+| 9.2.x                         | \>=2.10.0                    |
 
 > **Gradle DeployGate Plugin 2.10.0** migrated to AGP's public `androidComponents`/Artifacts API and
-> therefore requires **AGP 7.0+** and **Gradle 7.0+**. To use AGP 4.2.x–6.x, stay on 2.9.x or earlier.
+> therefore requires **AGP 8.0+**, **Gradle 8.0+**, and **JDK 17**. To use AGP 4.2.x–7.4.x, stay on 2.9.x or earlier.
 
 ### Canary/Beta support table
 
@@ -113,16 +113,13 @@ We are not supporting Canary(Alpha) versions because of API stability. Please wa
 
 See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflows/build-and-test.yml) for the latest information.
 
-| JRE | Android Gradle Plugin | Gradle DeployGate Plugin |
-|:----|:----------------------|:-------------------------|
-| 17  | -                     | -                        |
-
 ### Binary compatibility
 
 | Gradle DeployGate Plugin | Minimum JRE version |
 |:-------------------------|:--------------------|
 | \<2.6                    | 7                   |
 | \>=2.6.0                 | 8                   |
+| \>=2.10.0                | 17                  |
 
 ### Gradle compatibility
 
@@ -130,7 +127,7 @@ See the test matrix of [.github/workflows/build-and-test.yml](./.github/workflow
 |:-------------------------|:-----------------------|
 | \<2.6                    | 5.4                    |
 | \>=2.6.0                 | 6.7.1                  |
-| \>=2.10.0                | 7.0                    |
+| \>=2.10.0                | 8.0                    |
 
 ## Usage
 
@@ -310,7 +307,7 @@ If you get a time-out error from jitpack, then please run your task again.
 
 ### Requirements
 
-- JRE 11+
+- JRE 17+
 - Docker (only for testing)
 
 ### Steps
@@ -327,7 +324,7 @@ And also, please make sure your changes pass unit tests and acceptance tests. CI
 
 ```bash
 # please make sure https://github.com/DeployGate/deploygate-mock-server/pkgs/container/deploygate-mock-server has been launched
-./gradlew test acceptanceTest
+./gradlew test testUnrollAcceptanceTest testPluginAcceptanceTest
 ```
 
 ## <a name="migrate-v2">Migrate from v1 to v2</a>
@@ -417,7 +414,7 @@ See [CHANGELOG.md](./CHANGELOG.md)
 
 # License
 
-Copyright 2015-2020 DeployGate Inc.
+Copyright 2015-2026 DeployGate Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

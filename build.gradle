@@ -7,7 +7,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
         mavenCentral()
     }
-    dependencies { classpath "com.diffplug.spotless:spotless-plugin-gradle:7.2.1" }
+    dependencies { classpath "com.diffplug.spotless:spotless-plugin-gradle:8.6.0" }
 }
 
 class VersionString implements Comparable<VersionString> {
@@ -85,7 +85,11 @@ class VersionString implements Comparable<VersionString> {
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
-apply plugin: "com.diffplug.spotless"
+// Spotless 8.x requires Gradle 8.1+. The acceptance matrix runs this build on Gradle 8.0
+// (AGP 8.0's minimum) as well, where Spotless must not be applied.
+if (VersionString.parse(gradle.gradleVersion) >= VersionString.parse("8.1")) {
+    apply plugin: "com.diffplug.spotless"
+}
 
 group = 'com.deploygate'
 version = new File(rootProject.projectDir, 'src/main/resources/VERSION').text.trim()
@@ -101,11 +105,9 @@ repositories {
 ext {
     releaseVersion = version
     // Be careful to set androidGradleVersion's default. Bytecode compatibility needs to drop backward compatibility.
-    androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "4.2.0")
+    androidGradleVersion = VersionString.parse(System.getenv("TEST_AGP_VERSION") ?: "8.0.0")
     gradleVersion = VersionString.parse(gradle.gradleVersion)
 
-    requireJava11 = VersionString.parse("7.4.0") <= androidGradleVersion
-    requireGroovy3 = VersionString.parse("7.0") <= gradleVersion
     // Gradle 9.0+ bundles Groovy 4, which needs the matching Spock variant.
     requireGroovy4 = VersionString.parse("9.0") <= gradleVersion
 }
@@ -152,15 +154,9 @@ task createClasspathManifest {
 // Gradle 9 removed the project-level sourceCompatibility/targetCompatibility convention,
 // so these must be configured on the `java` extension.
 java {
-    if (requireJava11) {
-        // since this version, android gradle plugin artifact is targeting Java 11 and we are using it in testing dependencies.
-        // We need to change target compatibility only for testing.
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_11
-    } else {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+    // The minimum supported AGP is 8.0, which requires JDK 17, so target Java 17 directly.
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 dependencies {
@@ -186,12 +182,9 @@ dependencies {
     if (requireGroovy4) {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
         testImplementation 'org.spockframework:spock-junit4:2.3-groovy-4.0'
-    } else if (requireGroovy3) {
+    } else {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
         testImplementation 'org.spockframework:spock-junit4:2.3-groovy-3.0'
-    } else {
-        testImplementation 'org.spockframework:spock-core:2.3-groovy-2.5'
-        testImplementation 'org.spockframework:spock-junit4:2.3-groovy-2.5'
     }
 
     // for ApplyPluginSpec
@@ -264,41 +257,43 @@ def isRelease() {
 }
 
 allprojects {
-    // spotless requires Java11 so please comment out all spotless configurations if you wanna run on JRE 8
-    spotless {
-        ratchetFrom 'origin/master'
+    // Spotless requires Java 17 and Gradle 8.1+; skip it where unavailable (e.g. the Gradle 8.0 acceptance matrix).
+    if (VersionString.parse(gradle.gradleVersion) >= VersionString.parse("8.1")) {
+        spotless {
+            ratchetFrom 'origin/master'
 
-        encoding 'UTF-8'
+            encoding 'UTF-8'
 
-        java {
-            importOrder()
-            removeUnusedImports()
-            googleJavaFormat('1.16.0').aosp().reflowLongStrings()
-            formatAnnotations()
-            indentWithSpaces(4)
-        }
-        groovy {
-            importOrder()
-            excludeJava()
-            greclipse('4.26')
-            indentWithSpaces(4)
-        }
-        groovyGradle {
-            target '*.gradle'
-            greclipse('4.26')
-            indentWithSpaces(4)
-        }
-        format 'misc', {
-            target '*.md', '.gitignore', '*.properties'
+            java {
+                importOrder()
+                removeUnusedImports()
+                googleJavaFormat('1.16.0').aosp().reflowLongStrings()
+                formatAnnotations()
+                leadingTabsToSpaces(4)
+            }
+            groovy {
+                importOrder()
+                excludeJava()
+                greclipse('4.26')
+                leadingTabsToSpaces(4)
+            }
+            groovyGradle {
+                target '*.gradle'
+                greclipse('4.26')
+                leadingTabsToSpaces(4)
+            }
+            format 'misc', {
+                target '*.md', '.gitignore', '*.properties'
 
-            trimTrailingWhitespace()
-            indentWithSpaces(4)
-            endWithNewline()
-        }
+                trimTrailingWhitespace()
+                leadingTabsToSpaces(4)
+                endWithNewline()
+            }
 
-        // TODO detect violations automatically
-        // DO: Use org.jetbrains.annotations.{NotNull,Nullable,VisibleForTesting}
-        // DON'T: Use javax.annotations.{Nonnull,Nullable}, Guavas VisibleForTesting
+            // TODO detect violations automatically
+            // DO: Use org.jetbrains.annotations.{NotNull,Nullable,VisibleForTesting}
+            // DON'T: Use javax.annotations.{Nonnull,Nullable}, Guavas VisibleForTesting
+        }
     }
 }
 

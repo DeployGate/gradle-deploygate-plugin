@@ -1,8 +1,24 @@
 # ChangeLog
 
-## Unreleased
+## ver 2.10.0
 
+- Migrate to Android Gradle Plugin's public `androidComponents`/Artifacts API and support AGP 9.x. [#283](https://github.com/DeployGate/gradle-deploygate-plugin/pull/283)
+  - Support the following Android Gradle Plugin versions:
+    - 8.8.x with Gradle 8.10.2
+    - 8.9.x with Gradle 8.11.1
+    - 8.10.x with Gradle 8.11.1
+    - 8.11.x with Gradle 8.13
+    - 8.12.x with Gradle 8.13
+    - 8.13.x with Gradle 8.13
+    - 9.0.x with Gradle 9.1.0
+    - 9.1.x with Gradle 9.3.1
+    - 9.2.x with Gradle 9.4.1
 - Support Gradle's configuration cache. [#272](https://github.com/DeployGate/gradle-deploygate-plugin/pull/272)
+
+### Breaking Changes
+
+- Drop support for Android Gradle Plugin 4.2.x–7.4.x and Gradle 6.x–7.x.
+  - The minimum required Android Gradle Plugin is now **8.0** (was 4.2.0), the minimum required Gradle is now **8.0** (was 6.7.1), and **JDK 17** is required. To keep using AGP 4.2.x–7.4.x or Gradle 6.x–7.x, stay on 2.9.x or earlier.
 
 ## ver 2.9.0
 

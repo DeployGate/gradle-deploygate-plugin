@@ -3,7 +3,6 @@ package com.deploygate.gradle.plugins.internal.gradle
 import com.deploygate.gradle.plugins.internal.VersionString
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.gradle.util.GradleVersion
 import org.jetbrains.annotations.NotNull
 
 class GradleCompat {
@@ -29,20 +28,15 @@ class GradleCompat {
     }
 
     /**
-     * Handle forUseAtConfigurationTime compatibility.
+     * Kept for source compatibility with existing call sites.
      *
-     * {@code Provider#forUseAtConfigurationTime()} is only required to read providers at
-     * configuration time on Gradle 6.x. It was deprecated in Gradle 7.4 (so calling it on 7.0+
-     * emits a deprecation warning) and removed in Gradle 9.0. We therefore only invoke it on
-     * Gradle below 7.0 and return the provider untouched otherwise.
+     * {@code Provider#forUseAtConfigurationTime()} was only required on Gradle 6.x, was deprecated
+     * in Gradle 7.4, and removed in Gradle 9.0. The minimum supported Gradle is now 8.0, where
+     * reading providers at configuration time is the default, so this is a pass-through.
      *
      * ref: https://github.com/gradle/gradle/issues/15600
      */
     static <T> Provider<T> forUseAtConfigurationTime(Provider<T> provider) {
-        if (GradleVersion.current().baseVersion >= GradleVersion.version("7.0")) {
-            return provider
-        } else {
-            return provider.forUseAtConfigurationTime()
-        }
+        return provider
     }
 }
