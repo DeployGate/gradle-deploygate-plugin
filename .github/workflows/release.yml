@@ -35,6 +35,8 @@ jobs:
             exit 1
           fi
       - uses: ./.github/actions/setup-java
+        with:
+          java-version: 17
       - name: Set up gradle.properties for signing and nexus
         # Add timeout setting due to https://github.com/DeployGate/gradle-deploygate-plugin/runs/2523846388
         run: |
