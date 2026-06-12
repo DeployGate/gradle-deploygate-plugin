@@ -85,7 +85,11 @@ class VersionString implements Comparable<VersionString> {
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
-apply plugin: "com.diffplug.spotless"
+// Spotless 8.x requires Gradle 8.1+. The acceptance matrix runs this build on Gradle 8.0
+// (AGP 8.0's minimum) as well, where Spotless must not be applied.
+if (VersionString.parse(gradle.gradleVersion) >= VersionString.parse("8.1")) {
+    apply plugin: "com.diffplug.spotless"
+}
 
 group = 'com.deploygate'
 version = new File(rootProject.projectDir, 'src/main/resources/VERSION').text.trim()
@@ -253,41 +257,43 @@ def isRelease() {
 }
 
 allprojects {
-    // spotless requires Java11 so please comment out all spotless configurations if you wanna run on JRE 8
-    spotless {
-        ratchetFrom 'origin/master'
+    // Spotless requires Java 17 and Gradle 8.1+; skip it where unavailable (e.g. the Gradle 8.0 acceptance matrix).
+    if (VersionString.parse(gradle.gradleVersion) >= VersionString.parse("8.1")) {
+        spotless {
+            ratchetFrom 'origin/master'
 
-        encoding 'UTF-8'
+            encoding 'UTF-8'
 
-        java {
-            importOrder()
-            removeUnusedImports()
-            googleJavaFormat('1.16.0').aosp().reflowLongStrings()
-            formatAnnotations()
-            leadingTabsToSpaces(4)
-        }
-        groovy {
-            importOrder()
-            excludeJava()
-            greclipse('4.26')
-            leadingTabsToSpaces(4)
-        }
-        groovyGradle {
-            target '*.gradle'
-            greclipse('4.26')
-            leadingTabsToSpaces(4)
-        }
-        format 'misc', {
-            target '*.md', '.gitignore', '*.properties'
+            java {
+                importOrder()
+                removeUnusedImports()
+                googleJavaFormat('1.16.0').aosp().reflowLongStrings()
+                formatAnnotations()
+                leadingTabsToSpaces(4)
+            }
+            groovy {
+                importOrder()
+                excludeJava()
+                greclipse('4.26')
+                leadingTabsToSpaces(4)
+            }
+            groovyGradle {
+                target '*.gradle'
+                greclipse('4.26')
+                leadingTabsToSpaces(4)
+            }
+            format 'misc', {
+                target '*.md', '.gitignore', '*.properties'
 
-            trimTrailingWhitespace()
-            leadingTabsToSpaces(4)
-            endWithNewline()
-        }
+                trimTrailingWhitespace()
+                leadingTabsToSpaces(4)
+                endWithNewline()
+            }
 
-        // TODO detect violations automatically
-        // DO: Use org.jetbrains.annotations.{NotNull,Nullable,VisibleForTesting}
-        // DON'T: Use javax.annotations.{Nonnull,Nullable}, Guavas VisibleForTesting
+            // TODO detect violations automatically
+            // DO: Use org.jetbrains.annotations.{NotNull,Nullable,VisibleForTesting}
+            // DON'T: Use javax.annotations.{Nonnull,Nullable}, Guavas VisibleForTesting
+        }
     }
 }
 
