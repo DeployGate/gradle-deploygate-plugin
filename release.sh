@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -euo pipefail
 
 # Publish in a single build to:
 #   * Maven Central  -> publishReleasePublicationToMavenRepository (com.deploygate:gradle)
@@ -18,6 +18,9 @@ set -eu
 # CENTRAL_TOKEN_USERNAME/PASSWORD are a Central Portal user token (the legacy OSSRH
 # credentials return 401). Skipped when unset so non-publishing invocations stay no-op.
 if [[ -n "${CENTRAL_TOKEN_USERNAME:-}" && -n "${CENTRAL_TOKEN_PASSWORD:-}" ]]; then
+    # NB: the Central Portal Publisher API uses the *Bearer* scheme with a base64(user:pass)
+    # token, not HTTP Basic. This is non-standard but documented:
+    # https://central.sonatype.org/publish/publish-portal-api/#authentication
     auth=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
     curl -fsS -X POST \
         -H "Authorization: Bearer ${auth}" \
