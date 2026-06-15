@@ -45,6 +45,8 @@ jobs:
           systemProp.org.gradle.internal.http.socketTimeout=120000
           nexusUsername=${{ secrets.SHARED_NEXUS_TOKEN_USERNAME }}
           nexusPassword=${{ secrets.SHARED_NEXUS_TOKEN_PASSWORD }}
+          gradle.publish.key=${{ secrets.GRADLE_PORTAL_PUBLISH_KEY }}
+          gradle.publish.secret=${{ secrets.GRADLE_PORTAL_PUBLISH_SECRET }}
           EOF
       - name: Publish artifacts
         run: ./release.sh
@@ -52,10 +54,14 @@ jobs:
           TEST_SERVER_URL: http://localhost:${{ job.services.app.ports[3000] }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_SECRET_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_PASSPHRASE }}
+          # Central Portal user token, reused by the finalization POST in release.sh that
+          # transfers the OSSRH-staging upload to Maven Central.
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.SHARED_NEXUS_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.SHARED_NEXUS_TOKEN_PASSWORD }}
       - name: Slack Notification
         # we use specific version(v2.2.1) for avoid nested dependency
         uses: rtCamp/action-slack-notify@b24d75fe0e728a4bf9fc42ee217caa686d141ee8 # v2.2.1
         env:
           SLACK_TITLE: 'Gradle Plugin Release'
-          SLACK_MESSAGE: "${{ github.ref }} has been published to Sonatype. ref: https://oss.sonatype.org/"
+          SLACK_MESSAGE: "${{ github.ref }} has been published to Maven Central and the Gradle Plugin Portal. refs: https://central.sonatype.com/ , https://plugins.gradle.org/plugin/com.deploygate"
           SLACK_WEBHOOK: ${{ secrets.SHARED_FOR_RELEASE_ARTIFACT_SLACK_INCOMING_WEBHOOK_URL }}

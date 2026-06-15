@@ -7,7 +7,13 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
         mavenCentral()
     }
-    dependencies { classpath "com.diffplug.spotless:spotless-plugin-gradle:8.6.0" }
+    dependencies {
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:8.6.0"
+        // Publishes the plugin to the Gradle Plugin Portal. It transitively applies
+        // java-gradle-plugin (and maven-publish), which generates the plugin marker
+        // and the `com.deploygate` descriptor used by the plugins {} DSL.
+        classpath "com.gradle.publish:plugin-publish-plugin:2.1.1"
+    }
 }
 
 class VersionString implements Comparable<VersionString> {
@@ -85,6 +91,11 @@ class VersionString implements Comparable<VersionString> {
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
+// Registers the `com.deploygate` plugin id on the Gradle Plugin Portal. This also
+// applies java-gradle-plugin, so the published jar carries a generated
+// `com.deploygate.properties` descriptor alongside the hand-written legacy
+// `deploygate.properties`, keeping both `apply plugin: 'deploygate'` and the new id working.
+apply plugin: 'com.gradle.plugin-publish'
 // Spotless 8.x requires Gradle 8.1+. The acceptance matrix runs this build on Gradle 8.0
 // (AGP 8.0's minimum) as well, where Spotless must not be applied.
 if (VersionString.parse(gradle.gradleVersion) >= VersionString.parse("8.1")) {
@@ -297,11 +308,36 @@ allprojects {
     }
 }
 
+// Gradle Plugin Portal metadata. Only the namespaced `com.deploygate` id is registered
+// here; the legacy bare `deploygate` id keeps working via the hand-written descriptor
+// shipped to Maven Central (the Portal requires a reverse-DNS namespace).
+gradlePlugin {
+    website = 'https://github.com/DeployGate/gradle-deploygate-plugin'
+    vcsUrl = 'https://github.com/DeployGate/gradle-deploygate-plugin'
+    plugins {
+        deploygate {
+            id = 'com.deploygate'
+            implementationClass = 'com.deploygate.gradle.plugins.DeployGatePlugin'
+            displayName = 'Gradle DeployGate Plugin'
+            description = 'Build and deploy your apps to DeployGate by running a single Gradle task.'
+            tags.set([
+                'deploygate',
+                'android',
+                'deployment',
+                'distribution'
+            ])
+        }
+    }
+}
+
 afterEvaluate {
     publishing {
         repositories {
             maven {
-                url = isRelease() ? "https://oss.sonatype.org/service/local/staging/deploy/maven2/" : "https://oss.sonatype.org/content/repositories/snapshots/"
+                // The legacy Sonatype OSSRH was sunset on 2025-06-30. Publish through the
+                // Central Portal's OSSRH Staging API compatibility endpoint instead; a
+                // finalization POST in release.sh then transfers the deployment to Maven Central.
+                url = isRelease() ? "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/" : "https://central.sonatype.com/repository/maven-snapshots/"
 
                 credentials(PasswordCredentials) {
                     username = getRepositoryUsername()
@@ -312,9 +348,10 @@ afterEvaluate {
 
         publications {
             release(MavenPublication) {
+                // The plugin-publish plugin enables withSourcesJar()/withJavadocJar() on the java
+                // component, so components.java already carries the sources and javadoc jars; adding
+                // them again here would fail with "multiple artifacts with the identical ... classifier".
                 from components.java
-                artifact sourcesJar
-                artifact javadocJar
                 groupId = project.group
                 artifactId = archivesBaseName
                 version = project.version

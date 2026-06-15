@@ -9,7 +9,18 @@ This is the DeployGate plugin for the Gradle. You can build and deploy your apps
 
 Snapshot? See [how to use snapshot](#snapshot)
 
-1 ) Add mavenCentral and the dependency of this plugin to your *build.gradle*.
+1 ) Apply this plugin to your app module.
+
+**Recommended: the plugins DSL** (resolves from the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.deploygate); no extra repository setup needed)
+
+```groovy
+plugins {
+    id "com.android.application" // It's better to apply the Android plugin first.
+    id "com.deploygate" version "the latest version"
+}
+```
+
+**Alternative: the legacy `buildscript` classpath** (resolves from Maven Central)
 
 ```groovy
 buildscript {
@@ -25,45 +36,14 @@ buildscript {
     classpath "com.deploygate:gradle:$deployGatePluginVersion"
   }
 }
-```
 
-If you are using the new plugin block DSL, then the following is required in your *settings.gradle*.
-
-```groovy
-pluginManagement {
-    repositories {
-        mavenCentral()
-    }
-    resolutionStrategy {
-        eachPlugin {
-            switch (requested.id.id) {
-                case "deploygate":
-                    useModule("com.deploygate:gradle:${required.version}")
-                    break
-            }
-        }
-    }
-}
-```
-
-2 ) Apply this plugin to your app module
-
-```groovy
-apply plugin: 'com.android.application' // It's better to apply Android Plugin for Gradle first.
-apply plugin: 'deploygate'
-```
-
-*The new plugin block DSL*
-
-```groovy
-plugins {
-    id "com.deploygate" version "the latest version"
-}
+apply plugin: 'com.android.application' // It's better to apply the Android plugin first.
+apply plugin: 'deploygate'              // the bare `deploygate` id keeps working for back-compat
 ```
 
 This plugin does not work with non-app modules and/or library modules correctly.
 
-3 ) Ready for deployments. Run tasks which you need. Please check the *Usage#Tasks* section for the detail of added tasks.
+2 ) Ready for deployments. Run tasks which you need. Please check the *Usage#Tasks* section for the detail of added tasks.
 
 ### If you are using `dg` command (for MacOSX)
 

@@ -107,6 +107,10 @@ abstract class UploadArtifactTask extends DefaultTask {
         ].join(File.separator))
     }
 
+    // Derived from the real task inputs (apkInfo/aabInfo + deployment); subclasses override this
+    // with @Internal too. Annotated so java-gradle-plugin's validatePlugins (now wired into `check`
+    // via the plugin-publish plugin) does not flag the abstract declaration as un-annotated.
+    @Internal
     @NotNull
     abstract Provider<InputParams> getInputParamsProvider()
 
