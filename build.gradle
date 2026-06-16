@@ -347,14 +347,14 @@ afterEvaluate {
         }
 
         publications {
-            release(MavenPublication) {
-                // The plugin-publish plugin enables withSourcesJar()/withJavadocJar() on the java
-                // component, so components.java already carries the sources and javadoc jars; adding
-                // them again here would fail with "multiple artifacts with the identical ... classifier".
-                from components.java
-                groupId = project.group
+            // java-gradle-plugin (via plugin-publish) already creates the `pluginMaven` publication
+            // from components.java, with the sources and javadoc jars attached. Reuse it for BOTH
+            // Maven Central and the Plugin Portal rather than maintaining a second hand-rolled
+            // publication: a single publication means a single set of artifacts and a single signing
+            // task, which avoids two Sign tasks writing the same `*.asc` files. Keep the Maven Central
+            // coordinate as `com.deploygate:gradle` (not the project name) for back-compat.
+            pluginMaven {
                 artifactId = archivesBaseName
-                version = project.version
                 pom {
                     name = "Gradle DeployGate Plugin"
                     description = "This is the DeployGate plugin for the Gradle. You can build and deploy your apps to DeployGate by running a single task."
@@ -378,12 +378,14 @@ afterEvaluate {
         }
 
         signing {
-            required { (isRelease() || System.getenv("RELEASE_SCRIPT_TEST") == "true") && gradle.taskGraph.hasTask("publishReleasePublicationToMavenRepository") }
+            required { (isRelease() || System.getenv("RELEASE_SCRIPT_TEST") == "true") && gradle.taskGraph.hasTask("publishPluginMavenPublicationToMavenRepository") }
 
             def signingKey = findProperty("signingKey")
             def signingPassword = findProperty("signingPassword")
             useInMemoryPgpKeys(signingKey, signingPassword)
-            publishing.publications.configureEach { publication -> sign publication }
+            // No explicit `sign` call: the plugin-publish plugin already signs the `pluginMaven` and
+            // marker publications once the signing plugin is applied. Adding our own `sign` here would
+            // double-sign the shared jars and produce conflicting `*.asc` outputs.
         }
     }
 }
