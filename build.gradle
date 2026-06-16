@@ -378,7 +378,15 @@ afterEvaluate {
         }
 
         signing {
-            required { (isRelease() || System.getenv("RELEASE_SCRIPT_TEST") == "true") && gradle.taskGraph.hasTask("publishPluginMavenPublicationToMavenRepository") }
+            // Match by task name rather than gradle.taskGraph.hasTask("<name>"): hasTask compares the
+            // full task path (e.g. ":publishPluginMavenPublicationToMavenRepository"), so the bare name
+            // never matched and signing was effectively never "required". Matching the name makes the
+            // gate fail fast when a release runs without a signing key.
+            required {
+                (isRelease() || System.getenv("RELEASE_SCRIPT_TEST") == "true") && gradle.taskGraph.allTasks.any {
+                    it.name == "publishPluginMavenPublicationToMavenRepository"
+                }
+            }
 
             def signingKey = findProperty("signingKey")
             def signingPassword = findProperty("signingPassword")
