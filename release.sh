@@ -3,10 +3,10 @@
 set -euo pipefail
 
 # Publish in a single build to:
-#   * Maven Central  -> publishReleasePublicationToMavenRepository (com.deploygate:gradle)
-#   * Plugin Portal  -> publishPlugins                            (id com.deploygate)
+#   * Maven Central  -> publishPluginMavenPublicationToMavenRepository (com.deploygate:gradle)
+#   * Plugin Portal  -> publishPlugins                                 (id com.deploygate)
 ./gradlew clean build \
-    publishReleasePublicationToMavenRepository \
+    publishPluginMavenPublicationToMavenRepository \
     publishPlugins \
     --stacktrace
 
