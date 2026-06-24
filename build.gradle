@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:8.6.0"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:8.7.0"
         // Publishes the plugin to the Gradle Plugin Portal. It transitively applies
         // java-gradle-plugin (and maven-publish), which generates the plugin marker
         // and the `com.deploygate` descriptor used by the plugins {} DSL.
