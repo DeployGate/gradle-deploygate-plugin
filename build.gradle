@@ -188,7 +188,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     testImplementation 'org.objenesis:objenesis:3.5'
-    testImplementation 'net.bytebuddy:byte-buddy:1.18.10'
+    testImplementation 'net.bytebuddy:byte-buddy:1.18.11'
 
     if (requireGroovy4) {
         testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
